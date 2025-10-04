@@ -1,12 +1,12 @@
-const API_URL = "http://localhost:8032/api/zona";
+const API_URL = "http://localhost:8032/api/cancha";
 
-export async function getZonas() {
+export async function getCanchas() {
   const res = await fetch(API_URL);
   if (!res.ok) throw new Error(`Error ${res.status}`);
   return res.json();
 }
 
-export async function createZona(payload) {
+export async function createCancha(payload) {
   const res = await fetch(API_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -16,7 +16,7 @@ export async function createZona(payload) {
   return res.json();
 }
 
-export async function updateZona(id, payload) {
+export async function updateCancha(id, payload) {
   const res = await fetch(`${API_URL}/${id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
@@ -26,7 +26,7 @@ export async function updateZona(id, payload) {
   return res.json();
 }
 
-export async function deleteZona(id) {
+export async function deleteCancha(id) {
   const res = await fetch(`${API_URL}/${id}/eliminar`, { method: "PUT" });
   if (!res.ok) throw new Error(`Error ${res.status}`);
   return res.json();

@@ -1,12 +1,12 @@
-const API_URL = "http://localhost:8032/api/zona";
+const API_URL = "http://localhost:8032/api/equipamientos";
 
-export async function getZonas() {
+export async function getEquipamientos() {
   const res = await fetch(API_URL);
   if (!res.ok) throw new Error(`Error ${res.status}`);
   return res.json();
 }
 
-export async function createZona(payload) {
+export async function createEquipamiento(payload) {
   const res = await fetch(API_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -16,7 +16,7 @@ export async function createZona(payload) {
   return res.json();
 }
 
-export async function updateZona(id, payload) {
+export async function updateEquipamiento(id, payload) {
   const res = await fetch(`${API_URL}/${id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
@@ -26,7 +26,7 @@ export async function updateZona(id, payload) {
   return res.json();
 }
 
-export async function deleteZona(id) {
+export async function deleteEquipamiento(id) {
   const res = await fetch(`${API_URL}/${id}/eliminar`, { method: "PUT" });
   if (!res.ok) throw new Error(`Error ${res.status}`);
   return res.json();

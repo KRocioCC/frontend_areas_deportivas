@@ -86,6 +86,7 @@ export default function AreadeportivaForm({ initialData, onSave, onCancel }) {
     if (!horaFinArea) e.horaFinArea = "Hora de fin obligatoria";
     return e;
   };
+  
 //ENVIO FORMULARIO
   const handleSubmit = (ev) => {
     ev.preventDefault();
@@ -94,6 +95,7 @@ export default function AreadeportivaForm({ initialData, onSave, onCancel }) {
       setErrors(e);
       return;
     }
+    
 //REVISO
     const payload = {
       ...(initialData?.idAreadeportiva ? { idAreadeportiva: initialData.idAreadeportiva } : {}),

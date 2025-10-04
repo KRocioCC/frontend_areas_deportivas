@@ -40,7 +40,7 @@ export default function AreadeportivaPage() {
     }
 
     const filtered = items.filter(item =>
-      item.nombreArea?.toLowerCase().includes(search.trim().toLowerCase()) // Filtra las Areadeportivas por nombre
+      item.nombreAreadeportiva?.toLowerCase().includes(search.trim().toLowerCase()) // Filtra las Areadeportivas por nombre
     );
     setItems(filtered); // Actualiza el estado con las Areadeportivas filtradas
   }
@@ -57,7 +57,7 @@ export default function AreadeportivaPage() {
 
   
 
-
+//revisar
   function handleViewDetail(item) {
     alert(`
       Nombre: ${item.nombreArea}
@@ -65,35 +65,40 @@ export default function AreadeportivaPage() {
       Email: ${item.emailArea}
       Teléfono: ${item.telefonoArea}
       Horario: ${item.horaInicioArea} - ${item.horaFinArea}
-      Estado: ${item.estadoArea ? "Activo" : "Inactivo"}
+      Estado: ${item.estado ? "Activo" : "Inactivo"}
     `);
   }
 
   async function handleDelete(id) {
     if (!id) return;
 
-    if (!window.confirm("¿Desactivar este Areadeportiva?")) return;
+    if (!window.confirm("¿Desactivar esta área deportiva?")) return;
 
     try {
       const itemToUpdate = items.find(x => x.idAreadeportiva === id);
       if (!itemToUpdate) return;
 
+      // Crear payload con estado = false
       const updated = {
         ...itemToUpdate,
-        estado: false,
+        estado: false // 🔹 Booleano correcto
       };
 
+      // Llamada al backend
       await AreadeportivaService.updateAreadeportiva(id, updated);
 
+      // Actualizar la lista local para reflejar el cambio
       setItems(prev =>
         prev.map(x =>
           x.idAreadeportiva === id ? { ...x, estado: false } : x
         )
       );
     } catch (err) {
-      alert("No se pudo desactivar");
+      console.error("Error desactivando área:", err);
+      alert("No se pudo desactivar el área deportiva");
     }
   }
+
 
 async function handleSave(payload) {
   try {
@@ -186,13 +191,13 @@ async function handleSave(payload) {
               <tr><td colSpan="7" style={{ textAlign: "center" }}>Sin datos</td></tr>
             ) : (
               items.map(item => (
-                <tr key={item.idAreadeportiva} className={!item.estadoArea ? "row-inactive" : ""}>
+                <tr key={item.idAreadeportiva} className={!item.estado ? "row-inactive" : ""}>
                   <td>{item.nombreArea}</td>
                   <td>{item.descripcionArea}</td>
                   <td>{item.emailArea}</td>
                   <td>{item.telefonoArea}</td>
                   <td>{item.horaInicioArea} - {item.horaFinArea}</td>
-                  <td>{item.estado ? "Activo" : "Activo"}</td>
+                  <td>{item.estado ? "Activo" : "Inactivo"}</td>
                   <td>
                     <button onClick={() => openEdit(item)}>Editar</button>
                     <button onClick={() => handleViewDetail(item)}>Ver detalle</button>
