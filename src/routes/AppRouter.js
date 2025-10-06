@@ -11,6 +11,12 @@ import QrPage from "../features/qrs/pages/js/QrPage";
 //import ReservaPage from "../features/reservas/pages/ReservaPage";
 //import ReportePage from "../features/reportes/pages/ReportePage";
 //import ConfiguracionPage from "../features/configuracion/pages/ConfiguracionPage";
+import PersonaPage from "../features/personas/pages/PersonaPage";
+import ClientePage from "../features/personas/pages/ClientePage";
+import AdministradorPage from "../features/personas/pages/AdministradorPage";
+import UsuarioControlPage from "../features/personas/pages/UsuarioControlPage";
+import InvitadoPage from "../features/personas/pages/InvitadoPage";
+
 
 function AppRouter() {
   return (
@@ -65,7 +71,22 @@ function AppRouter() {
           }
         />
         
+        <Route
+          path="/personas"
+          element={
+            <DashboardLayout>
+              <PersonaPage />
+            </DashboardLayout>
+          }
+        >
+          {/* SUBRUTAS */}
+          <Route path="clientes" element={<ClientePage />} />
+          <Route path="administradores" element={<AdministradorPage />} />
+          <Route path="usuarios-control" element={<UsuarioControlPage />} />
+          <Route path="invitados" element={<InvitadoPage />} />
+        </Route>
       </Routes>
+ 
     </BrowserRouter>
   );
 }

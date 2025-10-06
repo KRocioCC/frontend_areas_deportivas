@@ -1,5 +1,5 @@
 // src/components/layout/Sidebar.js
-import React from "react";
+import React, { useState } from "react";
 import { NavLink } from "react-router-dom"; // <- usa NavLink para active
 import {
   TfiLayoutSidebarLeft,
@@ -7,10 +7,13 @@ import {
   TfiLocationPin,
   TfiBasketball,
   TfiLayersAlt,
+  TfiUser,
 } from "react-icons/tfi";
 import "../../styles/Sidebar.css";
 
 function Sidebar({ open }) {
+  const [isPersonaOpen, setIsPersonaOpen] = useState(false);
+
   const menuItems = [
     { label: "Macrodistritos", icon: <TfiLayoutSidebarLeft />, path: "/macrodistritos" },
     { label: "Zonas", icon: <TfiMapAlt />, path: "/zonas" },
@@ -36,6 +39,27 @@ function Sidebar({ open }) {
               </NavLink>
             </li>
           ))}
+
+          {/* Submenú Persona */}
+          <li className="submenu">
+            <div
+              className="submenu-title"
+              onClick={() => setIsPersonaOpen(!isPersonaOpen)}
+            >
+              <span className="icon"><TfiUser /></span>
+              <span className="label">Persona</span>
+              <span className="arrow">{isPersonaOpen ? "▾" : "▸"}</span>
+            </div>
+            {isPersonaOpen && (
+              <ul className="submenu-list">
+                <li><NavLink to="/personas/clientes">Cliente</NavLink></li>
+                <li><NavLink to="/personas/administradores">Administrador</NavLink></li>
+                <li><NavLink to="/personas/usuarios-control">Usuario de Control</NavLink></li>
+                <li><NavLink to="/personas/invitados">Invitado</NavLink></li>
+              </ul>
+            )}
+          </li>
+
         </ul>
       </nav>
     </aside>
