@@ -4,6 +4,8 @@ import * as macrodistritoService from "../../../api/macrodistritoApi";
 // src/features/macrodistritos/pages/MacrodistritoPage.jsx
 
 import "../pages/macrodistritoPage.css"; // Importar CSS de la página
+//import Button from "../../../components/ui/Button";
+import SearchBar from "../../../components/ui/SearchInput";
 
 export default function MacrodistritoPage() {
   const [items, setItems] = useState([]);
@@ -112,29 +114,24 @@ export default function MacrodistritoPage() {
   return (
     <div className="macrodistrito-page card">
       <div className="page-header">
-        <h2>Macrodistritos</h2>
+        <h2 className="h-heading text-3xl mb-2" >Macrodistritos</h2>
 
         <div className="search-actions-container">
           <form onSubmit={handleSearch} className="search-form">
-            <input
-              className="search-input"
-              placeholder="Buscar por nombre..."
+            <SearchBar
               value={search}
-              onChange={e => setSearch(e.target.value)}
+              onChange={(e) => setSearch(e.target.value)}
+              onSearch={() => handleSearch()} 
+              onClear={() => { setSearch(""); load(); }}
+              placeholder="Buscar macrodistrito por nombre..."
+              size="md"
+              className="search-input"
             />
           </form>
+
           <div className="button-group">
             <button className="btn btn-secondary" onClick={handleSearch}>Buscar</button>
-            <button
-              type="button"
-              className="btn btn-accent"
-              onClick={() => {
-                setSearch("");
-                load();
-              }}
-            >
-              Limpiar
-            </button>
+
             <button className="btn btn-primary" onClick={openCreate}>
               Nuevo macrodistrito
             </button>

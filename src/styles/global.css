@@ -1,17 +1,6 @@
-:root {
-  --color-primary: #D92332;
-  --color-primary-white: #ee59658e;
-  --color-secondary: #41BFB3;
-  --color-background: #F2EFEB;
-  --color-white: #FFFFFF;
-  --color-accent: #F28627;
-  --color-danger: #F25E3D;
-  --font-family: 'Poppins', sans-serif;
-}
-
 body {
   margin: 0;
-  font-family: var(--font-family);
+  font-family: "Baloo Tamma 2", sans-serif;
   background: var(--color-background);
   color: #333;
 }

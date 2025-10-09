@@ -1,14 +1,31 @@
-body {
-  font-family: 'Poppins', sans-serif;
-  background-color: #F2EFEB;
-  margin: 0;
-}
+@import url('https://fonts.googleapis.com/css2?family=Alumni+Sans:wght@400;600;700&family=Baloo+Tamma+2:wght@400;500;600&family=Josefin+Slab:wght@400;500;600&family=Oswald:wght@400;500;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 
 /* Paleta */
 :root {
-  --primary: #D92332;
+  /* Paleta principal */
+  --primary: #D92332; 
   --secondary: #41BFB3;
   --light: #F2EFEB;
   --accent1: #F28627;
   --accent2: #F25E3D;
+
+  --color-primary: #D92332;
+  --color-primary-white: #ee59658e;
+  --color-secondary: #41BFB3;
+  --color-background: #F2EFEB;
+  --color-white: #FFFFFF;
+  --color-accent: #F28627;
+  --color-danger: #F25E3D;
+
+  --botoncrear: #41BFB3; 
+  --botoneditar: #062c4b; 
+  --botoneliminar: #f44336; 
+  --botonguardar: #FF9800; 
+
 }
+
