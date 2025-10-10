@@ -1,10 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState ,useMemo, useCallback} from "react";
 import EquipamientoForm from "../pages/EquipamientoForm";
 import * as EquipamientoService from "../../../api/EquipamientoApi";
 
 
 //import "../pages/EquipamientoPage.css"; // Importar CSS de la página
+import Button from "../../../components/ui/Button";
+import SearchBar from "../../../components/ui/SearchInput";
+import { Plus , Eye, Edit3, Trash2  } from "lucide-react";
 
+//import "../pages/CanchaForm.css"; 
+
+import CRUDTable from "../../../components/ui/CRUDTable";
 
 export default function EquipamientoPage() {
   const [items, setItems] = useState([]); //listadito de Equipamientos
@@ -14,11 +20,9 @@ export default function EquipamientoPage() {
   const [editing, setEditing] = useState(null); //Guarda la Equipamiento que se está editando. Si es
   const [search, setSearch] = useState("");//El valor del campo de búsqueda para filtrar las Equipamientos por nombre.
 
-  useEffect(() => {
-    load();
-  }, []);
+  
 
-  async function load() { 
+  const load = useCallback(async () =>  { 
     setLoading(true);
     setError(null);
     try {
@@ -29,8 +33,11 @@ export default function EquipamientoPage() {
     } finally {
       setLoading(false); // Finaliza el estado de carga
     }
-  }
+  },[]);
 
+  useEffect(() => {
+    load();
+  }, [load]);
 
   async function handleSearch(e) {
     e && e.preventDefault(); // Previene el comportamiento por defecto del formulario
@@ -47,17 +54,22 @@ export default function EquipamientoPage() {
   }
 
 
-  function openCreate() {
-    setEditing(null); // No hay Equipamiento en edición
-    setShowForm(true); // Muestra el formulario de creación
-  }
+  const openCreate = useCallback(() => {
+      setEditing(null);
+      setShowForm(true);
+    }, []);
+  
+  const openEdit = useCallback((item) => {
+    setEditing(item);
+    setShowForm(true);
+  }, []);
 
-  function openEdit(item) {
-    setEditing(item); // Establece la Equipamiento a editar
-    setShowForm(true); // Muestra el formulario de edición
-  }
+  const openView = useCallback((item) => {
+    setEditing({ ...item, _readonly: true }); // modo solo lectura
+    setShowForm(true);
+  }, []);
 
-  async function handleDelete(id) {
+  const handleDelete = useCallback(async (id) => {
     if (!id) return;
 
     if (!window.confirm("¿Desactivar este Equipamiento?")) return;
@@ -81,7 +93,7 @@ export default function EquipamientoPage() {
     } catch (err) {
       alert("No se pudo desactivar");
     }
-  }
+  }, [items]);
 
 async function handleSave(payload) {
   try {
@@ -116,6 +128,35 @@ async function handleSave(payload) {
     alert("Error guardando Equipamiento");
   }
 }
+  const columns = useMemo(() => [
+    { header: "ID", accessor: "idEquipamiento", width: 90, sortable: true, align: "right" },
+    { header: "Nombre", accessor: "nombreEquipamiento", sortable: true, truncate: 220 },
+    { header: "Tipo", accessor: "tipoEquipamiento",sortable: true, truncate: 220 },
+    { header: "Descripcion", accessor: "descripcion", sortable: true, truncate: 220 },
+    {
+      header: "Estado",
+      accessor: "estado",
+      width: 120,
+      sortable: true,
+      render: (v) => (
+        <span
+          className="inline-flex items-center rounded-full px-2 py-0.5 text-xs border"
+          style={{
+            background: v ? "rgba(14, 223, 202, 0.12)" : "rgba(168, 61, 37, 0.13)",
+            color: "#222",
+          }}
+        >
+          {v ? "Activo" : "Inactivo"}
+        </span>
+      ),
+    },
+  ], []);
+
+  const actions = useMemo(() => [
+    { label: "", icon: Eye, size: "sm",  variant: "botoncrear",     onClick: (row) => openView(row) },
+    { label: "", icon: Edit3, variant: "botoneditar",    onClick: (row) => openEdit(row) },
+    { label: "", icon: Trash2, variant: "botoneliminar", show: (row) => row.estado, onClick: (row) => handleDelete(row.idCancha) },
+  ], [openView, openEdit, handleDelete]);
 
 
 
@@ -126,84 +167,39 @@ async function handleSave(payload) {
 
         <div className="search-actions-container">
           <form onSubmit={handleSearch} className="search-form">
-            <input
-              className="search-input"
-              placeholder="Buscar por nombre..."
+            <SearchBar
               value={search}
-              onChange={e => setSearch(e.target.value)}
+              onChange={(e) => setSearch(e.target.value)}
+              onSearch={() => handleSearch()} 
+              onClear={() => { setSearch(""); load(); }}
+              placeholder="Buscar Equipamiento por nombre..."
+              size="md"
+              className="search-input"
             />
           </form>
           <div className="button-group">
-            <button className="btn btn-secondary" onClick={handleSearch}>Buscar</button>
-            <button
-              type="button"
-              className="btn btn-accent"
-              onClick={() => {
-                setSearch("");
-                load();
-              }}
-            >
-              Limpiar
-            </button>
-            <button className="btn btn-primary" onClick={openCreate}>
-              Nuevo Equipamiento
-            </button>
+            <Button variant="primary" size="sm" icon={Plus} onClick={openCreate} >
+              Nuevo
+            </Button>
           </div>
         </div>
       </div>
 
-      {loading ? (
-        <p>Cargando...</p>
-      ) : error ? (
+      {error ? (
         <p className="error">{error}</p>
       ) : (
-        <div className="table-wrap">
-          <table className="styled-table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Descripción</th>
-                <th>Estado</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.length === 0 ? (
-                <tr>
-                  <td colSpan="5" style={{ textAlign: "center" }}>
-                    Sin datos
-                  </td>
-                </tr>
-              ) : (
-                items.map(item => (
-                  <tr
-                    key={item.idEquipamiento}
-                    className={!item.estado ? "row-inactive" : ""}
-                  >
-                    <td>{item.idEquipamiento}</td>
-                    <td>{item.nombre}</td>
-                    <td>{item.descripcion}</td>
-                    <td>{item.estado ? "Activo" : "Inactivo"}</td>
-                    <td>
-                      <div className="table-actions">
-                        <button className="btn btn-secondary" onClick={() => openEdit(item)}>
-                          Editar
-                        </button>
-                        <button
-                          className="btn btn-danger"
-                          onClick={() => handleDelete(item.idEquipamiento)}
-                        >
-                          Desactivar
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+        <CRUDTable
+          columns={columns}
+          data={items}
+          actions={actions}
+          rowIdKey="idEquipamiento"
+          dense="md"
+          stickyHeader
+          pageSize={5}
+          initialSort={{ accessor: "idEquipamiento", direction: "asc" }}
+          loading={loading}
+          emptyMessage="Sin datos"
+        />
       )}
 
       {showForm && (

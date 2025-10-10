@@ -1,10 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState ,useMemo, useCallback} from "react";
 import CanchaForm from "../pages/CanchaForm";
 import * as CanchaService from "../../../api/CanchaApi";
+//import "../../macrodistritos/pages/macrodistritoPage.css";
+import Button from "../../../components/ui/Button";
+import SearchBar from "../../../components/ui/SearchInput";
+import { Plus , Eye, Edit3, Trash2  } from "lucide-react";
 
+import "../pages/CanchaForm.css"; 
 
-//import "../pages/CanchaPage.css"; // Importar CSS de la página
-
+import CRUDTable from "../../../components/ui/CRUDTable";
 
 export default function CanchaPage() {
   const [items, setItems] = useState([]); //listadito de Canchas
@@ -14,11 +18,9 @@ export default function CanchaPage() {
   const [editing, setEditing] = useState(null); //Guarda la Cancha que se está editando. Si es
   const [search, setSearch] = useState("");//El valor del campo de búsqueda para filtrar las Canchas por nombre.
 
-  useEffect(() => {
-    load();
-  }, []);
+  
 
-  async function load() { 
+  const load = useCallback(async () =>  { 
     setLoading(true);
     setError(null);
     try {
@@ -29,8 +31,11 @@ export default function CanchaPage() {
     } finally {
       setLoading(false); // Finaliza el estado de carga
     }
-  }
+  }, []);
 
+  useEffect(() => {
+    load();
+  }, [load]);
 
   async function handleSearch(e) {
     e && e.preventDefault(); // Previene el comportamiento por defecto del formulario
@@ -47,17 +52,22 @@ export default function CanchaPage() {
   }
 
 
-  function openCreate() {
-    setEditing(null); // No hay Cancha en edición
-    setShowForm(true); // Muestra el formulario de creación
-  }
+  const openCreate = useCallback(() => {
+      setEditing(null);
+      setShowForm(true);
+    }, []);
+  
+  const openEdit = useCallback((item) => {
+    setEditing(item);
+    setShowForm(true);
+  }, []);
 
-  function openEdit(item) {
-    setEditing(item); // Establece la Cancha a editar
-    setShowForm(true); // Muestra el formulario de edición
-  }
+  const openView = useCallback((item) => {
+    setEditing({ ...item, _readonly: true }); // modo solo lectura
+    setShowForm(true);
+  }, []);
 
-  async function handleDelete(id) {
+  const handleDelete = useCallback(async (id) =>{
     if (!id) return;
 
     if (!window.confirm("¿Desactivar este Cancha?")) return;
@@ -81,7 +91,7 @@ export default function CanchaPage() {
     } catch (err) {
       alert("No se pudo desactivar");
     }
-  }
+  }, [items]);
 
 async function handleSave(payload) {
   try {
@@ -93,9 +103,9 @@ async function handleSave(payload) {
         ? { ...editing, ...payload, idCancha: editing.idCancha } // Si estamos editando, actualizamos los datos
         : payload; // Si estamos creando, usamos los datos del formulario
 
-    // Verificar que el payload tiene la propiedad idMacrodistrito
-    if (!dataToSend.idMacrodistrito) {
-      console.error("Falta el idMacrodistrito en el payload");
+    // Verificar que el payload tiene la propiedad idCancha
+    if (!dataToSend.idAreadeportiva) {
+      console.error("Falta el idAreadeportiva en el payload");
       return;
     }
 
@@ -116,7 +126,36 @@ async function handleSave(payload) {
     alert("Error guardando Cancha");
   }
 }
+  const columns = useMemo(() => [
+    { header: "ID", accessor: "idCancha", width: 90, sortable: true, align: "right" },
+    { header: "Nombre", accessor: "nombre", sortable: true, truncate: 220 },
+    { header: "Capacidad", accessor: "capacidad",sortable: true, truncate: 220 },
+    { header: " Costo Hora", accessor: "costoHora", sortable: true, truncate: 220 },
+    { header: "Horario", render: (_, row) => `${row.horaInicio} - ${row.horaFin}`, truncate: 220 },
+    {
+      header: "Estado",
+      accessor: "estado",
+      width: 120,
+      sortable: true,
+      render: (v) => (
+        <span
+          className="inline-flex items-center rounded-full px-2 py-0.5 text-xs border"
+          style={{
+            background: v ? "rgba(14, 223, 202, 0.12)" : "rgba(168, 61, 37, 0.13)",
+            color: "#222",
+          }}
+        >
+          {v ? "Activo" : "Inactivo"}
+        </span>
+      ),
+    },
+  ], []);
 
+  const actions = useMemo(() => [
+    { label: "", icon: Eye, size: "sm",  variant: "botoncrear",     onClick: (row) => openView(row) },
+    { label: "", icon: Edit3, variant: "botoneditar",    onClick: (row) => openEdit(row) },
+    { label: "", icon: Trash2, variant: "botoneliminar", show: (row) => row.estado, onClick: (row) => handleDelete(row.idCancha) },
+  ], [openView, openEdit, handleDelete]);
 
 
   return (
@@ -126,84 +165,39 @@ async function handleSave(payload) {
 
         <div className="search-actions-container">
           <form onSubmit={handleSearch} className="search-form">
-            <input
-              className="search-input"
-              placeholder="Buscar por nombre..."
+            <SearchBar
               value={search}
-              onChange={e => setSearch(e.target.value)}
+              onChange={(e) => setSearch(e.target.value)}
+              onSearch={() => handleSearch()} 
+              onClear={() => { setSearch(""); load(); }}
+              placeholder="Buscar Cancha por nombre..."
+              size="md"
+              className="search-input"
             />
           </form>
           <div className="button-group">
-            <button className="btn btn-secondary" onClick={handleSearch}>Buscar</button>
-            <button
-              type="button"
-              className="btn btn-accent"
-              onClick={() => {
-                setSearch("");
-                load();
-              }}
-            >
-              Limpiar
-            </button>
-            <button className="btn btn-primary" onClick={openCreate}>
-              Nuevo Cancha
-            </button>
+            <Button variant="primary" size="sm" icon={Plus} onClick={openCreate} >
+              Nuevo
+            </Button>
           </div>
         </div>
       </div>
 
-      {loading ? (
-        <p>Cargando...</p>
-      ) : error ? (
+      {error ? (
         <p className="error">{error}</p>
       ) : (
-        <div className="table-wrap">
-          <table className="styled-table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Descripción</th>
-                <th>Estado</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.length === 0 ? (
-                <tr>
-                  <td colSpan="5" style={{ textAlign: "center" }}>
-                    Sin datos
-                  </td>
-                </tr>
-              ) : (
-                items.map(item => (
-                  <tr
-                    key={item.idCancha}
-                    className={!item.estado ? "row-inactive" : ""}
-                  >
-                    <td>{item.idCancha}</td>
-                    <td>{item.nombre}</td>
-                    <td>{item.descripcion}</td>
-                    <td>{item.estado ? "Activo" : "Inactivo"}</td>
-                    <td>
-                      <div className="table-actions">
-                        <button className="btn btn-secondary" onClick={() => openEdit(item)}>
-                          Editar
-                        </button>
-                        <button
-                          className="btn btn-danger"
-                          onClick={() => handleDelete(item.idCancha)}
-                        >
-                          Desactivar
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+        <CRUDTable
+          columns={columns}
+          data={items}
+          actions={actions}
+          rowIdKey="idCancha"
+          dense="md"
+          stickyHeader
+          pageSize={5}
+          initialSort={{ accessor: "idCancha", direction: "asc" }}
+          loading={loading}
+          emptyMessage="Sin datos"
+        />
       )}
 
       {showForm && (
