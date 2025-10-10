@@ -21,7 +21,7 @@ const SearchBar = React.memo(({
 }) => {
   const SIZES = {
     sm: { h: "h-9",   text: "text-sm", icon: 16, padX: "px-3", gap: "gap-2" },
-    md: { h: "h-10",  text: "text-base", icon: 18, padX: "px-4", gap: "gap-3" },
+    md: { h: "h-9",  text: "text-base", icon: 18, padX: "px-4", gap: "gap-3" },
     lg: { h: "h-12",  text: "text-lg", icon: 20, padX: "px-5", gap: "gap-5" },
   };
   const S = SIZES[size] || SIZES.md;
@@ -30,19 +30,19 @@ const SearchBar = React.memo(({
     <div className={`inline-flex items-center ${S.gap} ${className}`}>
       {/* Wrapper del input (el estilo vive aquí) */}
       <div
-        className={[
-          "relative flex items-center rounded-full shadow-sm",
-          "bg-[var(--light)] border ",
+        className={[ 
+          "border-none relative flex items-center rounded-full shadow-sm",
+          "bg-[var(--color-white)]",
           S.h, S.padX, "w-full",
           "focus-within:ring-2 focus-within:ring-[var(--color-primary)]",
           "transition-all duration-300 ease-in-out",
         ].join(" ")}
-        style={{ minWidth: "18rem" }} 
+        style={{ minWidth: "50rem" }} 
       >
         {/* Icono izquierda */}
         <Search
           size={S.icon}
-          className="text-[var(--primary)] opacity-80 mr-2"
+          className="border-none text-[var(--primary)] opacity-80 mr-2"
         />
 
         {/* Input (sin borde) */}
@@ -64,7 +64,7 @@ const SearchBar = React.memo(({
           <button
             type="button"
             onClick={onClear}
-            className="ml-2 rounded-full p-1 text-[var( --color-background:)] hover:text-[var( --color-background:)] transition"
+            className="ml-2 border-none rounded-full p-1 text-[var( --color-background:)] hover:text-[var( --color-background:)] transition"
             aria-label="Limpiar búsqueda"
           >
             <X size={S.icon} />

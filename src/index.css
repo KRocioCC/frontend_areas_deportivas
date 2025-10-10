@@ -8,6 +8,8 @@
 /* Paleta */
 :root {
   /* Paleta principal */
+  --font-josefin: 'Josefin Slab', serif;
+  --font-Balo: 'Baloo Tamma 2', sans-serif;
   --primary: #D92332; 
   --secondary: #41BFB3;
   --light: #F2EFEB;

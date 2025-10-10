@@ -1,7 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect,useMemo, useState } from "react";
 import AreadeportivaForm from "../pages/AreadeportivaForm";
 import * as AreadeportivaService from "../../../api/AreadeportivaApi";
 
+//import "../pages/macrodistritoPage.css";
+import Button from "../../../components/ui/Button";
+import SearchBar from "../../../components/ui/SearchInput";
+import { Plus , Eye, Edit3, Trash2  } from "lucide-react";
+
+import CRUDTable from "../../../components/ui/CRUDTable";
 
 //import "../pages/AreadeportivaPage.css"; // Importar CSS de la página
 
@@ -14,22 +20,23 @@ export default function AreadeportivaPage() {
   const [editing, setEditing] = useState(null); //Guarda la Areadeportiva que se está editando. Si es
   const [search, setSearch] = useState("");//El valor del campo de búsqueda para filtrar las Areadeportivas por nombre.
 
-  useEffect(() => {
-    load();
+  const load =useCallback(async () => {
+    setLoading(true);
+        setError(null);
+        try {
+          const data = await AreadeportivaService.getAreadeportiva();
+          setItems(Array.isArray(data) ? data : []);
+        } catch (err) {
+          setError("No se pudieron cargar los areadeportiva");
+        } finally {
+          setLoading(false);
+        }
   }, []);
 
-  async function load() {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await AreadeportivaService.getAreadeportiva(); // Llama a la función para obtener las Areadeportivas
-      setItems(Array.isArray(data) ? data : []); // Guarda las Areadeportivas en el estado
-    } catch (err) {
-      setError("No se pudieron cargar los Areadeportivas"); // Si hay un error, muestra el mensaje
-    } finally {
-      setLoading(false); // Finaliza el estado de carga
-    }
-  }
+  useEffect(() => {
+    load();
+  }, [load]);
+
 
   async function handleSearch(e) {
     e && e.preventDefault(); // Previene el comportamiento por defecto del formulario
@@ -40,36 +47,29 @@ export default function AreadeportivaPage() {
     }
 
     const filtered = items.filter(item =>
-      item.nombreAreadeportiva?.toLowerCase().includes(search.trim().toLowerCase()) // Filtra las Areadeportivas por nombre
+      item.nombreArea?.toLowerCase().includes(search.trim().toLowerCase()) // Filtra las Areadeportivas por nombre
     );
     setItems(filtered); // Actualiza el estado con las Areadeportivas filtradas
   }
 
-  function openCreate() {
+  const openCreate = useCallback(() =>  {
     setEditing(null); // No hay Areadeportiva en edición
     setShowForm(true); // Muestra el formulario de creación
-  }
+  },[])
 
-  function openEdit(item) {
-    setEditing(item); // Establece la Areadeportiva a editar
-    setShowForm(true); // Muestra el formulario de edición
-  }
-
+  const openEdit = useCallback((item) => {
+      setEditing(item);
+      setShowForm(true);
+  }, []);
   
+  const openView = useCallback((item) => {
+    setEditing({ ...item, _readonly: true });
+    setShowForm(true);
+  }, []);
 
-//revisar
-  function handleViewDetail(item) {
-    alert(`
-      Nombre: ${item.nombreArea}
-      Descripción: ${item.descripcionArea}
-      Email: ${item.emailArea}
-      Teléfono: ${item.telefonoArea}
-      Horario: ${item.horaInicioArea} - ${item.horaFinArea}
-      Estado: ${item.estado ? "Activo" : "Inactivo"}
-    `);
-  }
 
-  async function handleDelete(id) {
+
+  const handleDelete = useCallback(async (id) => {
     if (!id) return;
 
     if (!window.confirm("¿Desactivar esta área deportiva?")) return;
@@ -81,7 +81,7 @@ export default function AreadeportivaPage() {
       // Crear payload con estado = false
       const updated = {
         ...itemToUpdate,
-        estado: false // 🔹 Booleano correcto
+        estado: false // Booleano 
       };
 
       // Llamada al backend
@@ -97,7 +97,7 @@ export default function AreadeportivaPage() {
       console.error("Error desactivando área:", err);
       alert("No se pudo desactivar el área deportiva");
     }
-  }
+  },[items]);
 
 
 async function handleSave(payload) {
@@ -135,92 +135,88 @@ async function handleSave(payload) {
 }
 
 
+const columns = useMemo(() => [
+    { header: "ID", accessor: "idAreadeportiva", width: 90, sortable: true, align: "right" },
+    { header: "Nombre", accessor: "nombreArea", sortable: true, truncate: 220 },
+    { header: "Email", accessor: "emailArea", sortable: true, truncate: 220 },
+    { header: "Telefono", accessor: "telefonoArea", truncate: 220 },
+    { header: "Horario", render: (_, row) => `${row.horaInicioArea} - ${row.horaFinArea}`, truncate: 220 },
+    {
+      header: "Estado",
+      accessor: "estado",
+      width: 120,
+      sortable: true,
+      render: (v) => (
+        <span
+          className="inline-flex items-center rounded-full px-2 py-0.5 text-xs border"
+          style={{
+            background: v ? "rgba(14, 223, 202, 0.12)" : "rgba(168, 61, 37, 0.13)",
+            color: "#222",
+          }}
+        >
+          {v ? "Activo" : "Inactivo"}
+        </span>
+      ),
+    },
+  ], []);
+  
+  const actions = useMemo(() => [
+      { label: "", icon: Eye, size: "sm",  variant: "botoncrear",     onClick: (row) => openView(row) },
+      { label: "", icon: Edit3, variant: "botoneditar",    onClick: (row) => openEdit(row) },
+      { label: "", icon: Trash2, variant: "botoneliminar", show: (row) => row.estado, onClick: (row) => handleDelete(row.idMacrodistrito) },
+  ], [openView, openEdit, handleDelete]);
+
 
   return (
     <div className="Areadeportiva-page card">
       <div className="page-header">
-        <h2>Areadeportivas</h2>
+        <h2 className="h-heading text-2xl mb-2" >Areadeportivas</h2>
 
         <div className="search-actions-container">
           <form onSubmit={handleSearch} className="search-form">
-            <input
-              className="search-input"
-              placeholder="Buscar por nombre..."
+            <SearchBar
               value={search}
-              onChange={e => setSearch(e.target.value)}
+              onChange={(e) => setSearch(e.target.value)}
+              onSearch={() => handleSearch()} 
+              onClear={() => { setSearch(""); load(); }}
+              placeholder="Buscar Area Deportiva por nombre..."
+              size="md"
+              className="search-input"
             />
           </form>
           <div className="button-group">
-            <button className="btn btn-secondary" onClick={handleSearch}>Buscar</button>
-            <button
-              type="button"
-              className="btn btn-accent"
-              onClick={() => {
-                setSearch("");
-                load();
-              }}
-            >
-              Limpiar
-            </button>
-            <button className="btn btn-primary" onClick={openCreate}>
-              Nuevo Areadeportiva
-            </button>
+            <Button variant="primary" size="sm" icon={Plus} onClick={openCreate} >
+              Nuevo
+            </Button>
           </div>
         </div>
       </div>
 
-      {loading ? (
-        <p>Cargando...</p>
-      ) : error ? (
+      {error ? (
         <p className="error">{error}</p>
       ) : (
-        <table className="styled-table">
-          <thead>
-            <tr>
-              <th>Nombre</th>
-              <th>Descripción</th>
-              <th>Email</th>
-              <th>Teléfono</th>
-              <th>Horario</th>
-              <th>Estado</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.length === 0 ? (
-              <tr><td colSpan="7" style={{ textAlign: "center" }}>Sin datos</td></tr>
-            ) : (
-              items.map(item => (
-                <tr key={item.idAreadeportiva} className={!item.estado ? "row-inactive" : ""}>
-                  <td>{item.nombreArea}</td>
-                  <td>{item.descripcionArea}</td>
-                  <td>{item.emailArea}</td>
-                  <td>{item.telefonoArea}</td>
-                  <td>{item.horaInicioArea} - {item.horaFinArea}</td>
-                  <td>{item.estado ? "Activo" : "Inactivo"}</td>
-                  <td>
-                    <button onClick={() => openEdit(item)}>Editar</button>
-                    <button onClick={() => handleViewDetail(item)}>Ver detalle</button>
-                    {/*<button onClick={() => handleDeactivate(item.idAreadeportiva)}>Desactivar</button>*/}
-                    <button onClick={() => handleDelete(item.idAreadeportiva)}>Eliminar</button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+        <CRUDTable
+          columns={columns}
+          data={items}
+          actions={actions}
+          rowIdKey="idAreadeportiva"
+          dense="md"
+          stickyHeader
+          pageSize={5}
+          initialSort={{ accessor: "idAreadeportiva", direction: "asc" }}
+          loading={loading}
+          emptyMessage="Sin datos"
+        />
       )}
-
       {showForm && (
         <div className="modal">
           <div className="modal-content">
             <AreadeportivaForm
               initialData={editing}
-              onCancel={() => {
-                setShowForm(false);
-                setEditing(null);
-              }}
+              onCancel={() => { setShowForm(false); setEditing(null); }}
               onSave={handleSave}
+              // opcional: puedes forzar el modo aquí si no usas _readonly
+              // mode={editing?._readonly ? "view" : (editing ? "edit" : "create")}
             />
           </div>
         </div>

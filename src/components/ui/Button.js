@@ -4,7 +4,7 @@ import { Loader2 } from "lucide-react";
 
 const Button = React.memo(({
   variant = "primary",
-  size = "md",
+  size = "sm",
   children,
   onClick,
   icon: Icon,
@@ -17,7 +17,7 @@ const Button = React.memo(({
 }) => {
   // Tamaños 
   const SIZES = {
-    sm: { h: 38, font: 16, padX: 16, med: 22, inset: 10, icon: 22},
+    sm: { h: 36, font: 15, padX: 28, med: 28, inset: 2, icon: 22},
     md: { h: 44, font: 14, padX: 20, med: 34, inset: 2, icon: 18 }, //aqui lo diseñe segun loq ue creo
     lg: { h: 54, font: 16, padX: 24, med: 36, inset: 10, icon: 22 },
   };
@@ -71,7 +71,7 @@ const Button = React.memo(({
         whileHover={!disabled ? { y: -3, scale: 1.03 } : {}}
         whileTap={!disabled ? { scale: 0.97 } : {}}
         type={type}
-        className={`inline-flex items-center justify-center font-poppins font-semibold focus:outline-none ${className} ${disabled ? "opacity-70 cursor-not-allowed" : ""}`}
+        className={`inline-flex items-center justify-center focus:outline-none ${className} ${disabled ? "opacity-70 cursor-not-allowed" : ""}`}
         style={circleOuter}
         onClick={!disabled && !loading ? onClick : undefined}
         disabled={disabled || loading}
@@ -130,8 +130,8 @@ const Button = React.memo(({
       whileHover={!disabled ? { y: -3, scale: 1.015 } : {}}
       whileTap={!disabled ? { scale: 0.985 } : {}}
       type={type}
-      className={`relative inline-flex items-center justify-center font-poppins font-semibold uppercase tracking-wide focus:outline-none ${className} ${disabled ? "opacity-70 cursor-not-allowed" : "hover:brightness-105"}`}
-      style={pillStyle}
+      className={`relative inline-flex items-center justify-center font-Balo tracking-wide focus:outline-none ${className} ${disabled ? "opacity-70 cursor-not-allowed" : "hover:brightness-105"}`}
+      style={{...pillStyle, fontFamily: "var(--font-josefin)"}}
       onClick={!disabled && !loading ? onClick : undefined}
       disabled={disabled || loading}
       {...props}
@@ -152,7 +152,7 @@ const Button = React.memo(({
       {/* highlight debajo del contenido */}
       <span
         className="pointer-events-none absolute inset-0 rounded-full opacity-0 hover:opacity-20 transition-all"
-        style={{ background: "linear-gradient(120deg, rgba(255,255,255,.35), transparent 45%)", zIndex: 1 }}
+        style={{ background: "linear-gradient(120deg, rgba(255,255,255,.35), transparent 45%)", zIndex: 1 , fontFamily: "Baloo Tamma 2, sans-serif" }}
       />
     </motion.button>
   );

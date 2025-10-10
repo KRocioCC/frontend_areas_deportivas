@@ -4,92 +4,82 @@
 .search-actions-container {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-bottom: 20px;
+  gap: 10px;
   border: none;
 }
 
 .search-form {
   display: flex;
   flex: 1;
-  border: none;
+  border: none; 
 }
 
 .search-input {
   flex: 1;
-  padding: 8px 12px;
+  padding: 8px;
   border: none;
 }
-
 /* Grupo de botones para acciones */
 .button-group {
   display: flex;
   gap: 10px;
-  flex-wrap: wrap;
+  flex-wrap: wrap-reverse;
+  justify-content: flex-end;
 }
 
 /* Modal */
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 1000;
-  background-color: rgba(0, 0, 0, 0.5);
-  width: 100vw;
-  height: 100vh;
+
+.macrodistrito-form {
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.macrodistrito-form h3 {
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+  text-align: center;
+  color: #333;
+}
+
+.form-row {
+  margin-bottom: 1rem;
   display: flex;
-  align-items: center;
+  flex-direction: column;
+}
+
+.form-row label {
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+  color: #444;
+}
+
+.form-row input,
+.form-row textarea {
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.form-row input:disabled,
+.form-row textarea:disabled {
+  background-color: #f5f5f5;
+  color: #666;
+}
+
+.form-error {
+  color: #e74c3c;
+  font-size: 0.8rem;
+  margin-top: 0.2rem;
+}
+
+.form-actions {
+  display: flex;
   justify-content: center;
-}
-
-.modal-content {
-  background-color: white;
-  padding: 20px;
-  border-radius: 10px;
-  max-width: 500px;
-  width: 90%;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-}
-
-/* Estilo de fila inactiva */
-.row-inactive {
-  opacity: 0.6;
-  background-color: #f9f9f9;
-}
-
-/* Estilo de los botones */
-.btn {
-  padding: 6px 12px;
-  border: none;
-  border-radius: 4px;
-  color: white;
-  cursor: pointer;
-  font-weight: 500;
-  transition: background 0.3s ease;
-}
-
-.btn:hover {
-  opacity: 0.9;
-}
-
-/* Colores específicos para cada tipo de botón */
-.btn-primary {
-  background-color: var(--color-primary);
-}
-
-.btn-secondary {
-  background-color: var(--color-secondary);
-}
-
-.btn-accent {
-  background-color: var(--color-accent);
-}
-
-.btn-danger {
-  background-color: var(--color-danger);
-}
-
-/* Grupo de botones en la tabla */
-.table-actions button {
-  margin-right: 8px;
+  gap: 0.8rem;
+  margin-top: 1.5rem;
 }

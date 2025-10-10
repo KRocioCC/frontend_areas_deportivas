@@ -1,8 +1,23 @@
 // src/features/areadeportivas/pages/AreadeportivaForm.jsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
+import Button from "../../../components/ui/Button";
+import { Plus, X } from "lucide-react";
 import './Areadeportiva.css';
 
-export default function AreadeportivaForm({ initialData, onSave, onCancel }) {
+export default function AreadeportivaForm({ 
+  initialData, 
+  onSave, 
+  onCancel,
+  mode,}) {
+  
+  const computedMode = useMemo(() => {
+      if (mode) return mode;
+      if (initialData?._readonly) return "view";
+      return initialData ? "edit" : "create";
+  }, [mode, initialData]);
+  
+  const readonly = computedMode === "view";
+
   // Campos principales
   const [nombreArea, setNombreArea] = useState('');
   const [descripcionArea, setDescripcionArea] = useState('');
@@ -10,13 +25,14 @@ export default function AreadeportivaForm({ initialData, onSave, onCancel }) {
   const [telefonoArea, setTelefonoArea] = useState('');
   const [horaInicioArea, setHoraInicioArea] = useState('');
   const [horaFinArea, setHoraFinArea] = useState('');
-  const [estado, setEstado] = useState(true);
   const [urlImagen, setUrlImagen] = useState('');
   const [latitud, setLatitud] = useState('');
   const [longitud, setLongitud] = useState('');
+  const [estado, setEstado] = useState(true);
+
   // Llaves foráneas
   const [idZona, setIdZona] = useState(null);
-  const [idAdministrador, setIdAdministrador] = useState(null);
+  const [id, setId] = useState(null);
 
   const [zonas, setZonas] = useState([]); // Lista de zonas para select
   const [administradores, setAdministradores] = useState([]); // Lista de administradores
@@ -24,9 +40,10 @@ export default function AreadeportivaForm({ initialData, onSave, onCancel }) {
 
   // Cargar zonas y administradores al montar el componente
   useEffect(() => {
+
     const loadData = async () => {
       try {
-        const zonasRes = await fetch('http://localhost:8032/api/zonas');
+        const zonasRes = await fetch('http://localhost:8032/api/zona');
         const zonasData = await zonasRes.json();
         setZonas(Array.isArray(zonasData) ? zonasData : []);
 
@@ -56,7 +73,7 @@ export default function AreadeportivaForm({ initialData, onSave, onCancel }) {
       setLatitud(initialData.latitud ?? '');
       setLongitud(initialData.longitud ?? '');
       setIdZona(initialData.idZona ?? null);
-      setIdAdministrador(initialData.idAdministrador ?? null);
+      setId(initialData.id ?? null);
     } else {
       setNombreArea('');
       setDescripcionArea('');
@@ -69,17 +86,17 @@ export default function AreadeportivaForm({ initialData, onSave, onCancel }) {
       setLatitud('');
       setLongitud('');
       setIdZona(null);
-      setIdAdministrador(null);
+      setId(null);
     }
     setErrors({});
   }, [initialData]);
 
   // Validación del formulario
-  const validate = () => {
+  function validate() {
     const e = {};
     if (!nombreArea.trim()) e.nombreArea = "El nombre del área es obligatorio";
     if (!idZona) e.idZona = "Debe seleccionar una zona";
-    if (!idAdministrador) e.idAdministrador = "Debe seleccionar un administrador";
+    if (!id) e.id = "Debe seleccionar un administrador";
     if (!latitud) e.latitud = "Latitud es obligatoria";
     if (!longitud) e.longitud = "Longitud es obligatoria";
     if (!horaInicioArea) e.horaInicioArea = "Hora de inicio obligatoria";
@@ -110,70 +127,138 @@ export default function AreadeportivaForm({ initialData, onSave, onCancel }) {
       latitud: Number(latitud),
       longitud: Number(longitud),
       idZona: Number(idZona),
-      idAdministrador: Number(idAdministrador)
+      id: Number(id)
     };
 
     onSave(payload);
   };
 
+  const title =
+    computedMode === "view"
+      ? "Ver Area Deportiva"
+      : computedMode === "edit"
+      ? "Editar Area Deportiva"
+      : "Nuevo Area Deportiva";
+
   return (
     <form className="Areadeportiva-form" onSubmit={handleSubmit}>
-      <h3>{initialData ? "Editar Área Deportiva" : "Nueva Área Deportiva"}</h3>
+      <h3>{title}</h3>
 
       <div className="form-row">
         <label>Nombre del Área</label>
-        <input value={nombreArea} onChange={e => setNombreArea(e.target.value)} />
+        <input 
+          value={nombreArea} 
+          onChange={e => setNombreArea(e.target.value)} 
+          disabled={readonly}
+          aria-readonly={readonly}
+          className={readonly ? "field-readonly" : ""}
+        />
         {errors.nombreArea && <div className="form-error">{errors.nombreArea}</div>}
       </div>
 
       <div className="form-row">
         <label>Descripción</label>
-        <textarea value={descripcionArea} onChange={e => setDescripcionArea(e.target.value)} />
+        <textarea 
+          value={descripcionArea} 
+          onChange={e => setDescripcionArea(e.target.value)}
+          disabled={readonly}
+          aria-readonly={readonly}
+          className={readonly ? "field-readonly" : ""}
+          rows={4} 
+        />
       </div>
 
       <div className="form-row">
         <label>Email</label>
-        <input type="email" value={emailArea} onChange={e => setEmailArea(e.target.value)} />
+        <input 
+          type="email" 
+          value={emailArea} 
+          onChange={e => setEmailArea(e.target.value)} 
+          disabled={readonly}
+          aria-readonly={readonly}
+        />
       </div>
 
       <div className="form-row">
         <label>Teléfono</label>
-        <input value={telefonoArea} onChange={e => setTelefonoArea(e.target.value)} placeholder="8 dígitos" />
+        <input 
+          value={telefonoArea} 
+          onChange={e => setTelefonoArea(e.target.value)} 
+          placeholder="8 dígitos" 
+          disabled={readonly}
+          aria-readonly={readonly}
+        />
       </div>
 
       <div className="form-row">
         <label>Hora Inicio</label>
-        <input type="time" value={horaInicioArea} onChange={e => setHoraInicioArea(e.target.value)} />
+        <input type="time" 
+          value={horaInicioArea} 
+          onChange={e => setHoraInicioArea(e.target.value)}
+          disabled={readonly}
+          aria-readonly={readonly}
+        />
         {errors.horaInicioArea && <div className="form-error">{errors.horaInicioArea}</div>}
       </div>
 
       <div className="form-row">
         <label>Hora Fin</label>
-        <input type="time" value={horaFinArea} onChange={e => setHoraFinArea(e.target.value)} />
+        <input 
+          type="time" 
+          value={horaFinArea} 
+          onChange={e => setHoraFinArea(e.target.value)}
+          disabled={readonly}
+          aria-readonly={readonly}
+        />
         {errors.horaFinArea && <div className="form-error">{errors.horaFinArea}</div>}
       </div>
 
       <div className="form-row">
         <label>Latitud</label>
-        <input type="number" step="any" value={latitud} onChange={e => setLatitud(e.target.value)} />
+        <input 
+          type="number" 
+          step="any" 
+          value={latitud} 
+          onChange={e => setLatitud(e.target.value)} 
+          disabled={readonly}
+          aria-readonly={readonly}
+        />
         {errors.latitud && <div className="form-error">{errors.latitud}</div>}
       </div>
 
       <div className="form-row">
         <label>Longitud</label>
-        <input type="number" step="any" value={longitud} onChange={e => setLongitud(e.target.value)} />
+        <input 
+          type="number" 
+          step="any" 
+          value={longitud} 
+          onChange={e => setLongitud(e.target.value)}
+          disabled={readonly}
+          aria-readonly={readonly}
+        />
         {errors.longitud && <div className="form-error">{errors.longitud}</div>}
       </div>
 
       <div className="form-row">
         <label>Url</label>
-        <input type="string" step="any" value={urlImagen} onChange={e => setUrlImagen(e.target.value)} />
+        <input 
+          type="string" 
+          step="any" 
+          value={urlImagen} 
+          onChange={e => setUrlImagen(e.target.value)}
+          disabled={readonly}
+          aria-readonly={readonly} 
+        />
         {errors.urlImagen && <div className="form-error">{errors.urlImagen}</div>}
       </div>
 
       <div className="form-row">
         <label>Zona</label>
-        <select value={idZona ?? ''} onChange={e => setIdZona(Number(e.target.value))}>
+        <select value={idZona ?? ''} 
+          onChange={e => setIdZona(Number(e.target.value))}
+          disabled={readonly}
+          aria-readonly={readonly} 
+        >
           <option value="">Seleccione una zona</option>
           {zonas.map(z => (
             <option key={z.idZona} value={z.idZona}>{z.nombre}</option>
@@ -184,24 +269,48 @@ export default function AreadeportivaForm({ initialData, onSave, onCancel }) {
 
       <div className="form-row">
         <label>Administrador</label>
-        <select value={idAdministrador ?? ''} onChange={e => setIdAdministrador(Number(e.target.value))}>
+        <select value={id ?? ''} 
+          onChange={e => setId(Number(e.target.value))}
+          disabled={readonly}
+          aria-readonly={readonly} 
+        >
           <option value="">Seleccione un administrador</option>
           {administradores.map(a => (
-            <option key={a.idAdministrador} value={a.idAdministrador}>{a.nombre}</option>
+            <option key={a.id} 
+            value={a.id}>{a.nombre}</option>
           ))}
         </select>
-        {errors.idAdministrador && <div className="form-error">{errors.idAdministrador}</div>}
+        {errors.id && <div className="form-error">{errors.id}</div>}
       </div>
 
       <div className="form-row">
         <label className="checkbox-label">
-          <input type="checkbox" checked={estado} onChange={e => setEstado(e.target.checked)} /> Activo
+          <input 
+            type="checkbox" 
+            checked={estado} 
+            onChange={e => setEstado(e.target.checked)}
+            disabled={readonly}
+            aria-readonly={readonly} 
+          /> Activo
         </label>
+        
       </div>
 
       <div className="form-actions">
-        <button type="submit">Guardar</button>
-        <button type="button" className="btn-cancel" onClick={onCancel}>Cancelar</button>
+        {readonly ? (
+          <Button variant="primary" size="sm" icon={X} onClick={onCancel}>
+            Cerrar
+          </Button>
+        ) : (
+          <>
+            <Button type="submit" variant="accent1" size="sm" icon={Plus}>
+              Guardar
+            </Button>
+            <Button variant="primary" size="sm" icon={X} onClick={onCancel}>
+              Cancelar
+            </Button>
+          </>
+        )}
       </div>
     </form>
   );
