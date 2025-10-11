@@ -96,7 +96,7 @@ const CRUDTable = ({
     <div className="rounded-2xl border border-gray-200 overflow-hidden">
       <div className="overflow-auto">
         <table className="min-w-full text-sm table-fixed">
-          <thead className={stickyHeader ? "sticky top-0 z-10" : ""}>
+          <thead className={stickyHeader ? "sticky top-0 z-8" : ""}>
             <tr className="bg-gray-50">
               {columns.map((col, idx) => {
                 const active = sort?.accessor === col.accessor;
