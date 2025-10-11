@@ -32,7 +32,7 @@ const CRUDTable = ({
 }) => {
   const padY = dense === "sm" ? "py-2" : dense === "lg" ? "py-4" : "py-3";
   const cellBase = `px-4 ${padY} align-middle break-anywhere`;
-  const thBase = "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-900 select-none";
+  const thBase = "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-[var(--color-t-1)] select-none";
 
   // ---- Ordenamiento
   const [sort, setSort] = useState(initialSort);
@@ -96,7 +96,7 @@ const CRUDTable = ({
     <div className="rounded-2xl border border-gray-200 overflow-hidden">
       <div className="overflow-auto">
         <table className="min-w-full text-sm table-fixed">
-          <thead className={stickyHeader ? "sticky top-0 z-10" : ""}>
+          <thead className={stickyHeader ? "sticky top-0 z-8" : ""}>
             <tr className="bg-gray-50">
               {columns.map((col, idx) => {
                 const active = sort?.accessor === col.accessor;
@@ -196,16 +196,16 @@ const CRUDTable = ({
         <span className="text-xs text-gray-500">
           Página {page} de {totalPages}
         </span>
-        <button className="px-3 py-1 text-sm rounded-full border hover:bg-gray-50" onClick={() => go(1)} disabled={page === 1}>
+        <button className="px-3 py-1 text-sm  text-[var(--color-p-4)] bg-[var(--color-p-5)] rounded-full border hover:bg-gray-50 hover:text-[var(--color-t-1)] shadow-sm" onClick={() => go(1)} disabled={page === 1}>
           «
         </button>
-        <button className="px-3 py-1 text-sm rounded-full border hover:bg-gray-50" onClick={() => go(page - 1)} disabled={page === 1}>
+        <button className="px-3 py-1 text-sm text-[var(--color-p-4)]  bg-[var(--color-p-5)] rounded-full border hover:bg-gray-50 hover:text-[var(--color-t-1)] shadow-sm" onClick={() => go(page - 1)} disabled={page === 1}>
           Anterior
         </button>
-        <button className="px-3 py-1 text-sm rounded-full border hover:bg-gray-50" onClick={() => go(page + 1)} disabled={page === totalPages}>
+        <button className="px-3 py-1 text-sm text-[var(--color-p-4)] bg-[var(--color-p-5)] rounded-full border hover:bg-gray-50 hover:text-[var(--color-t-1)] shadow-sm" onClick={() => go(page + 1)} disabled={page === totalPages}>
           Siguiente
         </button>
-        <button className="px-3 py-1 text-sm rounded-full border hover:bg-gray-50" onClick={() => go(totalPages)} disabled={page === totalPages}>
+        <button className="px-3 py-1 text-sm text-[var(--color-p-4)]  bg-[var(--color-p-5)] rounded-full border hover:bg-gray-50 hover:text-[var(--color-t-1)] shadow-sm" onClick={() => go(totalPages)} disabled={page === totalPages}>
           »
         </button>
       </div>
