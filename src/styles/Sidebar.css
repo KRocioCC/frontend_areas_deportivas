@@ -18,7 +18,7 @@
   color: var(--sb-fg);
   overflow: hidden;
   transition: width 0.3s ease;
-  z-index: 90;
+  z-index: 10;
   padding: 15px;
 }
 

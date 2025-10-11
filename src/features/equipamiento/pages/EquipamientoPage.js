@@ -106,10 +106,10 @@ async function handleSave(payload) {
         : payload; // Si estamos creando, usamos los datos del formulario
 
     // Verificar que el payload tiene la propiedad idMacrodistrito
-    if (!dataToSend.idMacrodistrito) {
+    /*if (!dataToSend.idMacrodistrito) {
       console.error("Falta el idMacrodistrito en el payload");
       return;
-    }
+    }*/
 
     if (dataToSend.idEquipamiento) {
       const updated = await EquipamientoService.updateEquipamiento(dataToSend.idEquipamiento, dataToSend); // Actualiza la Equipamiento

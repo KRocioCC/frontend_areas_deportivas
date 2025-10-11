@@ -201,8 +201,11 @@ async function handleSave(payload) {
       )}
 
       {showForm && (
-        <div className="modal">
-          <div className="modal-content">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          {/* Backdrop blur effect */}
+          <div className="absolute inset-0 backdrop-blur-sm"></div>
+          
+          <div className="relative bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
             <CanchaForm
               initialData={editing}
               onCancel={() => {

@@ -1,0 +1,137 @@
+/* Fondo del modal */
+.cancha-view-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(6px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  font-family: "Baloo Tamma 2", sans-serif;
+}
+
+/* Contenedor principal */
+.cancha-view-modal {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  width: 90%;
+  max-width: 850px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Encabezado */
+.cancha-view-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+}
+
+.cancha-view-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.close-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.close-btn:hover {
+  transform: scale(1.1);
+}
+
+/* Cuerpo principal */
+.cancha-view-body {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.cancha-view-left {
+  flex: 1 1 40%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.cancha-view-img {
+  width: 100%;
+  max-width: 300px;
+  height: 230px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.cancha-view-right {
+  flex: 1 1 55%;
+}
+
+.cancha-nombre {
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.cancha-costo {
+  color: #0077cc;
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+.cancha-detalle {
+  margin: 4px 0;
+}
+
+.cancha-extra {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px dashed #ccc;
+  font-size: 0.95rem;
+}
+
+/* Pie de botones */
+.cancha-view-footer {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+  border-top: 1px solid #eee;
+  padding-top: 12px;
+}
+
+.footer-btn {
+  background: #0077cc;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+  font-weight: 600;
+}
+
+.footer-btn:hover {
+  background: #005fa3;
+  transform: scale(1.05);
+}
+
+/* Animación */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

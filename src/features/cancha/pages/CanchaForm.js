@@ -1,8 +1,9 @@
 // src/features/Canchas/pages/CanchaForm.jsx
 import React, { useEffect, useState, useMemo } from "react";
 import Button from "../../../components/ui/Button";
-import { Plus, X } from "lucide-react";
+import { Plus, X} from "lucide-react";
 import "../pages/CanchaForm.css";
+import CanchaViewModal from "./CanchaViewModal";
 
 export default function CanchaForm({
   initialData,
@@ -127,7 +128,6 @@ export default function CanchaForm({
     console.log("Payload a enviar:", payload); // revisa en DevTools -> Network si llega bien
     onSave(payload);
   };
-  
 
   const title =
     computedMode === "view"
@@ -136,164 +136,250 @@ export default function CanchaForm({
       ? "Editar Cancha"
       : "Nuevo Cancha";
 
+  if (computedMode === "view") {
+    return <CanchaViewModal initialData={initialData} onCancel={onCancel} />;
+  }
+
   return (
-    <form className="Cancha-form" onSubmit={handleSubmit}>
-      <h3>{title}</h3>
-
-      <div className="form-row">
-        <label>Nombre de la Cancha</label>
-        <input
-          value={nombre}
-          onChange={e => setNombre(e.target.value)}
-          disabled={readonly}
-        />
-        {errors.nombre && <div className="form-error">{errors.nombre}</div>}
-      </div>
-
-      <div className="form-row">
-        <label>Imagen de la Cancha (URL)</label>
-        <input
-          type="text"
-          value={urlImagen}
-          onChange={e => setUrlImagen(e.target.value)}
-          disabled={readonly}
-        />
-      </div>
-
-      <div className="form-row">
-        <label>Costo Por Hora</label>
-        <input
-          type="number"
-          step="0.01"
-          value={costoHora}
-          onChange={e => setCostoHora(e.target.value)}
-          disabled={readonly}
-        />
-        {errors.costoHora && <div className="form-error">{errors.costoHora}</div>}
-      </div>
-
-      <div className="form-row">
-        <label>Límite de personas</label>
-        <input
-          type="number"
-          step="1"
-          value={capacidad}
-          onChange={e => setCapacidad(e.target.value)}
-          disabled={readonly}
-        />
-        {errors.capacidad && <div className="form-error">{errors.capacidad}</div>}
-      </div>
-
-      <div className="form-row">
-        <label>Hora Inicio</label>
-        <input type="time"
-          value={horaInicio}
-          onChange={e => setHoraInicio(e.target.value)}
-          disabled={readonly}
-        />
-        {errors.horaInicio && <div className="form-error">{errors.horaInicio}</div>}
-      </div>
-
-      <div className="form-row">
-        <label>Hora Fin</label>
-        <input type="time"
-          value={horaFin}
-          onChange={e => setHoraFin(e.target.value)}
-          disabled={readonly}
-        />
-        {errors.horaFin && <div className="form-error">{errors.horaFin}</div>}
-      </div>
-
-      <div className="form-row">
-        <label>Tamaño</label>
-        <input
-          value={tamano}
-          onChange={e => setTamano(e.target.value)}
-          disabled={readonly}
-        />
-        {errors.tamano && <div className="form-error">{errors.tamano}</div>}
-      </div>
-
-      <div className="form-row">
-        <label>Tipo de Superficie</label>
-        <input
-          value={tipoSuperficie}
-          onChange={e => setTipoSuperficie(e.target.value)}
-          disabled={readonly}
-        />
-        {errors.tipoSuperficie && <div className="form-error">{errors.tipoSuperficie}</div>}
-      </div>
-
-      <div className="form-row">
-        <label>Cubierta</label>
-        <input
-          value={cubierta}
-          onChange={e => setCubierta(e.target.value)}
-          disabled={readonly}
-        />
-      </div>
-
-      <div className="form-row">
-        <label>Iluminación</label>
-        <input
-          value={iluminacion}
-          onChange={e => setIluminacion(e.target.value)}
-          disabled={readonly}
-        />
-      </div>
-
-      <div className="form-row">
-        <label>Mantenimiento</label>
-        <textarea
-          value={mantenimiento}
-          onChange={e => setMantenimiento(e.target.value)}
-          disabled={readonly}
-          rows={4}
-        />
-      </div>
-
-      <div className="form-row">
-        <label>Área Deportiva</label>
-        <select
-          value={idAreadeportiva ?? ""}
-          onChange={e => setIdAreadeportiva(e.target.value ? Number(e.target.value) : null)}
-          disabled={readonly}
+    <div className="p-6 max-h-[80vh] overflow-y-auto">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold text-gray-800">{title}</h2>
+        <button 
+          onClick={onCancel}
+          className="p-2 rounded-full hover:bg-gray-100 transition-colors"
         >
-          <option value="">Seleccione a que Área Deportiva Pertenece</option>
-          {Areadeportiva.map(z => (
-            <option key={z.idAreadeportiva} value={z.idAreadeportiva}>{z.nombreArea}</option>
-          ))}
-        </select>
-        {errors.idAreadeportiva && <div className="form-error">{errors.idAreadeportiva}</div>}
+          <X className="w-5 h-5 text-gray-600" />
+        </button>
       </div>
 
-      <div className="form-row">
-        <label className="checkbox-label">
-          <input
-            type="checkbox"
-            checked={estado}
-            onChange={e => setEstado(e.target.checked)}
-            disabled={readonly}
-          /> Activo
-        </label>
-      </div>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Sección General */}
+        <div className="bg-white p-6 rounded-lg shadow-sm border">
+          <h3 className="text-lg font-semibold mb-4">Información General</h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Nombre de la Cancha
+              </label>
+              <input
+                value={nombre}
+                onChange={e => setNombre(e.target.value)}
+                disabled={readonly}
+                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.nombre ? 'border-red-500' : 'border-gray-300'}`}
+              />
+              {errors.nombre && <div className="text-sm text-red-600">{errors.nombre}</div>}
+            </div>
 
-      <div className="form-actions">
-        {readonly ? (
-          <Button variant="primary" size="sm" icon={X} onClick={onCancel}>
-            Cerrar
-          </Button>
-        ) : (
-          <>
-            <Button type="submit" variant="accent1" size="sm" icon={Plus}>
-              Guardar
-            </Button>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Imagen de la Cancha (URL)
+              </label>
+              <input
+                type="text"
+                value={urlImagen}
+                onChange={e => setUrlImagen(e.target.value)}
+                disabled={readonly}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Costo Por Hora
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                value={costoHora}
+                onChange={e => setCostoHora(e.target.value)}
+                disabled={readonly}
+                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.costoHora ? 'border-red-500' : 'border-gray-300'}`}
+              />
+              {errors.costoHora && <div className="text-sm text-red-600">{errors.costoHora}</div>}
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Límite de personas
+              </label>
+              <input
+                type="number"
+                step="1"
+                value={capacidad}
+                onChange={e => setCapacidad(e.target.value)}
+                disabled={readonly}
+                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.capacidad ? 'border-red-500' : 'border-gray-300'}`}
+              />
+              {errors.capacidad && <div className="text-sm text-red-600">{errors.capacidad}</div>}
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Área Deportiva
+              </label>
+              <select
+                value={idAreadeportiva ?? ""}
+                onChange={e => setIdAreadeportiva(e.target.value ? Number(e.target.value) : null)}
+                disabled={readonly}
+                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.idAreadeportiva ? 'border-red-500' : 'border-gray-300'}`}
+              >
+                <option value="">Seleccione área deportiva</option>
+                {Areadeportiva.map(z => (
+                  <option key={z.idAreadeportiva} value={z.idAreadeportiva}>{z.nombreArea}</option>
+                ))}
+              </select>
+              {errors.idAreadeportiva && <div className="text-sm text-red-600">{errors.idAreadeportiva}</div>}
+            </div>
+          </div>
+        </div>
+
+        {/* Sección Horarios */}
+        <div className="bg-white p-6 rounded-lg shadow-sm border">
+          <h3 className="text-lg font-semibold mb-4">Horarios</h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Hora Inicio
+              </label>
+              <input
+                type="time"
+                value={horaInicio}
+                onChange={e => setHoraInicio(e.target.value)}
+                disabled={readonly}
+                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.horaInicio ? 'border-red-500' : 'border-gray-300'}`}
+              />
+              {errors.horaInicio && <div className="text-sm text-red-600">{errors.horaInicio}</div>}
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Hora Fin
+              </label>
+              <input
+                type="time"
+                value={horaFin}
+                onChange={e => setHoraFin(e.target.value)}
+                disabled={readonly}
+                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.horaFin ? 'border-red-500' : 'border-gray-300'}`}
+              />
+              {errors.horaFin && <div className="text-sm text-red-600">{errors.horaFin}</div>}
+            </div>
+          </div>
+        </div>
+
+        {/* Sección Detalles */}
+        <div className="bg-white p-6 rounded-lg shadow-sm border">
+          <h3 className="text-lg font-semibold mb-4">Detalles de la Cancha</h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Tamaño
+              </label>
+              <input
+                value={tamano}
+                onChange={e => setTamano(e.target.value)}
+                disabled={readonly}
+                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.tamano ? 'border-red-500' : 'border-gray-300'}`}
+              />
+              {errors.tamano && <div className="text-sm text-red-600">{errors.tamano}</div>}
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Tipo de Superficie
+              </label>
+              <input
+                value={tipoSuperficie}
+                onChange={e => setTipoSuperficie(e.target.value)}
+                disabled={readonly}
+                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.tipoSuperficie ? 'border-red-500' : 'border-gray-300'}`}
+              />
+              {errors.tipoSuperficie && <div className="text-sm text-red-600">{errors.tipoSuperficie}</div>}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Cubierta
+              </label>
+              <input
+                value={cubierta}
+                onChange={e => setCubierta(e.target.value)}
+                disabled={readonly}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Iluminación
+              </label>
+              <input
+                value={iluminacion}
+                onChange={e => setIluminacion(e.target.value)}
+                disabled={readonly}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+          </div>
+
+          <div className="mt-6">
+            <label className="block text-sm font-medium text-gray-700">
+              Mantenimiento
+            </label>
+            <textarea
+              value={mantenimiento}
+              onChange={e => setMantenimiento(e.target.value)}
+              disabled={readonly}
+              rows={4}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+        </div>
+
+        {/* Estado */}
+        <div className="bg-white p-6 rounded-lg shadow-sm border">
+          <div className="flex items-center">
+            <label className="inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={estado}
+                onChange={e => setEstado(e.target.checked)}
+                disabled={readonly}
+                className="sr-only"
+              />
+              <div className={`relative w-14 h-7 rounded-full transition-colors duration-200 ease-in-out ${estado ? 'bg-blue-600' : 'bg-gray-300'}`}>
+                <span className={`absolute left-1 top-1 bg-white w-5 h-5 rounded-full transition-transform duration-200 ease-in-out transform ${estado ? 'translate-x-7' : ''}`}></span>
+              </div>
+              <span className="ml-3 text-sm font-medium text-gray-700">Activo</span>
+            </label>
+          </div>
+        </div>
+
+        {/* Botones de acción */}
+        <div className="flex flex-col sm:flex-row gap-3 pt-4">
+          {readonly ? (
             <Button variant="primary" size="sm" icon={X} onClick={onCancel}>
-              Cancelar
+              Cerrar
             </Button>
-          </>
-        )}
-      </div>
-    </form>
+          ) : (
+            <>
+              <Button type="submit" variant="accent1" size="sm" icon={Plus}>
+                Guardar
+              </Button>
+              <Button variant="primary" size="sm" icon={X} onClick={onCancel}>
+                Cancelar
+              </Button>
+            </>
+          )}
+        </div>
+      </form>
+    </div>
   );
 }
