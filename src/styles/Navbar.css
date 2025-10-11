@@ -4,24 +4,69 @@
   left: 0;
   right: 0;
   height: 60px;
-  background: white;
+  background: var(--color-p-6);
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 10px 10px;
   z-index: 5;
 }
-.navbar-icons span {
-  margin-left: 15px;
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+.navbar-logo {
+  height: 40px;       
+  width: auto;        
+  margin-left: 30px;   
+  transition: transform 0.2s ease;
+}
+.navbar-logo:hover {
+  transform: scale(1.05);
+}
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--color-p-6);
+  padding: 8px 15px;
+  border-radius: 50px;
   cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.user-menu:hover {
+  background: var(--color-p-4);
+}
+
+.user-icon {
+  width: 30px;
+  height: 30px;
+  background: var(--color-p-4);
+  color: var(--color-p-1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
 }
 
 .toggle-btn {
-  background: var(--color-primary);
-  color: white;
+  background: var(--color-p-1);
+  color: var(--color-p-4);
   border: none;
-  padding: 8px 10px;
+  padding: 10px 10px;
   font-size: 1.2rem;
   cursor: pointer;
   border-radius: 50px;
+  transition: all 0.2s ease;
+}
+.toggle-btn:hover {
+  background: var(--color-p-3);
 }

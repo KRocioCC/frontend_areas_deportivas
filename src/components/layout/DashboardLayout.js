@@ -4,6 +4,7 @@ import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
 import "../../styles/Sidebar.css";
 
+
 function DashboardLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -13,12 +14,9 @@ function DashboardLayout({ children }) {
 
   return (
     <div className="dashboard-container">
-      <Sidebar open={sidebarOpen} />
+      <Sidebar open={sidebarOpen} toggleSidebar={toggleSidebar}/>
       <div className={`dashboard-main ${sidebarOpen ? "expanded" : "collapsed"}`}>
-
-
         <Navbar toggleSidebar={toggleSidebar} sidebarOpen={sidebarOpen} />
-
         <div className="dashboard-content">{children}</div>
       </div>
     </div>

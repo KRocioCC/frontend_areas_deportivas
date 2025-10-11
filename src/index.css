@@ -4,13 +4,8 @@
 @tailwind components;
 @tailwind utilities;
 
-
-/* Paleta */
 :root {
-  /* Paleta principal */
-  --font-josefin: 'Josefin Slab', serif;
-  --font-Balo: 'Baloo Tamma 2', sans-serif;
-  --primary: #D92332; 
+    --primary: #D92332; 
   --secondary: #41BFB3;
   --light: #F2EFEB;
   --accent1: #F28627;
@@ -27,7 +22,46 @@
   --botoncrear: #41BFB3; 
   --botoneditar: #062c4b; 
   --botoneliminar: #f44336; 
-  --botonguardar: #FF9800; 
+  --botonguardar: #FF9800;
+  /*colores para fondo*/
+  --color-p-1: #d61727;
+  --color-p-2: #f35734;
+  --color-p-3: #f38321;
+  --color-p-4: #F2EFEB;
+  --color-p-5: #46c4b7;
+  --color-p-6: #FFFFFF;
+  --color-p-7: #e7ae9e;
+  --color-p-8: #8a2628;
+
+  /*titulo super */
+  --font-Oswald: 'Oswald', sans-serif ;
+  /*titulo */
+  --font-Alumni: 'Alumni Sans', sans-serif;
+  /*texto */
+  --font-Balo: 'Baloo Tamma 2', sans-serif;
+  /*Boton*/
+  --font-josefin: 'Josefin Slab', serif;
+
+  --color-pb-1: #d61727ab;
+  --color-pb-2: #f25e3db0;
+  --color-pb-3: #f28627af;
+  --color-pb-4: #f2efeb9a;
+  --color-pb-5: #41bfb29f;
+  --color-pb-6: #FFFFFF;
+  --color-pb-7: #e7ae9ead;
+  --color-pb-8: #8a262893;
+
+  --color-b-1: #45bfb5;
+  --color-b-2: #2596be;
+  --color-b-3: #264f61;
+  --color-b-4: #701123;
+  --color-b-5: #FF9800;
+  --color-b-6: #f43822;
+
+  --color-t-1: #000000;
+  --color-t-2: #575454;
+  --color-t-3: #837d7d;
+  --color-t-4: #a39a9a;
 
 }
 

@@ -6,11 +6,13 @@ import {
   TfiMapAlt,
   TfiLocationPin,
   TfiBasketball,
-  TfiLayersAlt,
+  TfiLayersAlt//,
+  //TfiAngleRight,
+  //TfiAngleLeft
 } from "react-icons/tfi";
 import "../../styles/Sidebar.css";
 
-function Sidebar({ open }) {
+function Sidebar({ open/*,toggleSidebar*/}) {
   const menuItems = [
     { label: "Macrodistritos", icon: <TfiLayoutSidebarLeft />, path: "/macrodistritos" },
     { label: "Zonas", icon: <TfiMapAlt />, path: "/zonas" },
@@ -27,7 +29,7 @@ function Sidebar({ open }) {
             <li key={item.label}>
               <NavLink
                 to={item.path}
-                className={({ isActive }) => (isActive ? "active-link" : "")}
+                className={({ isActive }) => `sidebar-link ${isActive ? "active-link" : ""}`}
               >
                 <span className="icon">{item.icon}</span>
                 <span className="label">{item.label}</span>

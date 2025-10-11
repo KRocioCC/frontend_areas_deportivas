@@ -177,6 +177,7 @@ async function handleSave(payload) {
               className="search-input"
             />
           </form>
+          
           <div className="button-group">
             <Button variant="primary" size="sm" icon={Plus} onClick={openCreate} >
               Nuevo
