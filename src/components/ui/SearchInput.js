@@ -20,7 +20,7 @@ const SearchBar = React.memo(({
   className = "",
 }) => {
   const SIZES = {
-    sm: { h: "h-9",   text: "text-sm", icon: 16, padX: "px-3", gap: "gap-2" },
+    sm: { h: "h-7",   text: "text-sm", icon: 16, padX: "px-3", gap: "gap-2" },
     md: { h: "h-9",  text: "text-base", icon: 18, padX: "px-4", gap: "gap-3" },
     lg: { h: "h-12",  text: "text-lg", icon: 20, padX: "px-5", gap: "gap-5" },
   };
@@ -31,10 +31,10 @@ const SearchBar = React.memo(({
       {/* Wrapper del input (el estilo vive aquí) */}
       <div
         className={[ 
-          "border-none relative flex items-center rounded-full shadow-sm",
-          "bg-[var(--color-white)]",
+          "flex items-center rounded-full shadow-sm",
+          "bg-[var(--color-p-6)]",
           S.h, S.padX, "w-full",
-          "focus-within:ring-2 focus-within:ring-[var(--color-primary)]",
+          "focus-within:ring-2 focus-within:ring-[var(--color-p-5)]",
           "transition-all duration-300 ease-in-out",
         ].join(" ")}
         style={{ minWidth: "50rem" }} 
@@ -42,10 +42,10 @@ const SearchBar = React.memo(({
         {/* Icono izquierda */}
         <Search
           size={S.icon}
-          className="border-none text-[var(--primary)] opacity-80 mr-2"
+          className="text-[var(--color-p-5)] mr-2"
         />
 
-        {/* Input (sin borde) */}
+        {/* Input */}
         <input
           type="text"
           value={value}
@@ -64,7 +64,7 @@ const SearchBar = React.memo(({
           <button
             type="button"
             onClick={onClear}
-            className="ml-2 border-none rounded-full p-1 text-[var( --color-background:)] hover:text-[var( --color-background:)] transition"
+            className="ml-2 rounded-full p-1 text-[var(--color-p-5)] hover:text-[var(--color-p-1)] transition"
             aria-label="Limpiar búsqueda"
           >
             <X size={S.icon} />
@@ -77,7 +77,7 @@ const SearchBar = React.memo(({
         type="button"
         onClick={onSearch}
         className={[
-          "rounded-full bg-[var(--secondary)] text-white shadow-sm hover:brightness-110",
+          "rounded-full bg-[var(--color-p-5)] text-[var(--color-p-4)] shadow-sm hover:brightness-110",
           "transition-all duration-200",
           S.h, "px-5", S.text,
         ].join(" ")}

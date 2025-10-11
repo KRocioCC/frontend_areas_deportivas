@@ -12,6 +12,8 @@
   transition: width 0.3s ease;
   z-index: 20;
   padding: 15px;
+  font-family: var(--font-Alumni);
+  font-size:medium;
 }
 
 /* Expandido/Colapsado */
@@ -39,6 +41,7 @@
   align-items: center;
   gap: 10px;
   color: var(--color-p-4);
+  font-family: var(--font-Alumni);
   text-decoration: none;
   padding: 9px 12px;
   border-radius: 9999px;
@@ -90,7 +93,6 @@
   padding: 9px 12px;
   border-radius: 50px;
   cursor: pointer;
-  font-size: 1rem;
   transition: background 180ms ease, transform 120ms ease;
   opacity: 0.95;
 }
@@ -99,7 +101,6 @@
 .dropdown-header .label { white-space: nowrap; }
 .dropdown-header .arrow { 
   margin-left: auto; 
-  font-size: 1.2rem;
   transition: transform 0.2s ease;
 }
 /*
@@ -134,8 +135,8 @@
   font-size: 1.2rem;
   opacity: 0.8;
 }
-
-/* ===== Menú flotante para sidebar colapsado ===== */
+/*Me falta logica del flotante SARA*/
+/* =sidebar colapsado */
 .dropdown-item {
   position: relative;
 }
@@ -158,7 +159,7 @@
   color: var(--color-p-2);
 }
 
-/* Estilo del trigger cuando está activo */
+
 .active-trigger {
   background: var(--color-p-3);
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.432);
@@ -168,7 +169,6 @@
   background: var(--color-p-9);
 }
 
-/* Menú flotante (oculto por defecto) */
 .floating-menu {
   position: absolute;
   top: 0;
@@ -186,7 +186,6 @@
   transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
 }
 
-/* Mostrar el menú flotante al hacer hover sobre el ícono */
 .dropdown-item:hover .floating-menu {
   opacity: 1;
   visibility: visible;

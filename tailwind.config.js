@@ -12,6 +12,13 @@ module.exports = {
         josefin: ['var(--font-Josefin)'],
       },
       colors: {
+        'p-1': 'var(--color-p-1)',
+        'p-2': 'var(--color-p-2)',
+        'p-3': 'var(--color-p-3)',
+        'p-4': 'var(--color-p-4)',
+        'p-5': 'var(--color-p-5)',
+        'p-6': 'var(--color-p-6)',
+        'p-7': 'var(--color-p-7)',
         'pb-1': 'var(--color-pb-1)',
         'pb-2': 'var(--color-pb-2)',
         'pb-3': 'var(--color-pb-3)',
