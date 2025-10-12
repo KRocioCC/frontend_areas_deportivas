@@ -9,12 +9,12 @@ const Modal = ({
   title, 
   children, 
   footer,
-  size = "md"
+  size = "lg"
 }) => {
   const sizes = {
-    sm: "max-w-md",
-    md: "max-w-lg",
-    lg: "max-w-2xl"
+    sm: "max-w-lg",
+    md: "max-w-2xl",
+    lg: "max-w-6xl"
   };
 
   if (!isOpen) return null;

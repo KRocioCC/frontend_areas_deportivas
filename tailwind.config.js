@@ -4,7 +4,15 @@ module.exports = {
     './public/index.html',
     './src/**/*.{js,jsx,ts,tsx,html}'
   ],
-  extend: {
+  safelist: [
+    'max-w-lg',
+    'max-w-2xl',
+    'max-w-4xl',
+    'max-w-6xl',
+    'max-w-[95vw]'
+  ],
+  theme: {
+    extend: {
       fontFamily: {
         oswald: ['var(--font-Oswald)'],
         alumni: ['var(--font-Alumni)'],
@@ -39,6 +47,6 @@ module.exports = {
         't-4': 'var(--color-t-4)',
       },
     },
+  },
   plugins: [],
 }
-
