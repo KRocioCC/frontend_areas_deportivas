@@ -1,6 +1,7 @@
 // src/components/layout/Sidebar.js
 import React, { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
+import { TfiCalendar } from "react-icons/tfi";
 import {
   TfiLayoutSidebarLeft,
   TfiMapAlt,
@@ -35,6 +36,8 @@ function Sidebar({ open }) {
     { label: "Áreas Deportivas", icon: <TfiLocationPin />, path: "/areadeportiva" },
     { label: "Canchas", icon: <TfiBasketball />, path: "/canchas" },
     { label: "Equipamientos", icon: <TfiLayersAlt />, path: "/equipamientos" },
+    { label: "Calendario", icon: <TfiCalendar />, path: "/reservas/calendario" },
+
   ];
 
   const toggleUbicacion = () => {

@@ -7,6 +7,8 @@ import ZonaPage from "../features/zonas/pages/ZonaPage";
 import AreadeportivaPage from "../features/areadeportiva/pages/AreadeportivaPage";
 import CanchaPage from "../features/cancha/pages/CanchaPage";
 import EquipamientoPage from "../features/equipamiento/pages/EquipamientoPage";
+import CalendarioPage from "../features/calendario/pages/CalendarioPage";
+
 
 //import EspacioPage from "../features/espacios/pages/EspacioPage";
 //import UsuarioPage from "../features/usuarios/pages/UsuarioPage";
@@ -65,7 +67,18 @@ function AppRouter() {
               <EquipamientoPage /> 
             </DashboardLayout>
           }
-        />*
+        
+        />
+         {/* Ruta para calendario*/} 
+        <Route
+          path="/reservas/calendario"
+          element={
+            <DashboardLayout>
+              <CalendarioPage />
+            </DashboardLayout>
+          }
+        />
+
       </Routes>
     </BrowserRouter>
   );
