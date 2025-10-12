@@ -2,6 +2,8 @@
 import React, { useState } from "react";
 import { X, MessageCircle, Users, Clock } from "lucide-react";
 import Button from "../../../components/ui/Button";
+import ComentarioPanel from "../../comentario/pages/ComentarioPanel";
+
 
 export default function CanchaViewModal({ initialData, onCancel }) {
   const [showComments, setShowComments] = useState(false);
@@ -29,7 +31,7 @@ export default function CanchaViewModal({ initialData, onCancel }) {
       {/* Aqui ta el efecto desenfoque */}
       <div className="absolute inset-0 backdrop-blur-sm"></div>
       
-      <div className="relative bg-white rounded-x1 shadow-2xl max-w-3xl w-full max-h-[70vh] overflow-hidden flex">
+      <div className="relative bg-white rounded-xl shadow-2xl w-[70vw] h-[88vh] overflow-hidden flex">
         {/* contenidp principal */}
         <div className="flex-1 p-6 overflow-y-auto">{/*sara */}
           {/* Header with close button and comments toggle */}
@@ -141,40 +143,9 @@ export default function CanchaViewModal({ initialData, onCancel }) {
           </div>
         </div>
 
-        {/* Commentarios */}
-        {showComments && (
-          <div className="w-80 bg-gray-50 border-l border-gray-200 flex flex-col">
-            <div className="p-4 border-b border-gray-200">
-              <h3 className="font-semibold text-gray-800">Comentarios</h3>
-            </div>
-            <div className="flex-1 p-4 overflow-y-auto">
-              <div className="space-y-4">
-                {[1, 2, 3].map((item) => (
-                  <div key={item} className="bg-white p-3 rounded-lg shadow-sm">
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
-                      <div>
-                        <div className="font-medium text-sm">Usuario {item}</div>
-                      </div>
-                    </div>
-                    <p className="text-sm text-gray-600">
-                      Excelente cancha, muy bien mantenida y con buenos servicios.
-                    </p>
-                    <div className="text-xs text-gray-400 mt-2">Hace 2 días</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="p-4 border-t border-gray-200">
-              <textarea 
-                placeholder="Escribe un comentario..." 
-                className="w-full p-2 border border-gray-300 rounded-lg text-sm resize-none h-20"
-              />
-              <button className="mt-2 w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg text-sm transition-colors">
-                Enviar
-              </button>
-            </div>
-          </div>
+        {/* Comentarios */}
+        {showComments && (  
+        <ComentarioPanel canchaId={initialData.idCancha} />
         )}
       </div>
     </div>
