@@ -1,0 +1,112 @@
+.search-actions-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.search-form {
+  display: flex;
+  flex: 1;
+}
+
+.search-input {
+  flex: 1;
+  padding: 8px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* Grupo de botones para acciones */
+.button-group {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* 🔹 Modal */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  background-color: rgba(0, 0, 0, 0.5);
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  overflow-y: auto; 
+  padding: 2rem 0;
+}
+
+/* 🔹 Contenido del modal */
+.modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  margin: auto;
+  position: relative;
+  max-height: 95vh;
+  overflow-y: auto;
+  animation: slideIn 0.25s ease-out;
+}
+
+/* 🔹 Animación suave */
+@keyframes slideIn {
+  from {
+    transform: translateY(-15px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Estilo de fila inactiva */
+.row-inactive {
+  opacity: 0.6;
+  background-color: #f9f9f9;
+}
+
+/* 🔹 Botones generales */
+.btn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.3s ease;
+}
+
+.btn:hover {
+  opacity: 0.9;
+}
+
+/* Colores específicos para cada tipo de botón */
+.btn-primary {
+  background-color: var(--color-primary);
+}
+
+.btn-secondary {
+  background-color: var(--color-secondary);
+}
+
+.btn-accent {
+  background-color: var(--color-accent);
+}
+
+.btn-danger {
+  background-color: var(--color-danger);
+}
+
+/* Grupo de botones en la tabla */
+.table-actions button {
+  margin-right: 8px;
+}
