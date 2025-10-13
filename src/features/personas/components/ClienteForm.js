@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import "./personaForm.css";
 
 export default function ClienteForm({ initialData, onSave, onCancel }) {
-  // inicializamos con claves que usaremos en la UI: apaterno, amaterno
   const [form, setForm] = useState({
     nombre: "",
     apaterno: "",
@@ -19,7 +18,6 @@ export default function ClienteForm({ initialData, onSave, onCancel }) {
 
   useEffect(() => {
     if (initialData) {
-      // extraemos los valores del backend de forma consistente
       setForm({
         nombre: initialData.nombre ?? "",
         apaterno: initialData.apaterno ?? initialData.apellidoPaterno ?? "",
@@ -41,6 +39,11 @@ export default function ClienteForm({ initialData, onSave, onCancel }) {
     if (!form.telefono.trim()) e.telefono = "El teléfono es obligatorio";
     if (!form.email.trim()) e.email = "El correo electrónico es obligatorio";
     if (!form.categoria.trim()) e.categoria = "El estado del cliente es obligatorio";
+    
+    if (form.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+      e.email = "El formato del email no es válido";
+    }
+    
     return e;
   }
 
@@ -50,6 +53,9 @@ export default function ClienteForm({ initialData, onSave, onCancel }) {
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
   }
 
   function handleSubmit(ev) {
@@ -60,7 +66,6 @@ export default function ClienteForm({ initialData, onSave, onCancel }) {
       return;
     }
 
-    // Payload consistente con el backend
     const payload = {
       ...form,
       apaterno: form.apaterno ?? "",
@@ -79,12 +84,17 @@ export default function ClienteForm({ initialData, onSave, onCancel }) {
   }
 
   return (
-    <form className="cliente-form" onSubmit={handleSubmit}>
+    <form className="persona-form" onSubmit={handleSubmit}>
       <h3>{initialData ? "Editar Cliente" : "Nuevo Cliente"}</h3>
 
       <div className="form-row">
-        <label>Nombre</label>
-        <input name="nombre" value={form.nombre} onChange={handleChange} />
+        <label>Nombre *</label>
+        <input 
+          name="nombre" 
+          value={form.nombre} 
+          onChange={handleChange}
+          className={errors.nombre ? 'error-field' : ''}
+        />
         {errors.nombre && <div className="form-error">{errors.nombre}</div>}
       </div>
 
@@ -94,25 +104,46 @@ export default function ClienteForm({ initialData, onSave, onCancel }) {
       </div>
 
       <div className="form-row">
-        <label>Apellido Materno</label>
-        <input name="amaterno" value={form.amaterno} onChange={handleChange} />
+        <label>Apellido Materno *</label>
+        <input 
+          name="amaterno" 
+          value={form.amaterno} 
+          onChange={handleChange}
+          className={errors.amaterno ? 'error-field' : ''}
+        />
         {errors.amaterno && <div className="form-error">{errors.amaterno}</div>}
       </div>
 
       <div className="form-row">
         <label>Fecha de Nacimiento</label>
-        <input type="date" name="fechaNacimiento" value={form.fechaNacimiento} onChange={handleChange} />
+        <input 
+          type="date" 
+          name="fechaNacimiento" 
+          value={form.fechaNacimiento} 
+          onChange={handleChange} 
+        />
       </div>
 
       <div className="form-row">
-        <label>Teléfono</label>
-        <input name="telefono" value={form.telefono} onChange={handleChange} />
+        <label>Teléfono *</label>
+        <input 
+          name="telefono" 
+          value={form.telefono} 
+          onChange={handleChange}
+          className={errors.telefono ? 'error-field' : ''}
+        />
         {errors.telefono && <div className="form-error">{errors.telefono}</div>}
       </div>
 
       <div className="form-row">
-        <label>Email</label>
-        <input name="email" type="email" value={form.email} onChange={handleChange} />
+        <label>Email *</label>
+        <input 
+          name="email" 
+          type="email" 
+          value={form.email} 
+          onChange={handleChange}
+          className={errors.email ? 'error-field' : ''}
+        />
         {errors.email && <div className="form-error">{errors.email}</div>}
       </div>
 
@@ -132,14 +163,20 @@ export default function ClienteForm({ initialData, onSave, onCancel }) {
       </div>
 
       <div className="form-row">
-        <label>Estado del Cliente</label>
-        <input name="categoria" value={form.categoria} onChange={handleChange} />
+        <label>Estado del Cliente *</label>
+        <input 
+          name="categoria" 
+          value={form.categoria} 
+          onChange={handleChange}
+          className={errors.categoria ? 'error-field' : ''}
+        />
         {errors.categoria && <div className="form-error">{errors.categoria}</div>}
       </div>
 
       <div className="form-row checkbox">
-        <label>
-          <input type="checkbox" name="estado" checked={form.estado} onChange={handleChange} /> Activo
+        <label className="checkbox-label">
+          <input type="checkbox" name="estado" checked={form.estado} onChange={handleChange} /> 
+          Cliente activo
         </label>
       </div>
 

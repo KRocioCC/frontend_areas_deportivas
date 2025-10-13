@@ -3,7 +3,6 @@ import ClienteForm from "../components/ClienteForm";
 import * as clienteService from "../../../api/clienteApi";
 import "../pages/userPage.css";
 
-
 function normalizeCliente(raw = {}) {
   const apaterno =
     raw.apaterno ??
@@ -11,7 +10,7 @@ function normalizeCliente(raw = {}) {
     raw.a_paterno ??
     raw.apellidoPaterno ??
     raw.apellido_paterno ??
-    raw.apellidoPaterno ?? ""; // fallback
+    raw.apellidoPaterno ?? "";
 
   const amaterno =
     raw.amaterno ??
@@ -31,7 +30,6 @@ function normalizeCliente(raw = {}) {
   const estado = typeof raw.estado === "boolean" ? raw.estado : !!raw.estado;
 
   return {
-    // propiedades usadas en la UI
     id,
     nombre: raw.nombre ?? "",
     apaterno,
@@ -42,7 +40,6 @@ function normalizeCliente(raw = {}) {
     urlImagen,
     estado,
     categoria: raw.categoria ?? raw.estado_cliente ?? "",
-    // mantener raw original por si queremos hacer merge directo
     _raw: raw,
   };
 }
@@ -52,7 +49,9 @@ export default function ClientePage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [showDetail, setShowDetail] = useState(false);
   const [editing, setEditing] = useState(null);
+  const [selectedCliente, setSelectedCliente] = useState(null);
   const [search, setSearch] = useState("");
 
   useEffect(() => {
@@ -96,38 +95,41 @@ export default function ClientePage() {
   }
 
   function openEdit(cliente) {
-    // cliente viene normalizado; pasamos el normalizado (contiene apaterno/amaterno)
     setEditing(cliente);
     setShowForm(true);
+  }
+
+  function openDetail(cliente) {
+    setSelectedCliente(cliente);
+    setShowDetail(true);
+  }
+
+  function closeModals() {
+    setShowForm(false);
+    setShowDetail(false);
+    setEditing(null);
+    setSelectedCliente(null);
   }
 
   async function handleSave(payload) {
     try {
       if (editing && editing.id) {
-        // obtener la versión completa desde el backend (server keys)
         const existingFromServer = await clienteService.getClienteById(editing.id);
-
-        // merge: propiedades del payload (form) sobreescriben las del servidor
-        // notar: payload usa apaterno/amaterno (normalizado), existingFromServer puede usar apaterno/amaterno u otra variante
         const merged = {
           ...existingFromServer,
           ...payload,
-          // aseguramos valores no nulos para campos NOT NULL del backend
           nombre: payload.nombre ?? existingFromServer.nombre ?? "",
           telefono: payload.telefono ?? existingFromServer.telefono ?? "",
           email: payload.email ?? existingFromServer.email ?? "",
-          // exportamos las variantes de apellido que el backend pueda necesitar:
           apaterno: payload.apaterno ?? payload.aPaterno ?? existingFromServer.apaterno ?? existingFromServer.aPaterno ?? existingFromServer.apellidoPaterno ?? "",
           amaterno: payload.amaterno ?? payload.aMaterno ?? existingFromServer.amaterno ?? existingFromServer.aMaterno ?? existingFromServer.apellidoMaterno ?? "",
         };
 
         console.log("PUT payload (merged):", merged);
         const updated = await clienteService.updateCliente(editing.id, merged);
-        // normalizamos la respuesta y actualizamos la lista
         const normalized = normalizeCliente(updated);
         setClientes((prev) => prev.map((c) => (c.id === normalized.id ? normalized : c)));
       } else {
-        // Crear: construimos un payload que incluya las variantes que el backend podría esperar
         const createPayload = {
           nombre: payload.nombre ?? "",
           fechaNacimiento: payload.fechaNacimiento || null,
@@ -136,7 +138,6 @@ export default function ClientePage() {
           urlImagen: payload.urlImagen ?? "",
           estado: Boolean(payload.estado),
           categoria: payload.categoria ?? "",
-          // variantes de apellidos (enviamos varias para asegurar compatibilidad)
           apaterno: payload.apaterno ?? payload.aPaterno ?? payload.apellidoPaterno ?? "",
           aPaterno: payload.apaterno ?? payload.aPaterno ?? payload.apellidoPaterno ?? "",
           apellidoPaterno: payload.apaterno ?? payload.aPaterno ?? payload.apellidoPaterno ?? "",
@@ -150,8 +151,7 @@ export default function ClientePage() {
         setClientes((prev) => [normalizeCliente(created), ...prev]);
       }
 
-      setShowForm(false);
-      setEditing(null);
+      closeModals();
     } catch (err) {
       console.error("handleSave error:", err);
       alert("Error guardando cliente. Revisa la consola para más detalle.");
@@ -159,32 +159,33 @@ export default function ClientePage() {
   }
 
   async function handleDelete(id) {
-    if (!window.confirm("¿Eliminar este cliente?")) return;
+    if (!window.confirm("¿Estás seguro de que deseas eliminar este cliente?")) return;
     try {
       await clienteService.deleteCliente(id);
       setClientes((prev) => prev.filter((c) => c.id !== id));
     } catch (err) {
       console.error("delete error:", err);
-      alert("Error al eliminar");
+      alert("Error al eliminar el cliente");
     }
   }
 
   async function toggleEstado(cliente) {
     if (!cliente.id) return;
 
-    const confirmMsg = cliente.estado ? "¿Desactivar este cliente?" : "¿Activar este cliente?";
+    const confirmMsg = cliente.estado ? 
+      "¿Desactivar este cliente?" : 
+      "¿Activar este cliente?";
+    
     if (!window.confirm(confirmMsg)) return;
 
     try {
       console.log("estado actual:", cliente.estado);
-
       const response = await clienteService.cambiarEstado(cliente.id, !cliente.estado);
 
       if (response && (response.id || response.estado !== undefined)) {
         const updatedNormalized = normalizeCliente(response);
         setClientes(prev => prev.map(c => (c.id === updatedNormalized.id ? updatedNormalized : c)));
       } else {
-
         setClientes(prev =>
           prev.map(c => (c.id === cliente.id ? { ...c, estado: !c.estado } : c))
         );
@@ -195,24 +196,86 @@ export default function ClientePage() {
     }
   }
 
+  function DetailModal({ cliente, onClose, onEdit }) {
+    if (!cliente) return null;
 
+    return (
+      <div className="modal">
+        <div className="modal-content detail-modal">
+          <div className="detail-content">
+            <div className="detail-header">
+              {cliente.urlImagen ? (
+                <img
+                  src={cliente.urlImagen}
+                  alt={`${cliente.nombre} ${cliente.apaterno}`}
+                  className="detail-avatar"
+                  onError={(e) => (e.target.style.display = "none")}
+                />
+              ) : (
+                <div className="avatar-placeholder" style={{width: '70px', height: '70px'}}>
+                  SIN IMG
+                </div>
+              )}
+              <div className="detail-title">
+                <h3>{cliente.nombre} {cliente.apaterno} {cliente.amaterno}</h3>
+                <div className="detail-subtitle">Cliente #{cliente.id}</div>
+              </div>
+              <span className={`status-badge ${cliente.estado ? 'status-active' : 'status-inactive'}`}>
+                {cliente.estado ? 'Activo' : 'Inactivo'}
+              </span>
+            </div>
 
+            <div className="detail-grid">
+              <div className="detail-item">
+                <span className="detail-label">Email</span>
+                <span className="detail-value">{cliente.email || <span className="empty-text">No especificado</span>}</span>
+              </div>
+              <div className="detail-item">
+                <span className="detail-label">Teléfono</span>
+                <span className="detail-value">{cliente.telefono || <span className="empty-text">No especificado</span>}</span>
+              </div>
+              <div className="detail-item">
+                <span className="detail-label">Fecha de Nacimiento</span>
+                <span className="detail-value">{cliente.fechaNacimiento || <span className="empty-text">No especificada</span>}</span>
+              </div>
+              <div className="detail-item">
+                <span className="detail-label">Categoría</span>
+                <span className="detail-value">{cliente.categoria || <span className="empty-text">No especificada</span>}</span>
+              </div>
+              <div className="detail-item">
+                <span className="detail-label">Apellido Paterno</span>
+                <span className="detail-value">{cliente.apaterno || <span className="empty-text">No especificado</span>}</span>
+              </div>
+              <div className="detail-item">
+                <span className="detail-label">Apellido Materno</span>
+                <span className="detail-value">{cliente.amaterno || <span className="empty-text">No especificado</span>}</span>
+              </div>
+            </div>
 
-
-
-
-
+            <div className="detail-actions">
+              <button className="btn btn-secondary" onClick={onClose}>
+                Cerrar
+              </button>
+              <button className="btn btn-primary" onClick={() => onEdit(cliente)}>
+                Editar Cliente
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="cliente-page card">
+    <div className="cliente-page">
       <div className="page-header">
-        <h2>Clientes</h2>
-
+        <h2>Gestión de Clientes</h2>
+        
         <div className="search-actions-container">
           <form onSubmit={handleSearch} className="search-form">
             <input
               className="search-input"
-              placeholder="Buscar por nombre..."
+              placeholder="Buscar cliente por nombre..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -221,76 +284,95 @@ export default function ClientePage() {
             <button className="btn btn-secondary" onClick={handleSearch}>
               Buscar
             </button>
-            <button className="btn btn-accent" onClick={() => loadClientes()}>
+            <button className="btn btn-accent" onClick={loadClientes}>
               Limpiar
             </button>
             <button className="btn btn-primary" onClick={openCreate}>
-              Nuevo cliente
+              Nuevo Cliente
             </button>
           </div>
         </div>
       </div>
 
       {loading ? (
-        <p>Cargando...</p>
+        <div className="loading">
+          <p>Cargando clientes...</p>
+        </div>
       ) : error ? (
-        <p className="error">{error}</p>
+        <div className="error">{error}</div>
       ) : (
         <div className="table-wrap">
           <table className="styled-table">
             <thead>
               <tr>
-                <th>ID</th>
+                <th>Imagen</th>
                 <th>Nombre</th>
-                <th>Apellido Paterno</th>
-                <th>Apellido Materno</th>
-                <th>Fecha Nacimiento</th>
                 <th>Email</th>
                 <th>Teléfono</th>
-                <th>Imagen</th>
                 <th>Estado</th>
-                <th>Estado Cliente</th>
                 <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
               {clientes.length === 0 ? (
                 <tr>
-                  <td colSpan="11" style={{ textAlign: "center" }}>
-                    Sin datos
+                  <td colSpan="6" style={{ textAlign: "center", padding: "40px" }}>
+                    No se encontraron clientes
                   </td>
                 </tr>
               ) : (
                 clientes.map((c) => (
                   <tr key={c.id} className={!c.estado ? "row-inactive" : ""}>
-                    <td>{c.id}</td>
-                    <td>{c.nombre}</td>
-                    <td>{c.apaterno}</td>
-                    <td>{c.amaterno}</td>
-                    <td>{c.fechaNacimiento}</td>
+                    <td>
+                      {c.urlImagen ? (
+                        <img
+                          src={c.urlImagen}
+                          alt={`${c.nombre} ${c.apaterno}`}
+                          className="avatar"
+                          onError={(e) => {
+                            e.target.style.display = "none";
+                            e.target.nextSibling.style.display = "flex";
+                          }}
+                        />
+                      ) : (
+                        <div className="avatar-placeholder">
+                          SIN IMG
+                        </div>
+                      )}
+                    </td>
+                    <td>
+                      <strong>{c.nombre} {c.apaterno}</strong>
+                      <br />
+                      <small style={{ color: '#666' }}>{c.amaterno}</small>
+                    </td>
                     <td>{c.email}</td>
                     <td>{c.telefono}</td>
                     <td>
-                      {c.urlImagen && (
-                        <img
-                          src={c.urlImagen}
-                          alt="foto"
-                          style={{ width: "50px", height: "50px", borderRadius: "8px" }}
-                          onError={(e) => (e.target.style.display = "none")}
-                        />
-                      )}
+                      <span className={`status-badge ${c.estado ? 'status-active' : 'status-inactive'}`}>
+                        {c.estado ? 'Activo' : 'Inactivo'}
+                      </span>
                     </td>
-                    <td>{c.estado ? "Activo" : "Inactivo"}</td>
-                    <td>{c.categoria}</td>
                     <td>
                       <div className="table-actions">
-                        <button className="btn btn-secondary" onClick={() => openEdit(c)}>
-                          Editar
+                        <button 
+                          className="btn btn-success" 
+                          onClick={() => openDetail(c)}
+                          title="Ver detalles"
+                        >
+                          Ver
                         </button>
-                        <button className="btn btn-warning" onClick={() => toggleEstado(c)}>
-                          {c.estado ? "Desactivar" : "Activar"}
+                        <button 
+                          className="btn btn-warning" 
+                          onClick={() => toggleEstado(c)}
+                          title={c.estado ? 'Desactivar' : 'Activar'}
+                        >
+                          {c.estado ? 'Desactivar' : 'Activar'}
                         </button>
-                        <button className="btn btn-danger" onClick={() => handleDelete(c.id)}>
+                        <button 
+                          className="btn btn-danger" 
+                          onClick={() => handleDelete(c.id)}
+                          title="Eliminar"
+                        >
                           Eliminar
                         </button>
                       </div>
@@ -305,17 +387,26 @@ export default function ClientePage() {
 
       {showForm && (
         <div className="modal">
-          <div className="modal-content scrollable-modal">
+          <div className="modal-content">
             <ClienteForm
-              initialData={editing ? editing : null}
-              onCancel={() => {
-                setShowForm(false);
-                setEditing(null);
-              }}
+              initialData={editing}
+              onCancel={closeModals}
               onSave={handleSave}
             />
           </div>
         </div>
+      )}
+
+      {showDetail && selectedCliente && (
+        <DetailModal
+          cliente={selectedCliente}
+          onClose={closeModals}
+          onEdit={(cliente) => {
+            setEditing(cliente);
+            setShowDetail(false);
+            setShowForm(true);
+          }}
+        />
       )}
     </div>
   );
