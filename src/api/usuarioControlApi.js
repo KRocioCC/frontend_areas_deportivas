@@ -1,53 +1,84 @@
 const API_URL = "http://localhost:8032/api/usuario_control";
 
-export async function getUsuariosControl() {
-  const res = await fetch(API_URL + "/activos");
-  if (!res.ok) throw new Error(`Error ${res.status}`);
-  return res.json();
+async function request(url, options = {}) {
+  const defaultHeaders = {
+    "Accept": "application/json",
+  };
+
+  const fetchOptions = {
+    ...options,
+    headers: {
+      ...defaultHeaders,
+      ...(options.headers || {}),
+    },
+  };
+
+  const res = await fetch(url, fetchOptions);
+
+  if (!res.ok) {
+    let msg = `${res.status} ${res.statusText}`;
+    try {
+      const errBody = await res.text();
+      if (errBody) msg += ` - ${errBody}`;
+    } catch (e) {
+      // ignore
+    }
+    throw new Error(msg);
+  }
+
+  if (res.status === 204 || res.headers.get("Content-Length") === "0") {
+    return null;
+  }
+
+  const text = await res.text();
+  if (!text) return null;
+  try {
+    return JSON.parse(text);
+  } catch (e) {
+    return text;
+  }
+}
+
+export async function getUsuariosControl(activos = false) {
+  const url = activos ? `${API_URL}/activos` : API_URL;
+  return request(url);
 }
 
 export async function getUsuarioControlById(id) {
-  const res = await fetch(`${API_URL}/${id}`);
-  if (!res.ok) throw new Error(`Error ${res.status}`);
-  return res.json();
+  return request(`${API_URL}/${id}`);
+}
+
+export async function searchUsuariosControl(nombre) {
+  return request(`${API_URL}/buscar/${encodeURIComponent(nombre)}`);
 }
 
 export async function createUsuarioControl(payload) {
-  const res = await fetch(API_URL, {
+  return request(API_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
-  if (!res.ok) throw new Error(`Error ${res.status}`);
-  return res.json();
 }
 
 export async function updateUsuarioControl(id, payload) {
-  const res = await fetch(`${API_URL}/${id}`, {
+  return request(`${API_URL}/${id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
-  if (!res.ok) throw new Error(`Error ${res.status}`);
-  return res.json();
 }
 
 export async function deleteUsuarioControl(id) {
-  const res = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
-  if (!res.ok) throw new Error(`Error ${res.status}`);
-  return res.json();
+  return request(`${API_URL}/${id}`, { method: "DELETE" });
 }
 
-export async function cambiarEstadoUsuarioControl(id, nuevoEstado) {
-  const res = await fetch(`${API_URL}/${id}/estado?estado=${nuevoEstado}`, {
+export async function cambiarEstadoUsuarioControl(id, estado) {
+  if (typeof estado !== "boolean") {
+    throw new Error("El valor de 'estado' debe ser booleano.");
+  }
+
+  const url = `${API_URL}/${id}/estado?estado=${encodeURIComponent(estado)}`;
+  return request(url, {
     method: "PATCH",
   });
-  if (!res.ok) throw new Error(`Error ${res.status}`);
-  return res.json();
-}
-
-export async function searchUsuarioControl(nombre) {
-  const res = await fetch(`${API_URL}/buscar/${nombre}`);
-  if (!res.ok) throw new Error(`Error ${res.status}`);
-  return res.json();
 }
