@@ -1,0 +1,94 @@
+/* Contenedor general */
+.reservas-page{
+  max-width: 1200px;
+  margin: 1.5rem auto 3rem;
+  padding: 0 1rem;
+  color: #0f172a;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+}
+
+/* Header */
+.reservas-header{
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.header-left{ display: grid; gap: .25rem; }
+.volver-link{
+  text-decoration: none;
+  color: #2c6ad6;
+  font-weight: 600;
+  width: fit-content;
+}
+.volver-link:hover{ text-decoration: underline; }
+.header-title{
+  margin: 0;
+  font-size: clamp(1.25rem, 1vw + 1.1rem, 1.6rem);
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.header-right{ display: flex; align-items: center; gap: .5rem; }
+.count-badge{
+  background: #eef2f7;
+  color: #334155;
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+  padding: .35rem .7rem;
+  font-weight: 700;
+  font-size: .9rem;
+}
+
+/* Grid de cards */
+.cards-grid{
+  display: flex;
+  flex-direction: column; 
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 1rem;
+}
+
+/* Skeletons */
+.skeleton-card{
+  background: #fff;
+  border: 1px solid #e6eaf0;
+  border-radius: 14px;
+  padding: 1rem;
+  box-shadow: 0 8px 28px rgba(16,24,40,.06);
+}
+.sk-header, .sk-row{
+  border-radius: 8px;
+  background: linear-gradient(90deg, #eef2f7, #f5f7fb, #eef2f7);
+  background-size: 200% 100%;
+  animation: shimmer 1.2s infinite;
+}
+.sk-header{ height: 24px; margin-bottom: .9rem; }
+.sk-row{ height: 14px; margin: .5rem 0; }
+@keyframes shimmer{
+  0%{ background-position: 200% 0; }
+  100%{ background-position: -200% 0; }
+}
+
+/* Estado vacío y error */
+.empty-state, .error-box{
+  background: #fff;
+  border: 1px solid #e6eaf0;
+  border-radius: 16px;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  box-shadow: 0 12px 36px rgba(16,24,40,.08);
+  margin-top: 1rem;
+}
+.empty-emoji{ font-size: 2rem; margin-bottom: .5rem; }
+.btn-ghost{
+  margin-top: .75rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: .55rem 1rem;
+  font-weight: 700;
+  color: #0f172a;
+  cursor: pointer;
+}
+.btn-ghost:hover{ background: #eef2f7; }

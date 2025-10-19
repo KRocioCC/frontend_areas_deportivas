@@ -1,0 +1,92 @@
+/* Contenedor */
+.reserva-wrapper{
+  max-width:1100px;
+  margin:2rem auto;
+  padding:0 1rem;
+  font-family:ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+  color:#0f172a;
+}
+
+/* Card base */
+.card{
+  background:#fff;
+  border:1px solid #e6eaf0;
+  border-radius:18px;
+  box-shadow:0 12px 36px rgba(16,24,40,.08);
+  padding:1.5rem 1.5rem 1.25rem;
+}
+
+/* Header: título/horario izq, botones der */
+.row-between{ display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; }
+.card-header{ border-bottom:1px solid #eef2f7; padding-bottom:1rem; margin-bottom:1.25rem; }
+
+.header-left{ display:grid; gap:.35rem; }
+.titulo-principal{
+  margin:0;
+  font-size:1.45rem;
+  line-height:1.2;
+  font-weight:800;
+  letter-spacing:.2px;
+}
+.evento-horario{
+  display:inline-flex;
+  gap:.5rem;
+  align-items:center;
+  font-weight:700;
+  font-size:1rem;
+  color:#b7791f; /* dorado sutil */
+  opacity:.95;
+}
+.ico-reloj{ transform:translateY(1px); }
+
+.header-actions{
+  display:flex;
+  gap:.5rem;
+  align-items:center;
+  flex-wrap:wrap;
+}
+
+/* Grid de 3 columnas con tarjetas suaves */
+.grid-info{
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:1rem;
+}
+@media (max-width:1024px){ .grid-info{ grid-template-columns:repeat(2,1fr); } }
+@media (max-width:720px){
+  .row-between{ flex-direction:column; align-items:stretch; gap:.75rem; }
+  .header-actions{ justify-content:flex-start; }
+  .grid-info{ grid-template-columns:1fr; }
+}
+
+.info-box{
+  background:#f9fbfd;
+  border:1px solid #eef2f7;
+  border-radius:14px;
+  padding:1rem;
+}
+.box-title{ margin:0 0 .75rem; font-weight:800; color:#334155; font-size:1rem; }
+
+.kv{ list-style:none; margin:0; padding:0; }
+.kv li{
+  display:grid;
+  grid-template-columns:160px 1fr;
+  gap:.5rem;
+  font-size:.95rem;
+  padding:.28rem 0;
+}
+.kv strong{ color:#475569; font-weight:700; }
+.kv span{ color:#1f2937; }
+
+/* Botones (mismos dos de siempre) */
+.btn{
+  appearance:none; border:1px solid transparent; border-radius:12px;
+  padding:.6rem 1rem; font-weight:700; cursor:pointer;
+  transition:transform .03s ease, background-color .2s ease, box-shadow .2s ease;
+  box-shadow:0 1px 2px rgba(16,24,40,.06);
+}
+.btn:active{ transform:translateY(1px); }
+.btn--danger{ background:#ef4444; color:#fff; border-color:#dc2626; }
+.btn--danger:hover{ background:#dc2626; }
+.btn--success{ background:#22c55e; color:#fff; border-color:#16a34a; }
+.btn--success:hover{ background:#16a34a; }
