@@ -2,94 +2,109 @@ import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import DashboardLayout from "../components/layout/DashboardLayout";
 
+// Contexto y protección
+import { AuthProvider } from "../auth/context/AuthContext";
+import ProtectedRoute from "../auth/components/ProtectedRoute";
+
+// Páginas
 import MacrodistritoPage from "../features/macrodistritos/pages/MacrodistritoPage";
 import ZonaPage from "../features/zonas/pages/ZonaPage";
 import AreadeportivaPage from "../features/areadeportiva/pages/AreadeportivaPage";
 import CanchaPage from "../features/cancha/pages/CanchaPage";
 import EquipamientoPage from "../features/equipamiento/pages/EquipamientoPage";
 import CalendarioPage from "../features/calendario/pages/CalendarioPage";
-import CalendarioReservasPage from "../features/calendario/pages/CalendarioReservaPage"; // 
+import CalendarioReservasPage from "../features/calendario/pages/CalendarioReservaPage";
 
-
-//import EspacioPage from "../features/espacios/pages/EspacioPage";
-//import UsuarioPage from "../features/usuarios/pages/UsuarioPage";
-//import ReservaPage from "../features/reservas/pages/ReservaPage";
-//import ReportePage from "../features/reportes/pages/ReportePage";
-//import ConfiguracionPage from "../features/configuracion/pages/ConfiguracionPage";
+// Login
+import Login from "../auth/components/Login";
 
 function AppRouter() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Navigate to="/macrodistritos" replace />} />
-        
-        <Route
-          path="/macrodistritos"
-          element={
-            <DashboardLayout>
-              <MacrodistritoPage />
-            </DashboardLayout>
-          }
-        />
-        
-        {/* Ruta para Zonas */}
-        <Route
-          path="/zonas"
-          element={
-            <DashboardLayout>
-              <ZonaPage /> 
-            </DashboardLayout>
-          }
-        />
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          {/* Redirección por defecto → login */}
+          <Route path="/" element={<Navigate to="/login" replace />} />
 
-        {/* Ruta para Áreas Deportivas */}
-        <Route
-          path="/areadeportiva"
-          element={
-            <DashboardLayout>
-              <AreadeportivaPage /> 
-            </DashboardLayout>
-          }
-        />
-        {/*Ruta para Canchas */}
-        <Route
-          path="/canchas"
-          element={
-            <DashboardLayout>
-              <CanchaPage /> 
-            </DashboardLayout>
-          }
-        />
-        {/* Ruta para espacios*/}
-        <Route
-          path="/equipamientos"
-          element={
-            <DashboardLayout>
-              <EquipamientoPage /> 
-            </DashboardLayout>
-          }
-        
-        />
-         {/* Ruta para calendario*/} 
-        <Route
-          path="/reservas/calendario"
-          element={
-            <DashboardLayout>
-              <CalendarioPage />
-            </DashboardLayout>
-          }
-        />
-        <Route
-          path="/reservas/:fecha"
-          element={
-            <DashboardLayout>
-              <CalendarioReservasPage />
-            </DashboardLayout>
-          }
-        />
+          {/* Login público */}
+          <Route path="/login" element={<Login />} />
 
-      </Routes>
-    </BrowserRouter>
+          {/* Ruta accesible para cualquier usuario autenticado */}
+          <Route
+            path="/canchas"
+            element={
+              <ProtectedRoute>
+                <DashboardLayout>
+                  <CanchaPage />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Rutas solo para admin o superusuario */}
+          <Route
+            path="/macrodistritos"
+            element={
+              <ProtectedRoute requireAdmin>
+                <DashboardLayout>
+                  <MacrodistritoPage />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/zonas"
+            element={
+              <ProtectedRoute requireAdmin>
+                <DashboardLayout>
+                  <ZonaPage />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/areadeportiva"
+            element={
+              <ProtectedRoute requireAdmin>
+                <DashboardLayout>
+                  <AreadeportivaPage />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/equipamientos"
+            element={
+              <ProtectedRoute requireAdmin>
+                <DashboardLayout>
+                  <EquipamientoPage />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/reservas/calendario"
+            element={
+              <ProtectedRoute requireAdmin>
+                <DashboardLayout>
+                  <CalendarioPage />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/reservas/:fecha"
+            element={
+              <ProtectedRoute requireAdmin>
+                <DashboardLayout>
+                  <CalendarioReservasPage />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 

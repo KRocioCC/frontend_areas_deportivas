@@ -1,4 +1,3 @@
-// src/components/layout/Sidebar.js
 import React, { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { TfiCalendar } from "react-icons/tfi";
@@ -11,34 +10,47 @@ import {
   TfiAngleDown,
   TfiAngleRight
 } from "react-icons/tfi";
+import { useAuth } from "../../auth/hooks/useAuth";
 import "../../styles/Sidebar.css";
 
 function Sidebar({ open }) {
   const location = useLocation();
   const [ubicacionOpen, setUbicacionOpen] = useState(false);
+  const { isAuthenticated, isAdmin, isSuperuser, isClient } = useAuth();
 
-  // Verificar si alguna ruta de ubicación está activa
+  // ⛔ Evita renderizar si el usuario no está autenticado
+  if (!isAuthenticated) return null;
+
   const isUbicacionActive = [
     '/macrodistritos',
     '/zonas'
   ].includes(location.pathname);
 
-  const menuItems = [
-    { 
-      label: "Ubicación", 
-      icon: <TfiMapAlt />, 
-      isDropdown: true,
-      items: [
-        { label: "Macrodistritos", icon: <TfiLayoutSidebarLeft />, path: "/macrodistritos" },
-        { label: "Zonas", icon: <TfiLocationPin />, path: "/zonas" }
-      ]
-    },
-    { label: "Áreas Deportivas", icon: <TfiLocationPin />, path: "/areadeportiva" },
-    { label: "Canchas", icon: <TfiBasketball />, path: "/canchas" },
-    { label: "Equipamientos", icon: <TfiLayersAlt />, path: "/equipamientos" },
-    { label: "Calendario", icon: <TfiCalendar />, path: "/reservas/calendario" },
+  const menuItems = [];
 
-  ];
+  if (isAdmin || isSuperuser) {
+    menuItems.push(
+      {
+        label: "Ubicación",
+        icon: <TfiMapAlt />,
+        isDropdown: true,
+        items: [
+          { label: "Macrodistritos", icon: <TfiLayoutSidebarLeft />, path: "/macrodistritos" },
+          { label: "Zonas", icon: <TfiLocationPin />, path: "/zonas" }
+        ]
+      },
+      { label: "Áreas Deportivas", icon: <TfiLocationPin />, path: "/areadeportiva" },
+      { label: "Canchas", icon: <TfiBasketball />, path: "/canchas" },
+      { label: "Equipamientos", icon: <TfiLayersAlt />, path: "/equipamientos" },
+      { label: "Calendario", icon: <TfiCalendar />, path: "/reservas/calendario" }
+    );
+  }
+
+  if (isClient) {
+    menuItems.push(
+      { label: "Canchas", icon: <TfiBasketball />, path: "/canchas" }
+    );
+  }
 
   const toggleUbicacion = () => {
     setUbicacionOpen(!ubicacionOpen);
@@ -51,13 +63,10 @@ function Sidebar({ open }) {
           {menuItems.map((item) => {
             if (item.isDropdown) {
               return (
-                <li 
-                  key={item.label} 
-                  className="dropdown-container"
-                >
+                <li key={item.label} className="dropdown-container">
                   <div
                     className={`dropdown-header ${isUbicacionActive ? "active-dropdown" : ""}`}
-                    onClick={open ? toggleUbicacion : undefined} // solo abre al hacer clic si está expandido
+                    onClick={open ? toggleUbicacion : undefined}
                   >
                     <span className="icon">{item.icon}</span>
                     {open && <span className="label">{item.label}</span>}
@@ -68,7 +77,6 @@ function Sidebar({ open }) {
                     )}
                   </div>
 
-                  {/* En modo expandido → menú normal */}
                   {open && ubicacionOpen && (
                     <ul className="dropdown-menu">
                       {item.items.map((subItem) => (
@@ -86,7 +94,7 @@ function Sidebar({ open }) {
                       ))}
                     </ul>
                   )}
-                  {/* En modo colapsado → menú flotante */}
+
                   {!open && (
                     <div className="floating-menu">
                       <div className="floating-menu-title">{item.label}</div>
@@ -122,7 +130,6 @@ function Sidebar({ open }) {
               );
             }
           })}
-
         </ul>
       </nav>
     </aside>
