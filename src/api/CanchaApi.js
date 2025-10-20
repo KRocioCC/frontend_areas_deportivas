@@ -5,7 +5,11 @@ export async function getCanchas() {
   if (!res.ok) throw new Error(`Error ${res.status}`);
   return res.json();
 }
-
+export async function getCancha(id) {
+  const res = await fetch(`${API_URL}/${id}`);
+  if (!res.ok) throw new Error(`Error ${res.status}`);
+  return res.json();
+}
 export async function createCancha(payload) {
   const res = await fetch(API_URL, {
     method: "POST",
