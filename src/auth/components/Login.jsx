@@ -27,12 +27,12 @@ const Login = () => {
       // Redirige según el rol del usuario
       const roles = response.roles || [];
 
-      if (roles.includes('ROLE_SUPERUSUARIO')) {
-        navigate('/admin/solicitudes'); // Panel de aprobación
+      if (roles.includes('ROL_SUPERUSUARIO')) {
+        navigate('/solicitudes'); // Panel de aprobación
       } else if (roles.includes('ROL_ADMINISTRADOR')) {
-        navigate('/macrodistritos'); // Admin dashboard
+        navigate('/zonas'); // Admin dashboard
       } else if (roles.includes('ROL_CLIENTE')) {
-        navigate('/canchas'); // Cliente solo ve canchas
+        navigate('/zonas'); // Cliente solo ve canchas
       } else {
         setError('Tu cuenta no tiene un rol válido');
       }

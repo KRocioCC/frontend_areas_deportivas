@@ -14,7 +14,8 @@ import CanchaPage from "../features/cancha/pages/CanchaPage";
 import EquipamientoPage from "../features/equipamiento/pages/EquipamientoPage";
 import CalendarioPage from "../features/calendario/pages/CalendarioPage";
 import CalendarioReservasPage from "../features/calendario/pages/CalendarioReservaPage";
-
+import SolicitudesPage from "../features/AsignacionRoles/pages/SolicitudesPage";
+import Register from "../auth/components/Register";
 // Login
 import Login from "../auth/components/Login";
 
@@ -30,8 +31,15 @@ function AppRouter() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
+          
           {/* Redirección por defecto → login */}
           <Route path="/" element={<Navigate to="/login" replace />} />
+
+          <Route
+            path="/register"
+            element={<Register />
+            }
+          />
 
           {/* Login público */}
           <Route path="/login" element={<Login />} />
@@ -47,7 +55,18 @@ function AppRouter() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/solicitudes"
+            element={
+              <ProtectedRoute requireAdmin>
+                <DashboardLayout>
+                  <SolicitudesPage />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
 
+          
           {/* Rutas solo para admin o superusuario */}
           <Route
             path="/macrodistritos"

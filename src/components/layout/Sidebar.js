@@ -35,6 +35,7 @@ function Sidebar({ open }) {
 
   if (isAdmin || isSuperuser) {
     menuItems.push(
+      { label: "Control Accesos", icon: <TfiLocationPin />, path: "/solicitudes" },
       {
         label: "Ubicación",
         icon: <TfiMapAlt />,
