@@ -27,7 +27,7 @@ const Login = () => {
       // Redirige según el rol del usuario
       const roles = response.roles || [];
 
-      if (roles.includes('ROL_SUPERUSUARIO')) {
+      if (roles.includes('ROLE_SUPERUSUARIO')) {
         navigate('/admin/solicitudes'); // Panel de aprobación
       } else if (roles.includes('ROL_ADMINISTRADOR')) {
         navigate('/macrodistritos'); // Admin dashboard
