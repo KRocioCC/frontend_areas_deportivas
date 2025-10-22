@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import ClienteForm from "../components/ClienteForm";
-import * as clienteService from "../../../api/clienteApi";
+import * as clienteService from "../../../api/ClienteApi";
 import "../pages/userPage.css";
 
 function normalizeCliente(raw = {}) {
