@@ -8,7 +8,8 @@ import {
   TfiBasketball,
   TfiLayersAlt,
   TfiAngleDown,
-  TfiAngleRight
+  TfiAngleRight,
+  TfiUser
 } from "react-icons/tfi";
 import { useAuth } from "../../auth/hooks/useAuth";
 import "../../styles/Sidebar.css";
@@ -16,14 +17,18 @@ import "../../styles/Sidebar.css";
 function Sidebar({ open }) {
   const location = useLocation();
   const [ubicacionOpen, setUbicacionOpen] = useState(false);
+  const [personaOpen, setPersonaOpen] = useState(false);
   const { isAuthenticated, isAdmin, isSuperuser, isClient } = useAuth();
 
   // ⛔ Evita renderizar si el usuario no está autenticado
   if (!isAuthenticated) return null;
 
-  const isUbicacionActive = [
-    '/macrodistritos',
-    '/zonas'
+  const isUbicacionActive = ["/macrodistritos", "/zonas"].includes(location.pathname);
+  const isPersonaActive = [
+    "/personas/clientes",
+    "/personas/administradores",
+    "/personas/usuarios-control",
+    "/personas/invitados"
   ].includes(location.pathname);
 
   const menuItems = [];
@@ -34,9 +39,26 @@ function Sidebar({ open }) {
         label: "Ubicación",
         icon: <TfiMapAlt />,
         isDropdown: true,
+        isActive: isUbicacionActive,
+        isOpen: ubicacionOpen,
+        toggle: () => setUbicacionOpen(!ubicacionOpen),
         items: [
           { label: "Macrodistritos", icon: <TfiLayoutSidebarLeft />, path: "/macrodistritos" },
           { label: "Zonas", icon: <TfiLocationPin />, path: "/zonas" }
+        ]
+      },
+      {
+        label: "Persona",
+        icon: <TfiUser />,
+        isDropdown: true,
+        isActive: isPersonaActive,
+        isOpen: personaOpen,
+        toggle: () => setPersonaOpen(!personaOpen),
+        items: [
+          { label: "Cliente", path: "/personas/clientes" },
+          { label: "Administrador", path: "/personas/administradores" },
+          { label: "Usuario de Control", path: "/personas/usuarios-control" },
+          { label: "Invitado", path: "/personas/invitados" }
         ]
       },
       { label: "Áreas Deportivas", icon: <TfiLocationPin />, path: "/areadeportiva" },
@@ -47,14 +69,8 @@ function Sidebar({ open }) {
   }
 
   if (isClient) {
-    menuItems.push(
-      { label: "Canchas", icon: <TfiBasketball />, path: "/canchas" }
-    );
+    menuItems.push({ label: "Canchas", icon: <TfiBasketball />, path: "/canchas" });
   }
-
-  const toggleUbicacion = () => {
-    setUbicacionOpen(!ubicacionOpen);
-  };
 
   return (
     <aside className={`sidebar ${open ? "expanded" : "collapsed"}`}>
@@ -65,19 +81,19 @@ function Sidebar({ open }) {
               return (
                 <li key={item.label} className="dropdown-container">
                   <div
-                    className={`dropdown-header ${isUbicacionActive ? "active-dropdown" : ""}`}
-                    onClick={open ? toggleUbicacion : undefined}
+                    className={`dropdown-header ${item.isActive ? "active-dropdown" : ""}`}
+                    onClick={open ? item.toggle : undefined}
                   >
                     <span className="icon">{item.icon}</span>
                     {open && <span className="label">{item.label}</span>}
                     {open && (
                       <span className="arrow">
-                        {ubicacionOpen ? <TfiAngleDown /> : <TfiAngleRight />}
+                        {item.isOpen ? <TfiAngleDown /> : <TfiAngleRight />}
                       </span>
                     )}
                   </div>
 
-                  {open && ubicacionOpen && (
+                  {open && item.isOpen && (
                     <ul className="dropdown-menu">
                       {item.items.map((subItem) => (
                         <li key={subItem.path}>
@@ -87,7 +103,9 @@ function Sidebar({ open }) {
                               `sidebar-link ${isActive ? "active-link" : ""}`
                             }
                           >
-                            <span className="icon sub-icon">{subItem.icon}</span>
+                            {subItem.icon && (
+                              <span className="icon sub-icon">{subItem.icon}</span>
+                            )}
                             <span className="label">{subItem.label}</span>
                           </NavLink>
                         </li>
@@ -106,7 +124,7 @@ function Sidebar({ open }) {
                             `floating-menu-item ${isActive ? "active" : ""}`
                           }
                         >
-                          <span className="icon">{subItem.icon}</span>
+                          {subItem.icon && <span className="icon">{subItem.icon}</span>}
                           <span className="label">{subItem.label}</span>
                         </NavLink>
                       ))}

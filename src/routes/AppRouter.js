@@ -18,6 +18,13 @@ import CalendarioReservasPage from "../features/calendario/pages/CalendarioReser
 // Login
 import Login from "../auth/components/Login";
 
+// Persona
+import PersonaPage from "../features/personas/pages/PersonaPage";
+import ClientePage from "../features/personas/pages/ClientePage";
+import AdministradorPage from "../features/personas/pages/AdministradorPage";
+import UsuarioControlPage from "../features/personas/pages/UsuarioControlPage";
+import InvitadoPage from "../features/personas/pages/InvitadoPage";
+
 function AppRouter() {
   return (
     <AuthProvider>
@@ -102,6 +109,22 @@ function AppRouter() {
               </ProtectedRoute>
             }
           />
+
+          <Route
+          path="/personas"
+          element={
+            <DashboardLayout>
+              <PersonaPage />
+            </DashboardLayout>
+          }
+        >
+          {/* SUBRUTAS */}
+          <Route path="clientes" element={<ClientePage />} />
+          <Route path="administradores" element={<AdministradorPage />} />
+          <Route path="usuarios-control" element={<UsuarioControlPage />} />
+          <Route path="invitados" element={<InvitadoPage />} />
+        </Route>
+        
         </Routes>
       </BrowserRouter>
     </AuthProvider>
