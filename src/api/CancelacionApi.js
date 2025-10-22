@@ -1,55 +1,38 @@
-const API_URL = "http://localhost:8032/api/cancelacion";
+import api from './api';
+
+const API_URL = '/cancelacion';
 
 export async function getCancelaciones() {
-  const res = await fetch(API_URL);
-  if (!res.ok) throw new Error(`Error ${res.status}`);
-  return res.json();
+  const res = await api.get(API_URL);
+  return res.data;
 }
 
 export async function getCancelacionById(id) {
-  const res = await fetch(`${API_URL}/${id}`);
-  if (!res.ok) throw new Error(`Error ${res.status}`);
-  return res.json();
+  const res = await api.get(`${API_URL}/${id}`);
+  return res.data;
 }
 
 export async function createCancelacion(payload) {
-  const res = await fetch(API_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
-  if (!res.ok) throw new Error(`Error ${res.status}`);
-  return res.json();
+  const res = await api.post(API_URL, payload);
+  return res.data;
 }
 
 export async function updateCancelacion(id, payload) {
-  const res = await fetch(`${API_URL}/${id}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
-  if (!res.ok) throw new Error(`Error ${res.status}`);
-  return res.json();
+  const res = await api.put(`${API_URL}/${id}`, payload);
+  return res.data;
 }
 
 export async function deleteCancelacion(id) {
-  const res = await fetch(`${API_URL}/${id}/eliminar`, {
-    method: "PUT",
-  });
-  if (!res.ok) throw new Error(`Error ${res.status}`);
-  return res.json();
+  const res = await api.put(`${API_URL}/${id}/eliminar`);
+  return res.data;
 }
 
 export async function lockCancelacion(id) {
-  const res = await fetch(`${API_URL}/${id}/lock`);
-  if (!res.ok) throw new Error(`Error ${res.status}`);
-  return res.json();
+  const res = await api.get(`${API_URL}/${id}/lock`);
+  return res.data;
 }
 
 export async function deleteCancelacionFisica(id) {
-  const res = await fetch(`${API_URL}/${id}`, {
-    method: "DELETE",
-  });
-  if (!res.ok) throw new Error(`Error ${res.status}`);
-  return res.text(); // porque el backend devuelve un String
+  const res = await api.delete(`${API_URL}/${id}`);
+  return res.data;
 }

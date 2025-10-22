@@ -1,9 +1,8 @@
-/* solo GET PARA PAGOS
-*/
-const API_URL = "http://localhost:8032/api/pagos";
+import api from './api';
+
+const API_URL = '/pagos';
 
 export async function getPagos() {
-  const res = await fetch(API_URL);
-  if (!res.ok) throw new Error(`Error ${res.status}`);
-  return res.json();
+  const res = await api.get(API_URL);
+  return res.data;
 }

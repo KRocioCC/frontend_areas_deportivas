@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { TfiCalendar } from "react-icons/tfi";
 import {
   TfiLayoutSidebarLeft,
@@ -9,18 +9,19 @@ import {
   TfiLayersAlt,
   TfiAngleDown,
   TfiAngleRight,
-  TfiUser
+  TfiUser,
+  TfiPowerOff
 } from "react-icons/tfi";
 import { useAuth } from "../../auth/hooks/useAuth";
 import "../../styles/Sidebar.css";
 
 function Sidebar({ open }) {
   const location = useLocation();
+  const navigate = useNavigate();
   const [ubicacionOpen, setUbicacionOpen] = useState(false);
   const [personaOpen, setPersonaOpen] = useState(false);
-  const { isAuthenticated, isAdmin, isSuperuser, isClient } = useAuth();
+  const { isAuthenticated, isAdmin, isSuperuser, isClient, logout } = useAuth();
 
-  // ⛔ Evita renderizar si el usuario no está autenticado
   if (!isAuthenticated) return null;
 
   const isUbicacionActive = ["/macrodistritos", "/zonas"].includes(location.pathname);
@@ -72,6 +73,11 @@ function Sidebar({ open }) {
   if (isClient) {
     menuItems.push({ label: "Canchas", icon: <TfiBasketball />, path: "/canchas" });
   }
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
 
   return (
     <aside className={`sidebar ${open ? "expanded" : "collapsed"}`}>
@@ -149,6 +155,14 @@ function Sidebar({ open }) {
               );
             }
           })}
+
+          {/*  Botón de Cerrar sesión */}
+          <li>
+            <button onClick={handleLogout} className="sidebar-link logout-button">
+              <span className="icon"><TfiPowerOff /></span>
+              {open && <span className="label">Cerrar sesión</span>}
+            </button>
+          </li>
         </ul>
       </nav>
     </aside>
