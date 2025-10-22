@@ -1,0 +1,34 @@
+/* Fondo difuminado */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px; /* espacio interno */
+  z-index: 9999;
+  overflow: auto; /* ✅ permite que el modal se desplace si es muy alto */
+}
+
+/* Contenedor del formulario */
+.modal-content {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(16px);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  width: 100%;
+  max-width: 750px;
+  max-height: 90vh; /* ✅ límite de altura del modal */
+  overflow-y: auto; /* ✅ scroll vertical interno */
+  overflow-x: hidden;
+  padding: 2rem;
+  animation: fadeIn 0.25s ease;
+}
+
+/* Animación suave */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

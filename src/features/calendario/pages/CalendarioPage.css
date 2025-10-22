@@ -1,0 +1,157 @@
+/* ===== CONTENEDOR PRINCIPAL ===== */
+.calendario-container {
+  padding: 2rem;
+  max-width: 1100px;
+  max-height: 1000px;
+  margin: 0 auto;
+  background-color: #f9fafb;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* ===== TÍTULO ===== */
+.titulo-calendario {
+  font-size: 2.2rem;
+  font-weight: 700;
+  text-align: center;
+  color: #D92332;
+  margin-bottom: 1.5rem;
+}
+
+/* ===== FILTROS ===== */
+.filtros-container {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.filtro-select {
+  background-color: #41BFB3;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.filtro-select:hover {
+  background-color: #D92332;
+}
+
+.btn-limpiar {
+  background-color: #f3f4f6;
+  color: #111827;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.btn-limpiar:hover {
+  background-color: #e5e7eb;
+}
+
+/* ===== CALENDARIO ===== */
+.qj-calendar {
+  width: 100%;
+  background: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  font-family: 'Segoe UI', sans-serif;
+  font-size: 1rem;
+}
+
+/* Días normales */
+.qj-calendar .react-calendar__tile {
+  height: 4rem;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  position: relative;
+}
+
+/* Día actual */
+.qj-calendar .react-calendar__tile--now {
+  background-color: rgba(37, 99, 235, 0.1);
+  border-radius: 12px;
+}
+
+/* Día seleccionado */
+.qj-calendar .react-calendar__tile--active {
+  background-color: #41BFB3!important;
+  color: white !important;
+  font-weight: bold;
+  box-shadow: none;
+}
+
+/* Hover */
+.qj-calendar .react-calendar__tile:enabled:hover {
+  background-color: #2563eb20;
+  cursor: pointer;
+}
+
+/* Sábados en rojo */
+.qj-calendar .is-saturday {
+  color: #e11d48 !important;
+}
+
+/* Punto indicador de reserva */
+.punto-reserva {
+  width: 6px;
+  height: 6px;
+  background-color: #facc15; /* amarillo suave */
+  border-radius: 50%;
+  margin: 4px auto 0;
+}
+
+/* Foco limpio */
+.qj-calendar .react-calendar__tile:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
+}
+
+/* Cabecera (mes y flechas) */
+.qj-calendar .react-calendar__navigation {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+/* Botones de navegación */
+.qj-calendar .react-calendar__navigation button {
+  color: #41BFB3;
+  font-size: 1.3rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.qj-calendar .react-calendar__navigation button:hover {
+  color: #1d4ed8;
+}
+
+/* Cabecera de los días (L, M, M, J...) */
+.qj-calendar .react-calendar__month-view__weekdays {
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #374151;
+  font-size: 0.95rem;
+}
+
+.qj-calendar .react-calendar__month-view__weekdays abbr {
+  text-decoration: none;
+}

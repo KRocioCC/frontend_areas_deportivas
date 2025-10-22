@@ -1,0 +1,68 @@
+@import url('https://fonts.googleapis.com/css2?family=Alumni+Sans:wght@400;600;700&family=Baloo+Tamma+2:wght@400;500;600&family=Josefin+Slab:wght@400;500;600&family=Oswald:wght@400;500;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --primary: #D92332; 
+  --secondary: #41BFB3;
+  --light: #F2EFEB;
+  --accent1: #F28627;
+  --accent2: #F25E3D;
+
+  --color-primary: #D92332;
+  --color-primary-white: #ee59658e;
+  --color-secondary: #41BFB3;
+  --color-background: #F2EFEB;
+  --color-white: #FFFFFF;
+  --color-accent: #F28627;
+  --color-danger: #F25E3D;
+
+  --botoncrear: #41BFB3; 
+  --botoneditar: #062c4b; 
+  --botoneliminar: #f44336; 
+  --botonguardar: #FF9800;
+  /*colores para fondo*/
+  --color-p-1: #d61727;
+  --color-p-2: #f35734;
+  --color-p-3: #f38321;
+  --color-p-4: #F2EFEB;
+  --color-p-5: #46c4b7;
+  --color-p-6: #FFFFFF;
+  --color-p-7: #e7ae9e;
+  --color-p-8: #8a2628;
+  --color-p-9: #f8f4f465;
+
+  /*titulo super */
+  --font-Oswald: 'Oswald', sans-serif ;
+  /*titulo */
+  --font-Alumni: 'Alumni Sans', sans-serif;
+  /*texto */
+  --font-Balo: 'Baloo Tamma 2', sans-serif;
+  /*Boton*/
+  --font-josefin: 'Josefin Slab', serif;
+
+  --color-pb-1: #d61727ab;
+  --color-pb-2: #f25e3db0;
+  --color-pb-3: #f28627af;
+  --color-pb-4: #f2efeb9a;
+  --color-pb-5: #41bfb29f;
+  --color-pb-6: #FFFFFF;
+  --color-pb-7: #e7ae9ead;
+  --color-pb-8: #8a262893;
+
+  --color-b-1: #45bfb5;
+  --color-b-2: #2596be;
+  --color-b-3: #264f61;
+  --color-b-4: #701123;
+  --color-b-5: #FF9800;
+  --color-b-6: #f43822;
+
+  --color-t-1: #000000;
+  --color-t-2: #575454;
+  --color-t-3: #837d7d;
+  --color-t-4: #a39a9a;
+
+}
+
