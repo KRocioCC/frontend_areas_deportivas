@@ -40,7 +40,7 @@ const ProtectedRoute = ({ children, requireAdmin = false, requireClient = false,
 
   // ✅ Si la ruta requiere cliente y el usuario no lo es → redirigir
   if (requireClient && !isClient) {
-    return <Navigate to="/solicitud" replace />;
+    return <Navigate to="/canchas" replace />;
   }
 
   if (requireControl && !roles.includes('ROL_CONTROL')) {

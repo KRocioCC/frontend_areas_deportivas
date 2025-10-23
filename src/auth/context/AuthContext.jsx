@@ -49,9 +49,9 @@ export const AuthProvider = ({ children }) => {
     isAuthenticated: !!currentUser,
 
     // Roles 
-    isSuperuser: currentUser?.roles?.includes('ROL_SUPERUSUARIO') || false,
-    isAdmin: currentUser?.roles?.includes('ROL_ADMINISTRADOR') || false,
-    isClient: currentUser?.roles?.includes('ROL_CLIENTE') || false,
+    isSuperuser: currentUser?.roles?.includes('ROLE_SUPERUSUARIO') || false,
+    isAdmin: currentUser?.roles?.includes('ROLE_ADMINISTRADOR') || false,
+    isClient: currentUser?.roles?.includes('ROLE_CLIENTE') || false,
 
     //  Roles disponibles como array
     roles: currentUser?.roles || []

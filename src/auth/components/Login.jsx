@@ -21,17 +21,21 @@ const Login = () => {
       // Realiza el login y recibe los datos del usuario
       const response = await login(username, password);
 
+      //Esto va dentro de handleSubmit, después de obtener `response`
+      localStorage.setItem('user', JSON.stringify(response));
+
       // Configura Axios con el token JWT
       authService.setupAxiosInterceptors(response.token);
 
       // Redirige según el rol del usuario
       const roles = response.roles || [];
+      
 
-      if (roles.includes('ROL_SUPERUSUARIO')) {
+      if (roles.includes('ROLE_SUPERUSUARIO')) {
         navigate('/solicitudes'); // Panel de aprobación
-      } else if (roles.includes('ROL_ADMINISTRADOR')) {
+      } else if (roles.includes('ROLE_ADMINISTRADOR')) {
         navigate('/zonas'); // Admin dashboard
-      } else if (roles.includes('ROL_CLIENTE')) {
+      } else if (roles.includes('ROLE_CLIENTE')) {
         navigate('/zonas'); // Cliente solo ve canchas
       } else {
         setError('Tu cuenta no tiene un rol válido');

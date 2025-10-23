@@ -1,23 +1,16 @@
+// src/features/AsignacionRoles/pages/SolicitudesPage.jsx
 import React, { useEffect, useState } from 'react';
-import { useAuth } from '../../../auth/hooks/useAuth'; // o donde tengas tu auth
+import api from '../../../api/api.js'; // <-- Importa tu instancia de axios
 
 const SolicitudesPage = () => {
   const [solicitudes, setSolicitudes] = useState([]);
   const [loading, setLoading] = useState(true);
-  const auth = useAuth();
 
   useEffect(() => {
     const cargarSolicitudes = async () => {
       try {
-        const res = await fetch('http://localhost:8032/api/admin/solicitudes', {
-          headers: {
-            'Authorization': `Bearer ${auth.token}`
-          }
-        });
-        if (res.ok) {
-          const data = await res.json();
-          setSolicitudes(data);
-        }
+        const res = await api.get('/admin/solicitudes'); 
+        setSolicitudes(res.data);
       } catch (err) {
         console.error('Error:', err);
       } finally {
@@ -25,18 +18,11 @@ const SolicitudesPage = () => {
       }
     };
     cargarSolicitudes();
-  }, [auth.token]);
+  }, []);
 
   const aprobar = async (id) => {
     try {
-      await fetch(`http://localhost:8032/api/admin/solicitudes/${id}/aprobar`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${auth.token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      // Eliminar de la lista
+      await api.post(`/admin/solicitudes/${id}/aprobar`);
       setSolicitudes(solicitudes.filter(s => s.id !== id));
     } catch (err) {
       alert('Error al aprobar');
@@ -45,13 +31,7 @@ const SolicitudesPage = () => {
 
   const rechazar = async (id) => {
     try {
-      await fetch(`http://localhost:8032/api/admin/solicitudes/${id}/rechazar`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${auth.token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      await api.post(`/admin/solicitudes/${id}/rechazar`);
       setSolicitudes(solicitudes.filter(s => s.id !== id));
     } catch (err) {
       alert('Error al rechazar');
