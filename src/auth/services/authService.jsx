@@ -10,7 +10,7 @@ const authService = {
       const response = await axios.post(API_URL + 'signup', userData);
       return response.data;
     } catch (error) {
-      console.error('Error en registro:', error);
+ //     console.error('Error en registro:', error);
       throw error.response?.data || { message: "Error al registrar usuario" };
     }
   },

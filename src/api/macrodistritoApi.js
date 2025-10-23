@@ -1,33 +1,23 @@
-const API_URL = "http://localhost:8032/api/macrodistrito";
+import api from './api';
+
+const API_URL = '/macrodistrito';
 
 export async function getMacrodistritos() {
-  const res = await fetch(API_URL);
-  if (!res.ok) throw new Error(`Error ${res.status}`);
-  return res.json();
+  const res = await api.get(API_URL);
+  return res.data;
 }
 
 export async function createMacrodistrito(payload) {
-  const res = await fetch(API_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
-  if (!res.ok) throw new Error(`Error ${res.status}`);
-  return res.json();
+  const res = await api.post(API_URL, payload);
+  return res.data;
 }
 
 export async function updateMacrodistrito(id, payload) {
-  const res = await fetch(`${API_URL}/${id}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
-  if (!res.ok) throw new Error(`Error ${res.status}`);
-  return res.json();
+  const res = await api.put(`${API_URL}/${id}`, payload);
+  return res.data;
 }
 
 export async function deleteMacrodistrito(id) {
-  const res = await fetch(`${API_URL}/${id}/eliminar`, { method: "PUT" });
-  if (!res.ok) throw new Error(`Error ${res.status}`);
-  return res.json();
+  const res = await api.put(`${API_URL}/${id}/eliminar`);
+  return res.data;
 }

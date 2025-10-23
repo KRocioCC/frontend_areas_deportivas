@@ -130,19 +130,21 @@ function AppRouter() {
           />
 
           <Route
-          path="/personas"
-          element={
-            <DashboardLayout>
-              <PersonaPage />
-            </DashboardLayout>
-          }
-        >
-          {/* SUBRUTAS */}
-          <Route path="clientes" element={<ClientePage />} />
-          <Route path="administradores" element={<AdministradorPage />} />
-          <Route path="usuarios-control" element={<UsuarioControlPage />} />
-          <Route path="invitados" element={<InvitadoPage />} />
-        </Route>
+            path="/personas"
+            element={
+              <ProtectedRoute requireAdmin>
+                <DashboardLayout>
+                  <PersonaPage />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          >
+            <Route path="clientes" element={<ClientePage />} />
+            <Route path="administradores" element={<AdministradorPage />} />
+            <Route path="usuarios-control" element={<UsuarioControlPage />} />
+            <Route path="invitados" element={<InvitadoPage />} />
+          </Route>
+
         
         </Routes>
       </BrowserRouter>

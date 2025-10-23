@@ -1,75 +1,36 @@
-const API_URL = "http://localhost:8032/api/administradores";
+import api from './api';
 
-async function request(url, options = {}) {
-  const defaultHeaders = {
-    "Accept": "application/json",
-  };
-
-  const fetchOptions = {
-    ...options,
-    headers: {
-      ...defaultHeaders,
-      ...(options.headers || {}),
-    },
-  };
-
-  const res = await fetch(url, fetchOptions);
-
-  if (!res.ok) {
-    let msg = `${res.status} ${res.statusText}`;
-    try {
-      const errBody = await res.text();
-      if (errBody) msg += ` - ${errBody}`;
-    } catch (e) {
-      // ignore
-    }
-    throw new Error(msg);
-  }
-
-  if (res.status === 204 || res.headers.get("Content-Length") === "0") {
-    return null;
-  }
-
-  const text = await res.text();
-  if (!text) return null;
-  try {
-    return JSON.parse(text);
-  } catch (e) {
-    return text;
-  }
-}
+const API_URL = '/administradores';
 
 export async function getAdministradores(activos = false) {
   const url = activos ? `${API_URL}/activos` : API_URL;
-  return request(url);
+  const res = await api.get(url);
+  return res.data;
 }
 
 export async function getAdministradorById(id) {
-  return request(`${API_URL}/${id}`);
+  const res = await api.get(`${API_URL}/${id}`);
+  return res.data;
 }
 
 export async function searchAdministradores(nombre) {
-  return request(`${API_URL}/buscar/${encodeURIComponent(nombre)}`);
+  const res = await api.get(`${API_URL}/buscar/${encodeURIComponent(nombre)}`);
+  return res.data;
 }
 
 export async function createAdministrador(payload) {
-  return request(API_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
+  const res = await api.post(API_URL, payload);
+  return res.data;
 }
 
 export async function updateAdministrador(id, payload) {
-  return request(`${API_URL}/${id}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
+  const res = await api.put(`${API_URL}/${id}`, payload);
+  return res.data;
 }
 
 export async function deleteAdministrador(id) {
-  return request(`${API_URL}/${id}`, { method: "DELETE" });
+  const res = await api.delete(`${API_URL}/${id}`);
+  return res.data;
 }
 
 export async function cambiarEstadoAdministrador(id, estado) {
@@ -78,7 +39,6 @@ export async function cambiarEstadoAdministrador(id, estado) {
   }
 
   const url = `${API_URL}/${id}/estado?estado=${encodeURIComponent(estado)}`;
-  return request(url, {
-    method: "PATCH",
-  });
+  const res = await api.patch(url);
+  return res.data;
 }
