@@ -9,6 +9,8 @@ export async function getMacrodistritos() {
 
 export async function createMacrodistrito(payload) {
   const res = await api.post(API_URL, payload);
+
+  
   return res.data;
 }
 
