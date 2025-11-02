@@ -1,6 +1,7 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import DashboardLayout from "../components/layout/DashboardLayout";
+import DashboardLayoutAdmin from "../components/layout/DashboardLayoutAdmin";
 
 // Contexto y protección
 import { AuthProvider } from "../auth/context/AuthContext";
@@ -144,6 +145,48 @@ function AppRouter() {
             <Route path="usuarios-control" element={<UsuarioControlPage />} />
             <Route path="invitados" element={<InvitadoPage />} />
           </Route>
+
+          {/* RUTAS NUEVAS PARA ADMINISTRADOR - DashboardLayoutAdmin */}
+          <Route
+            path="/admin/dashboard"
+            element={
+              <ProtectedRoute requireAdmin>
+                <DashboardLayoutAdmin>
+                  <div>Dashboard Administrador - Nueva Página Principal</div>
+                </DashboardLayoutAdmin>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/usuarios"
+            element={
+              <ProtectedRoute requireAdmin>
+                <DashboardLayoutAdmin>
+                  <div>Gestión de Usuarios</div>
+                </DashboardLayoutAdmin>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/reportes"
+            element={
+              <ProtectedRoute requireAdmin>
+                <DashboardLayoutAdmin>
+                  <div>Reportes</div>
+                </DashboardLayoutAdmin>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/configuracion"
+            element={
+              <ProtectedRoute requireAdmin>
+                <DashboardLayoutAdmin>
+                  <div>Configuración</div>
+                </DashboardLayoutAdmin>
+              </ProtectedRoute>
+            }
+          />
 
         
         </Routes>

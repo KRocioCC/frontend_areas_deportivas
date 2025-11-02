@@ -1,0 +1,39 @@
+/* Estilos específicos para el sidebar de administrador */
+.admin-sidebar {
+  background: linear-gradient(180deg, #1e3a8a 0%, #3730a3 100%);
+  width: 16rem; /* equivalente a w-64 */
+  min-height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 50;
+}
+
+
+.admin-sidebar .sidebar-header {
+  padding: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 1rem;
+}
+
+.admin-sidebar .sidebar-header h3 {
+  color: white;
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.admin-sidebar .sidebar-link {
+  color: #e0e7ff;
+}
+
+.admin-sidebar .sidebar-link:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.admin-sidebar .active-link {
+  background-color: #4f46e5;
+  color: white;
+  border-right: 3px solid #818cf8;
+}
