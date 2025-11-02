@@ -21,7 +21,7 @@ const Login = () => {
       // Realiza el login y recibe los datos del usuario
       const response = await login(username, password);
 
-      //Esto va dentro de handleSubmit, después de obtener `response`
+      // Guarda el usuario en localStorage
       localStorage.setItem('user', JSON.stringify(response));
 
       // Configura Axios con el token JWT
@@ -30,15 +30,17 @@ const Login = () => {
       // Redirige según el rol del usuario
       const roles = response.roles || [];
       
+      console.log("Roles del usuario:", roles); // Para debug
 
+      // REDIRECCIONES ACTUALIZADAS CON NUEVAS RUTAS
       if (roles.includes('ROLE_SUPERUSUARIO')) {
-        navigate('/solicitudes'); // Panel de aprobación
+        navigate('/solicitudes'); // Panel de superusuario - sidebar original
       } else if (roles.includes('ROLE_ADMINISTRADOR')) {
-        navigate('/zonas'); // Admin dashboard
+        navigate('/admin/dashboard'); // Nuevo panel administrador - nuevo sidebar
       } else if (roles.includes('ROLE_CLIENTE')) {
-        navigate('/zonas'); // Cliente solo ve canchas
+        navigate('/canchas'); // Cliente solo ve canchas
       } else {
-        setError('Tu cuenta no tiene un rol válido');
+        setError('Tu cuenta no tiene un rol válido asignado.');
       }
 
     } catch (err) {
@@ -107,6 +109,14 @@ const Login = () => {
           <Link to="/register" className="text-[#17252A] hover:underline">
             ¿No tienes cuenta? Regístrate
           </Link>
+        </div>
+
+        {/* Información de debug (opcional - puedes removerlo en producción) */}
+        <div className="mt-4 p-3 bg-gray-100 rounded text-xs text-gray-600">
+          <p><strong>Para testing:</strong></p>
+          <p>• Superusuario → /solicitudes (sidebar original)</p>
+          <p>• Administrador → /admin/dashboard (nuevo sidebar)</p>
+          <p>• Cliente → /canchas</p>
         </div>
       </div>
     </div>
