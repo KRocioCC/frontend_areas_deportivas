@@ -27,6 +27,10 @@ import AdministradorPage from "../features/personas/pages/AdministradorPage";
 import UsuarioControlPage from "../features/personas/pages/UsuarioControlPage";
 import InvitadoPage from "../features/personas/pages/InvitadoPage";
 
+//ADMINISTRADOR
+import MiAreaPage from '../features/RolAdministrador/mi_area/MiAreaPage';
+import CanchasAdmin from "../features/RolAdministrador/canchas/CanchasAdmin";
+
 function AppRouter() {
   return (
     <AuthProvider>
@@ -147,6 +151,28 @@ function AppRouter() {
           </Route>
 
           {/* RUTAS NUEVAS PARA ADMINISTRADOR - DashboardLayoutAdmin */}
+
+          <Route
+            path="/admin/mi_area"
+            element={
+              <ProtectedRoute requireAdmin>
+                <DashboardLayoutAdmin>
+                   <MiAreaPage />
+                </DashboardLayoutAdmin>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/canchas_admin"
+            element={
+              <ProtectedRoute requireAdmin>
+                <DashboardLayoutAdmin>
+                  <CanchasAdmin />
+
+                </DashboardLayoutAdmin>
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/admin/dashboard"
             element={
@@ -178,11 +204,11 @@ function AppRouter() {
             }
           />
           <Route
-            path="/admin/configuracion"
+            path="/admin/notificaciones"
             element={
               <ProtectedRoute requireAdmin>
                 <DashboardLayoutAdmin>
-                  <div>Configuración</div>
+                  <div>Notificaciones</div>
                 </DashboardLayoutAdmin>
               </ProtectedRoute>
             }
