@@ -31,3 +31,9 @@ export async function deleteCancha(id) {
   const res = await api.put(`${API_URL}/${id}/eliminar`);
   return res.data;
 }
+
+// Obtener canchas por área deportiva
+export async function getCanchasPorArea(idArea) {
+  const res = await api.get(`${API_URL}/area/${idArea}`);
+  return res.data;
+}
