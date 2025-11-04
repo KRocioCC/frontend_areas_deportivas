@@ -32,7 +32,7 @@ function NavbarAdmin({ onToggleSidebar, sidebarOpen }) {
             <p className="text-sm font-medium text-gray-800">
               {currentUser?.username || 'Administrador'}
             </p>
-            <p className="text-xs text-gray-600">Rol: Administrador</p>
+            <p className="text-xs text-gray-600">Administrador</p>
           </div>
           
           <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">

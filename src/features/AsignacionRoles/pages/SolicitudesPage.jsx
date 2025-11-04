@@ -1,6 +1,10 @@
 // src/features/AsignacionRoles/pages/SolicitudesPage.jsx
 import React, { useEffect, useState } from 'react';
-import api from '../../../api/api.js'; // <-- Importa tu instancia de axios
+import {
+  getSolicitudes,
+  aprobarSolicitud,
+  rechazarSolicitud,
+} from '../../../api/admin.js';
 
 const SolicitudesPage = () => {
   const [solicitudes, setSolicitudes] = useState([]);
@@ -9,10 +13,10 @@ const SolicitudesPage = () => {
   useEffect(() => {
     const cargarSolicitudes = async () => {
       try {
-        const res = await api.get('/admin/solicitudes'); 
-        setSolicitudes(res.data);
+        const data = await getSolicitudes();
+        setSolicitudes(data);
       } catch (err) {
-        console.error('Error:', err);
+        console.error('Error al cargar solicitudes:', err);
       } finally {
         setLoading(false);
       }
@@ -22,19 +26,21 @@ const SolicitudesPage = () => {
 
   const aprobar = async (id) => {
     try {
-      await api.post(`/admin/solicitudes/${id}/aprobar`);
-      setSolicitudes(solicitudes.filter(s => s.id !== id));
+      await aprobarSolicitud(id);
+      setSolicitudes((prev) => prev.filter((s) => s.id !== id));
     } catch (err) {
-      alert('Error al aprobar');
+      alert('Error al aprobar la solicitud');
+      console.error(err);
     }
   };
 
   const rechazar = async (id) => {
     try {
-      await api.post(`/admin/solicitudes/${id}/rechazar`);
-      setSolicitudes(solicitudes.filter(s => s.id !== id));
+      await rechazarSolicitud(id);
+      setSolicitudes((prev) => prev.filter((s) => s.id !== id));
     } catch (err) {
-      alert('Error al rechazar');
+      alert('Error al rechazar la solicitud');
+      console.error(err);
     }
   };
 
@@ -47,8 +53,11 @@ const SolicitudesPage = () => {
         <p className="text-gray-600">No hay solicitudes pendientes.</p>
       ) : (
         <div className="space-y-4">
-          {solicitudes.map(s => (
-            <div key={s.id} className="border border-gray-200 rounded-lg p-4 shadow-sm bg-white">
+          {solicitudes.map((s) => (
+            <div
+              key={s.id}
+              className="border border-gray-200 rounded-lg p-4 shadow-sm bg-white"
+            >
               <p><strong>Usuario:</strong> {s.username}</p>
               <p><strong>Rol solicitado:</strong> {s.rolSolicitado}</p>
               <p><strong>Email:</strong> {s.email}</p>
