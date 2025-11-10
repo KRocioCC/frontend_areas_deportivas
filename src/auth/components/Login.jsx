@@ -23,6 +23,7 @@ const Login = () => {
 
       // Guarda el usuario en localStorage
       localStorage.setItem('user', JSON.stringify(response));
+      localStorage.setItem('id', response.id); // guarda el ID 
 
       // Configura Axios con el token JWT
       authService.setupAxiosInterceptors(response.token);
