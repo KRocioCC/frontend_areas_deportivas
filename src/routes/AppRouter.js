@@ -31,6 +31,10 @@ import InvitadoPage from "../features/personas/pages/InvitadoPage";
 import MiAreaPage from '../features/RolAdministrador/mi_area/MiAreaPage';
 import CanchasAdmin from "../features/RolAdministrador/canchas/CanchasAdmin";
 
+import PageClientes from "../features/RolAdministrador/usuarios/clientes/PageClientes";
+import PageUsuariosControl from "../features/RolAdministrador/usuarios/usuarios_control/PageUsuariosControl";
+
+
 function AppRouter() {
   return (
     <AuthProvider>
@@ -184,11 +188,21 @@ function AppRouter() {
             }
           />
           <Route
-            path="/admin/usuarios"
+            path="/admin/usuarios/control"
             element={
               <ProtectedRoute requireAdmin>
                 <DashboardLayoutAdmin>
-                  <div>Gestión de Usuarios</div>
+                  <PageUsuariosControl/>
+                </DashboardLayoutAdmin>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/usuarios/clientes"
+            element={
+              <ProtectedRoute requireAdmin>
+                <DashboardLayoutAdmin>
+                  <PageClientes/>
                 </DashboardLayoutAdmin>
               </ProtectedRoute>
             }
