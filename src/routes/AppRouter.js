@@ -33,7 +33,7 @@ import CanchasAdmin from "../features/RolAdministrador/canchas/CanchasAdmin";
 
 import PageClientes from "../features/RolAdministrador/usuarios/clientes/PageClientes";
 import PageUsuariosControl from "../features/RolAdministrador/usuarios/usuarios_control/PageUsuariosControl";
-
+import Dashboard from "../features/RolAdministrador/dashboard/index.jsx";
 
 function AppRouter() {
   return (
@@ -182,7 +182,7 @@ function AppRouter() {
             element={
               <ProtectedRoute requireAdmin>
                 <DashboardLayoutAdmin>
-                  <div>Dashboard Administrador - Nueva Página Principal</div>
+                    <Dashboard />
                 </DashboardLayoutAdmin>
               </ProtectedRoute>
             }
