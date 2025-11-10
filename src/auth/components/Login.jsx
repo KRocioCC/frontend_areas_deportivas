@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import authService from '../services/authService';
+import PasswordInput from '../components/PasswordInput';
+import '../../styles/authStyles.css';
 
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-
   const navigate = useNavigate();
   const { login } = useAuth();
 
@@ -18,27 +19,18 @@ const Login = () => {
     setError('');
 
     try {
-      // Realiza el login y recibe los datos del usuario
       const response = await login(username, password);
-
-      // Guarda el usuario en localStorage
       localStorage.setItem('user', JSON.stringify(response));
-
-      // Configura Axios con el token JWT
       authService.setupAxiosInterceptors(response.token);
 
-      // Redirige según el rol del usuario
       const roles = response.roles || [];
       
-      console.log("Roles del usuario:", roles); // Para debug
-
-      // REDIRECCIONES ACTUALIZADAS CON NUEVAS RUTAS
       if (roles.includes('ROLE_SUPERUSUARIO')) {
-        navigate('/solicitudes'); // Panel de superusuario - sidebar original
+        navigate('/solicitudes');
       } else if (roles.includes('ROLE_ADMINISTRADOR')) {
-        navigate('/admin/dashboard'); // Nuevo panel administrador - nuevo sidebar
+        navigate('/admin/dashboard');
       } else if (roles.includes('ROLE_CLIENTE')) {
-        navigate('/canchas'); // Cliente solo ve canchas
+        navigate('/canchas');
       } else {
         setError('Tu cuenta no tiene un rol válido asignado.');
       }
@@ -51,72 +43,73 @@ const Login = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-b from-[#17252A] via-[#2B7A78] to-[#3AAFA9]">
-      <div className="m-auto w-full max-w-md p-8 bg-white rounded-lg shadow-xl">
-        <h1 className="text-4xl font-semibold text-center text-[#17252A] mb-8">Iniciar Sesión</h1>
-        
-        {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-            <span className="block sm:inline">{error}</span>
-          </div>
-        )}
+    <div className="auth-container">
+      <div className="auth-card">
+        <div className="auth-header">
+          <h1 className="auth-title">Iniciar Sesión</h1>
+          <p className="auth-subtitle">Accede a tu cuenta</p>
+        </div>
+
+        {error && <div className="auth-error">{error}</div>}
         
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="username" className="block text-sm font-medium text-[#17252A]">
-              Nombre de usuario
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Usuario
             </label>
             <input
-              id="username"
-              name="username"
               type="text"
               required
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="mt-1 block w-full px-3 py-2 border border-[#2B7A78] rounded-md shadow-sm focus:outline-none focus:ring-[#3AAFA9] focus:border-[#3AAFA9]"
-              placeholder="Ingresa tu nombre de usuario"
+              className="auth-input"
+              placeholder="Ingresa tu usuario"
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-[#17252A]">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Contraseña
             </label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              required
+            <PasswordInput
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 block w-full px-3 py-2 border border-[#2B7A78] rounded-md shadow-sm focus:outline-none focus:ring-[#3AAFA9] focus:border-[#3AAFA9]"
+              required
               placeholder="Ingresa tu contraseña"
             />
           </div>
 
-          <div>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#2B7A78] hover:bg-[#3AAFA9] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#3AAFA9] ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
-            >
-              {isLoading ? 'Iniciando sesión...' : 'Iniciar sesión'}
-            </button>
-          </div>
+          <button
+            type="submit"
+            disabled={isLoading}
+            className={`auth-button ${isLoading ? 'auth-button-disabled' : ''}`}
+          >
+            {isLoading ? (
+              <div className="flex items-center justify-center">
+                <div className="loading-spinner"></div>
+                Iniciando sesión...
+              </div>
+            ) : (
+              'Iniciar Sesión'
+            )}
+          </button>
         </form>
 
         <div className="mt-6 text-center">
-          <Link to="/register" className="text-[#17252A] hover:underline">
+          <Link to="/register" className="auth-link">
             ¿No tienes cuenta? Regístrate
           </Link>
         </div>
 
-        {/* Información de debug (opcional - puedes removerlo en producción) */}
-        <div className="mt-4 p-3 bg-gray-100 rounded text-xs text-gray-600">
-          <p><strong>Para testing:</strong></p>
-          <p>• Superusuario → /solicitudes (sidebar original)</p>
-          <p>• Administrador → /admin/dashboard (nuevo sidebar)</p>
-          <p>• Cliente → /canchas</p>
+        <div className="auth-debug">
+          <details>
+            <summary className="debug-summary">Información de roles</summary>
+            <div className="debug-content">
+              <p><strong>Superusuario:</strong> /solicitudes</p>
+              <p><strong>Administrador:</strong> /admin/dashboard</p>
+              <p><strong>Cliente:</strong> /canchas</p>
+            </div>
+          </details>
         </div>
       </div>
     </div>
