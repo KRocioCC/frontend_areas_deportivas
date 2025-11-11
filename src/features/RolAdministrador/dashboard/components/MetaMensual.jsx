@@ -59,7 +59,7 @@ const MetaMensual = () => {
   const series = [parseFloat(progreso)];
 
   const options = {
-    colors: ['#465FFF'],
+    colors: ['#94ebd2'],
     chart: {
       fontFamily: 'Outfit, sans-serif',
       type: 'radialBar',

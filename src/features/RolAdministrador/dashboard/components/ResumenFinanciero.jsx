@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { getClientes } from '../../../../api/clienteApi';
 import { getReservas, getReservasPorRangoFechas } from '../../../../api/ReservaApi';
 import { ArrowDownIcon, ArrowUpIcon, BoxIconLine, GroupIcon } from '../icons';
-import Badge from './ui/Badge';
+import Badge from './ui/badge/Badge';
 
 const ResumenFinanciero = () => {
   const [clientes, setClientes] = useState([]);

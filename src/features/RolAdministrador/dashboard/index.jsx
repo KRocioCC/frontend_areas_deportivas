@@ -1,11 +1,34 @@
 import ResumenFinanciero from './components/ResumenFinanciero';
 import MetaMensual from './components/MetaMensual';
-const Dashboard = () => (
-  <div className="p-6 bg-gray-100 min-h-screen">
-    <h1 className="text-2xl font-bold mb-4">Dashboard Administrador</h1>
-    <ResumenFinanciero />
-        <MetaMensual />
-  </div>
-);
+import TablaPedidosRecientes from './components/TablaPedidosRecientes';
 
-export default Dashboard;
+export default function DashboardAdministrador() {
+  return (
+    <div className="min-h-screen bg-gray-100 p-6 space-y-8">
+      <h1 className="text-4xl font-bold text-gray-800 mb-4">
+        Panel Administrador
+      </h1>
+
+      {/* Fila 1: Resumen financiero (estirado) */}
+      <div className="grid grid-cols-12">
+        <div className="col-span-12">
+          <ResumenFinanciero />
+        </div>
+      </div>
+
+      {/* Fila 2: Meta mensual (estirado) */}
+      <div className="grid grid-cols-12">
+        <div className="col-span-12">
+          <MetaMensual />
+        </div>
+      </div>
+
+      {/* Fila 3: Tabla de pedidos recientes (estirado) */}
+      <div className="grid grid-cols-12">
+        <div className="col-span-12">
+          <TablaPedidosRecientes />
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -34,7 +34,7 @@ const Login = () => {
         navigate('/admin/dashboard');
       } else if (roles.includes('ROLE_CLIENTE')) {
         navigate('/canchas');
-      } else {https://github.com/JosueMisaelLopezHuanca/frontend-espacios-qr/pull/17/conflict?name=src%252Fauth%252Fcomponents%252FLogin.jsx&ancestor_oid=ae9533122609bd0f6d23be97cd9a2d9c31288e82&base_oid=46247c4735c4897a0733e5043e1a526c76d4bb62&head_oid=ac9f4a9f9e0e89f022eb6e6a4e5f292165619034
+      } else {
         setError('Tu cuenta no tiene un rol válido asignado.');
       }
 
