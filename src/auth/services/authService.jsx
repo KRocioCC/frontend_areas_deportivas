@@ -10,7 +10,8 @@ const authService = {
       const response = await axios.post(API_URL + 'registro/cliente', clienteData);
       return response.data;
     } catch (error) {
-      throw error.response?.data || { message: "Error al registrar cliente" };
+      const errorMessage = error.response?.data?.message || error.response?.data || "Error al registrar cliente";
+      throw new Error(errorMessage);
     }
   },
 
@@ -20,7 +21,9 @@ const authService = {
       const response = await axios.post(API_URL + 'registro/administrador', adminData);
       return response.data;
     } catch (error) {
-      throw error.response?.data || { message: "Error al registrar administrador" };
+      // Manejar específicamente el error de contraseña incorrecta
+      const errorMessage = error.response?.data?.message || error.response?.data || "Error al registrar administrador";
+      throw new Error(errorMessage);
     }
   },
 
@@ -40,8 +43,8 @@ const authService = {
 
       return response.data;
     } catch (error) {
-      console.error('Error en login:', error);
-      throw error.response?.data || { message: "Error en el inicio de sesión" };
+      const errorMessage = error.response?.data?.message || error.response?.data || "Error en el inicio de sesión";
+      throw new Error(errorMessage);
     }
   },
 

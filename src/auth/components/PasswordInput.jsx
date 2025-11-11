@@ -1,28 +1,36 @@
 import React, { useState } from 'react';
-import '../../styles/authStyles.css';
 
 const PasswordInput = ({ 
+  name, 
   value, 
   onChange, 
   placeholder, 
-  required 
+  required, 
+  minLength, 
+  className = '' 
 }) => {
   const [showPassword, setShowPassword] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   return (
     <div className="relative">
       <input
         type={showPassword ? 'text' : 'password'}
+        name={name}
         value={value}
         onChange={onChange}
         required={required}
+        minLength={minLength}
         placeholder={placeholder}
-        className="auth-input pr-12"
+        className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#2B7A78] focus:border-[#2B7A78] transition-colors pr-12 ${className}`}
       />
       <button
         type="button"
-        onClick={() => setShowPassword(!showPassword)}
-        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+        onClick={togglePasswordVisibility}
+        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors focus:outline-none"
       >
         {showPassword ? (
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

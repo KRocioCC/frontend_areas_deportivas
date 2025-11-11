@@ -45,9 +45,9 @@ const Login = () => {
   return (
     <div className="auth-container">
       <div className="auth-card">
-        <div className="auth-header">
-          <h1 className="auth-title">Iniciar Sesión</h1>
-          <p className="auth-subtitle">Accede a tu cuenta</p>
+        <div className="text-center mb-8">
+          <h1 className="text-2xl font-semibold text-[#17252A] mb-2">Iniciar Sesión</h1>
+          <p className="text-gray-600">Accede a tu cuenta</p>
         </div>
 
         {error && <div className="auth-error">{error}</div>}
