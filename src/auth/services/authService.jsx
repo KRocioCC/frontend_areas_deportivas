@@ -4,14 +4,26 @@ const API_URL = 'http://localhost:8032/api/auth/';
 axios.defaults.withCredentials = true;
 
 const authService = {
-  // Registrar nuevo usuario
-  register: async (userData) => {
+  // Registrar nuevo cliente
+  registerCliente: async (clienteData) => {
     try {
-      const response = await axios.post(API_URL + 'signup', userData);
+      const response = await axios.post(API_URL + 'registro/cliente', clienteData);
       return response.data;
     } catch (error) {
- //     console.error('Error en registro:', error);
-      throw error.response?.data || { message: "Error al registrar usuario" };
+      const errorMessage = error.response?.data?.message || error.response?.data || "Error al registrar cliente";
+      throw new Error(errorMessage);
+    }
+  },
+
+  // Registrar nuevo administrador
+  registerAdministrador: async (adminData) => {
+    try {
+      const response = await axios.post(API_URL + 'registro/administrador', adminData);
+      return response.data;
+    } catch (error) {
+      // Manejar específicamente el error de contraseña incorrecta
+      const errorMessage = error.response?.data?.message || error.response?.data || "Error al registrar administrador";
+      throw new Error(errorMessage);
     }
   },
 
@@ -31,8 +43,8 @@ const authService = {
 
       return response.data;
     } catch (error) {
-      console.error('Error en login:', error);
-      throw error.response?.data || { message: "Error en el inicio de sesión" };
+      const errorMessage = error.response?.data?.message || error.response?.data || "Error en el inicio de sesión";
+      throw new Error(errorMessage);
     }
   },
 

@@ -16,9 +16,12 @@ import EquipamientoPage from "../features/equipamiento/pages/EquipamientoPage";
 import CalendarioPage from "../features/calendario/pages/CalendarioPage";
 import CalendarioReservasPage from "../features/calendario/pages/CalendarioReservaPage";
 import SolicitudesPage from "../features/AsignacionRoles/pages/SolicitudesPage";
-import Register from "../auth/components/Register";
-// Login
+
+// Componentes de autenticación
 import Login from "../auth/components/Login";
+import RegisterTypeSelector from "../auth/components/RegisterTypeSelector";
+import RegisterCliente from "../auth/components/RegisterCliente";
+import RegisterAdministrador from "../auth/components/RegisterAdministrador";
 
 // Persona
 import PersonaPage from "../features/personas/pages/PersonaPage";
@@ -27,7 +30,7 @@ import AdministradorPage from "../features/personas/pages/AdministradorPage";
 import UsuarioControlPage from "../features/personas/pages/UsuarioControlPage";
 import InvitadoPage from "../features/personas/pages/InvitadoPage";
 
-//ADMINISTRADOR
+// ADMINISTRADOR
 import MiAreaPage from '../features/RolAdministrador/mi_area/MiAreaPage';
 import CanchasAdmin from "../features/RolAdministrador/canchas/CanchasAdmin";
 
@@ -44,14 +47,11 @@ function AppRouter() {
           {/* Redirección por defecto → login */}
           <Route path="/" element={<Navigate to="/login" replace />} />
 
-          <Route
-            path="/register"
-            element={<Register />
-            }
-          />
-
-          {/* Login público */}
+          {/* Rutas de autenticación públicas */}
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<RegisterTypeSelector />} />
+          <Route path="/register/cliente" element={<RegisterCliente />} />
+          <Route path="/register/administrador" element={<RegisterAdministrador />} />
 
           {/* Ruta accesible para cualquier usuario autenticado */}
           <Route
@@ -64,6 +64,8 @@ function AppRouter() {
               </ProtectedRoute>
             }
           />
+
+          {/* Rutas solo para admin o superusuario - DashboardLayout original */}
           <Route
             path="/solicitudes"
             element={
@@ -74,9 +76,6 @@ function AppRouter() {
               </ProtectedRoute>
             }
           />
-
-          
-          {/* Rutas solo para admin o superusuario */}
           <Route
             path="/macrodistritos"
             element={
@@ -138,6 +137,7 @@ function AppRouter() {
             }
           />
 
+          {/* Rutas de gestión de personas - DashboardLayout original */}
           <Route
             path="/personas"
             element={
@@ -155,13 +155,25 @@ function AppRouter() {
           </Route>
 
           {/* RUTAS NUEVAS PARA ADMINISTRADOR - DashboardLayoutAdmin */}
-
+          <Route
+            path="/admin/dashboard"
+            element={
+              <ProtectedRoute requireAdmin>
+                <DashboardLayoutAdmin>
+                  <div className="p-6">
+                    <h1 className="text-2xl font-bold text-[#17252A] mb-4">Dashboard Administrador</h1>
+                    <p className="text-gray-600">Bienvenido al panel de administración</p>
+                  </div>
+                </DashboardLayoutAdmin>
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/admin/mi_area"
             element={
               <ProtectedRoute requireAdmin>
                 <DashboardLayoutAdmin>
-                   <MiAreaPage />
+                  <MiAreaPage />
                 </DashboardLayoutAdmin>
               </ProtectedRoute>
             }
@@ -172,27 +184,6 @@ function AppRouter() {
               <ProtectedRoute requireAdmin>
                 <DashboardLayoutAdmin>
                   <CanchasAdmin />
-
-                </DashboardLayoutAdmin>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/dashboard"
-            element={
-              <ProtectedRoute requireAdmin>
-                <DashboardLayoutAdmin>
-                    <Dashboard />
-                </DashboardLayoutAdmin>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/usuarios/control"
-            element={
-              <ProtectedRoute requireAdmin>
-                <DashboardLayoutAdmin>
-                  <PageUsuariosControl/>
                 </DashboardLayoutAdmin>
               </ProtectedRoute>
             }
@@ -212,7 +203,10 @@ function AppRouter() {
             element={
               <ProtectedRoute requireAdmin>
                 <DashboardLayoutAdmin>
-                  <div>Reportes</div>
+                  <div className="p-6">
+                    <h1 className="text-2xl font-bold text-[#17252A] mb-4">Reportes</h1>
+                    <p className="text-gray-600">Funcionalidad en desarrollo</p>
+                  </div>
                 </DashboardLayoutAdmin>
               </ProtectedRoute>
             }
@@ -222,13 +216,17 @@ function AppRouter() {
             element={
               <ProtectedRoute requireAdmin>
                 <DashboardLayoutAdmin>
-                  <div>Notificaciones</div>
+                  <div className="p-6">
+                    <h1 className="text-2xl font-bold text-[#17252A] mb-4">Notificaciones</h1>
+                    <p className="text-gray-600">Funcionalidad en desarrollo</p>
+                  </div>
                 </DashboardLayoutAdmin>
               </ProtectedRoute>
             }
           />
 
-        
+          {/* Ruta 404 - Redirigir a login */}
+          <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
