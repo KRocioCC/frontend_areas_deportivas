@@ -55,7 +55,7 @@ function SidebarAdmin({ open }) {
       isOpen: usuariosOpen,
       toggle: () => setUsuariosOpen(!usuariosOpen),
       items: [
-        { label: "Usuario Control", path: "/admin/usuarios/control" },
+        { label: "Usuarios Control", path: "/admin/usuarios/control" },
         { label: "Clientes", path: "/admin/usuarios/clientes" }
       ]
     },

@@ -1,0 +1,12 @@
+.toast-mensaje {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  background-color: #2ecc71;
+  color: white;
+  padding: 0.8rem 1.2rem;
+  border-radius: 6px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  font-weight: bold;
+  z-index: 9999;
+}

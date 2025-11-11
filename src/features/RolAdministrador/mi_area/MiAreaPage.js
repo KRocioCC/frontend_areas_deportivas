@@ -111,17 +111,23 @@ const MiAreaPage = () => {
 
   // --- PREVIEW DE IMAGEN (segura: no dispara 401 al backend) -----------------
   // Solo renderiza <img> si la URL es pública (http/https) y NO corresponde a tu backend protegido.
-  const publicImageSrc = useMemo(() => {
-    const u = (formData.urlImagen || area?.urlImagen || '').trim();
-    if (!u) return null;
+const publicImageSrc = useMemo(() => {
+  const u = (formData.urlImagen || area?.urlImagen || '').trim();
+  if (!u) return null;
 
-    const isHttp = /^https?:\/\//i.test(u);
-    const isBackend = /localhost:8032/i.test(u); // tu backend protegido
-    if (isHttp && !isBackend) return u;
+  const isHttp = /^https?:\/\//i.test(u);
+  const isBackend = /localhost:8032/i.test(u);
 
-    // Para rutas relativas (p.ej. "img/escalada.jpg") o backend: no cargar imagen (evita 401)
-    return null;
-  }, [area?.urlImagen, formData.urlImagen]);
+  // ✅ Si es una URL completa del backend, permitirla
+  if (isHttp && isBackend) return u;
+
+  // ✅ Si es una URL pública (no backend), permitirla
+  if (isHttp && !isBackend) return u;
+
+  // ❌ Si es una ruta relativa (ej. "img/escalada.jpg"), no mostrar
+  return null;
+}, [area?.urlImagen, formData.urlImagen]);
+
 
   // --- RENDER ----------------------------------------------------------------
   if (loading) return <div className="mi-area-loading">Cargando área deportiva...</div>;
@@ -295,7 +301,7 @@ const MiAreaPage = () => {
                   placeholder="https://misitio.com/imagen.jpg"
                 />
                 <small style={{ color: '#6b7280' }}>
-                  Por ahora solo se previsualizan URLs públicas. Las rutas del backend (p. ej. <code>/img/…</code>) se ignoran para evitar 401.
+                  Se permiten URLs públicas y del backend si son accesibles. Las rutas relativas (ej. <code>/img/…</code>) se ignoran para evitar errores.
                 </small>
               </div>
             )}

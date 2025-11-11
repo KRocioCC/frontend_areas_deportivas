@@ -1,6 +1,6 @@
 /* Estilos específicos para el sidebar de administrador */
 .admin-sidebar {
-  background: linear-gradient(180deg, #1e3a8a 0%, #3730a3 100%);
+  background: var(--color-p-3);
   width: 16rem; /* equivalente a w-64 */
   min-height: 100vh;
   position: fixed;
@@ -33,7 +33,7 @@
 }
 
 .admin-sidebar .active-link {
-  background-color: #4f46e5;
+  background-color: var(--color-p-5);
   color: white;
-  border-right: 3px solid #818cf8;
+  border-right: 3px solid var(--color-p-5);
 }

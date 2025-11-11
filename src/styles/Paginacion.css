@@ -1,0 +1,34 @@
+/* Paginación */
+.paginacion {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.paginacion button {
+  padding: 0.4rem 0.8rem;
+  border: none;
+  background-color: #f0f0f0;
+  color: #333;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  transition: background-color 0.2s ease;
+}
+
+.paginacion button:hover:not(:disabled) {
+  background-color: #d0d0d0;
+}
+
+.paginacion button.active {
+  background-color: var(--color-p-5);
+  color: white;
+  font-weight: bold;
+}
+
+.paginacion button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

@@ -152,7 +152,7 @@
 }
 
 .btn-crear {
-  background-color: #6c5ce7;
+  background-color: var(--color-p-5);
   color: white;
   border: none;
   padding: 0.6rem 1.2rem;
@@ -165,7 +165,7 @@
 }
 
 .btn-crear:hover {
-  background-color: #a29bfe;
+  background-color: var(--color-p-3);
 }
 .btn-cancel {
   background-color: #d63031;
@@ -190,7 +190,7 @@
 }
 
 
-/* Estilos para el modal de información adicional */
+/* Estilos para el modal de información adicional ESTO AUN NO SE IMPLEMENTO*/
 .modal-overlay {
   position: fixed;
   top: 0;
