@@ -72,3 +72,8 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/t
 
 instala esto
 npm install lucide-react framer-motion
+
+
+npm install react-icons recharts
+
+npm install react-apexcharts apexcharts
