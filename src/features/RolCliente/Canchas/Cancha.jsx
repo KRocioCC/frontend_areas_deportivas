@@ -5,6 +5,8 @@ import { getCanchasPorArea } from "../../../api/CanchaApi";
 import { getAreadeportivaById } from "../../../api/AreadeportivaApi"; 
 import { FaArrowLeft, FaDollarSign, FaUsers } from "react-icons/fa";
 import CanchaModal from "./CanchaModal";
+import { useNavigate } from "react-router-dom";
+// ...
 
 export default function Cancha() {
   const [area, setArea] = useState(null);
@@ -13,6 +15,7 @@ export default function Cancha() {
   const [loading, setLoading] = useState(true);
   const location = useLocation();
   const areaId = new URLSearchParams(location.search).get("areaId");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -68,7 +71,7 @@ export default function Cancha() {
 
       {/* Grid de canchas */}
       <div className="py-6 px-4 md:px-8">
-        <h2 className="text-2xl font-bold mb-4">Canchas Disponibles</h2>
+        <h2 className="text-2xl text-gray-300 font-bold mb-4">Canchas Disponibles</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {canchas.map((cancha) => (
             <div
@@ -93,13 +96,13 @@ export default function Cancha() {
                 <div className="mt-4 flex gap-2">
                   <button
                     className="px-3 py-1 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded text-sm"
-                    onClick={() => alert("Ver Comentarios (próximamente)")}
+                    onClick={() => alert("Ver Comentarios (próximamente mejor si jala hacia abajo lso comenatrios)")}
                   >
                     Ver Comentarios
                   </button>
                   <button
                     className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm"
-                    onClick={() => setSelectedCancha(cancha)}
+                    onClick={() => navigate(`/canchacli/detalle/${cancha.id}`)}
                   >
                     Realizar Reserva
                   </button>

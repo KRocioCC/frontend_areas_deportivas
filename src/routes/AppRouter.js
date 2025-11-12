@@ -41,6 +41,7 @@ import Dashboard from "../features/RolAdministrador/dashboard/index.jsx";
 //CLIENTE
 // CLIENTE - componentes visuales
 import Preloader from "../components/ComponentsCli/Preloader.jsx";
+import { AnimatePresence, motion } from "framer-motion";
 import LayoutCliente from "../components/ComponentsCli/LayoutCliente.jsx";  
 //import Navbar from "../componentsCli/Navbar";
 //import Hero from "../componentsCli/Hero";
@@ -50,11 +51,36 @@ import Inicio from "../features/RolCliente/Inicio/InicioCli.jsx";
 //import Seccion1 from "../feature/RolCliente/Inicio/Seccion1";
 import Areadeportiva from "../features/RolCliente/AreaDeportiva/AreaDeportiva.jsx"
 import Cancha from "../features/RolCliente/Canchas/Cancha.jsx"
+import CanchaDetalle from "../features/RolCliente/Canchas/CanchaDetalleModal.jsx"
 //import HistorialReserva from "../feature/RolCliente/Areadeportiva/HistorialReserva/HistorialReserva";
 //import Notificaciones from "../feature/RolCliente/Notificaciones/Notificaciones"; // si existe
 
 
 function AppRouter() {
+
+  const pageVariants = {
+    initial: (direction) => ({
+      x: direction > 0 ? 300 : -300,
+      opacity: 0,
+      position: "absolute",
+      width: "100%"
+    }),
+    animate: {
+      x: 0,
+      opacity: 1,
+      position: "relative",
+      width: "100%",
+      transition: { type: "tween", duration: 0.5 }
+    },
+    exit: (direction) => ({
+      x: direction > 0 ? -300 : 300,
+      opacity: 0,
+      position: "absolute",
+      width: "100%",
+      transition: { type: "tween", duration: 0.5 }
+    })
+  };
+
   const [loading, setLoading] = useState(true);
   return (
     <AuthProvider>
@@ -105,6 +131,21 @@ function AppRouter() {
               <LayoutCliente>
                 <Cancha />
               </LayoutCliente>
+            }
+          />
+
+           <Route
+            path="canchacli/detalle/:id"
+            element={
+              <motion.div
+                variants={pageVariants}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                custom={1}
+              >
+                <CanchaDetalle />
+              </motion.div>
             }
           />
 
