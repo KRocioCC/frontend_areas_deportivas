@@ -8,6 +8,7 @@ export async function getAreadeportivaActivos() {
   return res.data;
 }
 
+
 // Obtener todas las áreas deportivas (incluye inactivos)
 export async function getAreadeportiva() {
   const res = await api.get(API_URL);
@@ -55,6 +56,7 @@ export async function buscarAreadeportivaPorNombre(nombre) {
   const res = await api.get(`${API_URL}/buscar/${nombre}`);
   return res.data;
 }
+
 
 // Obtener con bloqueo
 export async function getAreadeportivaConBloqueo(id) {

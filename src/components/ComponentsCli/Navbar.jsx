@@ -54,7 +54,7 @@ export default function Navbar() {
     <motion.nav
       className={`fixed top-0 left-0 right-0 z-50 px-5 md:px-8 py-3 transition-all duration-500 ${
         scrolled
-          ? "bg-[var(--color-pb-1)] backdrop-blur-lg shadow-lg border-b border-[var(--color-pb-3)]"
+          ? "bg-[var(--color-pb-5)] backdrop-blur-lg shadow-lg border-b border-[var(--color-b-3)]"
           : "bg-black/60 backdrop-blur-sm"
       }`}
       initial={{ y: -100 }}

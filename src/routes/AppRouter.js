@@ -48,7 +48,8 @@ import LayoutCliente from "../components/ComponentsCli/LayoutCliente.jsx";
 // CLIENTE - páginas
 import Inicio from "../features/RolCliente/Inicio/InicioCli.jsx";
 //import Seccion1 from "../feature/RolCliente/Inicio/Seccion1";
-//import Areadeportiva from "../feature/RolCliente/Areadeportiva/Areadeportiva";
+import Areadeportiva from "../features/RolCliente/AreaDeportiva/AreaDeportiva.jsx"
+import Cancha from "../features/RolCliente/Canchas/Cancha.jsx"
 //import HistorialReserva from "../feature/RolCliente/Areadeportiva/HistorialReserva/HistorialReserva";
 //import Notificaciones from "../feature/RolCliente/Notificaciones/Notificaciones"; // si existe
 
@@ -87,8 +88,25 @@ function AppRouter() {
           <Route path="/register/administrador" element={<RegisterAdministrador />} />
 
           {/*paginas publicas */}
-          <Route path="/inicio" element={<Inicio />} />
-          {/*<Route path="/areadeportiva" element={<Areadeportiva />} /> */}
+          <Route
+            path="/areadeportivacli"
+            element={
+              <LayoutCliente>
+                <Areadeportiva />
+              </LayoutCliente>
+            }
+          />
+
+          {/*Pagiinas publicas Canchas */}
+
+          <Route
+            path="/canchacli"
+            element={
+              <LayoutCliente>
+                <Cancha />
+              </LayoutCliente>
+            }
+          />
 
             {/*  <Route
               path="/reservas/historial"
@@ -105,7 +123,7 @@ function AppRouter() {
                   <Notificaciones />
                 </ProtectedRoute>
               }
-            />*/}
+            />
 
           {/* Ruta accesible para cualquier usuario autenticado */}
           <Route
