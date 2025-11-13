@@ -167,46 +167,7 @@ export default function PageUsuariosControlForm({ initialData, onSave, onCancel 
       <div className="form-row"><label>Dirección</label><input value={direccion} onChange={e => setDireccion(e.target.value)} /></div>
       <div className="form-row"><label>Hora Inicio Turno</label><input type="time" value={horaInicioTurno} onChange={e => setHoraInicioTurno(e.target.value)} />{errors.horaInicioTurno && <div className="form-error">{errors.horaInicioTurno}</div>}</div>
       <div className="form-row"><label>Hora Fin Turno</label><input type="time" value={horaFinTurno} onChange={e => setHoraFinTurno(e.target.value)} />{errors.horaFinTurno && <div className="form-error">{errors.horaFinTurno}</div>}</div>
-      <div className="form-row"><label>Estado Operativo</label><select value={estadoOperativo} onChange={e => setEstadoOperativo(e.target.value)}><option value="Activo">Activo</option><option value="Inactivo">Inactivo</option></select></div>
-      <div className="form-row"><label className="checkbox-label"><input type="checkbox" checked={estado} onChange={e => setEstado(e.target.checked)} /> Activo</label></div>
 
-      {/* Asignar nuevas canchas */}
-      <div className="form-row">
-        <label>Asignar Canchas</label>
-        <div className="checkbox-group">
-          {canchas.map(c => (
-            <label key={c.id} className="checkbox-label">
-              <input
-                type="checkbox"
-                checked={canchasSeleccionadas.includes(c.idCancha)}
-                onChange={() => toggleCancha(c.idCancha)}
-              />
-              {c.nombre}
-            </label>
-          ))}
-        </div>
-      </div>
-
-      {/* Canchas ya asignadas */}
-      {initialData?.id && canchasAsignadas.length > 0 && (
-        <div className="form-row">
-          <label>Canchas Asignadas</label>
-          <ul className="asignadas-list">
-            {canchasAsignadas.map(c => (
-              <li key={c.idCancha}>
-                {c.nombre}
-                <button
-                  type="button"
-                  className="btn-remove"
-                  onClick={() => handleQuitarCancha(c.id)}
-                >
-                  Quitar
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
 
       <div className="form-actions">
         <button type="submit">Guardar</button>
