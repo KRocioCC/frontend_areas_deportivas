@@ -25,6 +25,7 @@ export default function Cancha() {
           getAreadeportivaById(areaId),
           getCanchasPorArea(areaId)
         ]);
+        console.log("Canchas recibidas:", canchasData);
         setArea(areaData);
         setCanchas(canchasData);
       } catch (error) {
@@ -75,7 +76,7 @@ export default function Cancha() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {canchas.map((cancha) => (
             <div
-              key={cancha.id}
+              key={cancha.idCancha}
               className="border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition"
             >
               <img
