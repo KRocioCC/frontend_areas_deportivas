@@ -92,7 +92,7 @@ export const marcarEnCurso = async (id) => {
 //  Obtener reservas del administrador en un rango de fechas
 // Se usa en el dashboard y calendario para mostrar solo las reservas de sus canchas
 export async function getReservasPorAdministradorEnRango(idAdministrador, inicio, fin) {
-  const res = await api.get(`${API_URL}/administrador/${idAdministrador}/rango-fechas?inicio=${inicio}&fin=${fin}`);
+  const res = await api.get(`${URL_BASE}/administrador/${idAdministrador}/rango-fechas?inicio=${inicio}&fin=${fin}`);
   return res.data;
 }
 
