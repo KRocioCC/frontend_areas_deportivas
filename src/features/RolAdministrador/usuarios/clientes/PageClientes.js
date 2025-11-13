@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { getClientesPorAdministrador } from "../../../../api/administradorApi";
+import Paginacion from "../../../../components/ui/Paginacion";
+
 import "./PageClientes.css";
 
 export default function PageClientes() {
@@ -8,15 +10,19 @@ export default function PageClientes() {
   const [error, setError] = useState(null);
   const [search, setSearch] = useState("");
 
+  const [paginaActual, setPaginaActual] = useState(1);
+  const [clientesPorPagina, setClientesPorPagina] = useState(8);
+
+
   // Obtener el ID de la persona que actúa como administrador
   const id = localStorage.getItem("id");
 
-  console.log("🧠 ID del administrador obtenido:", id);
+  console.log("ID del administrador obtenido:", id);
 
   useEffect(() => {
     async function fetchClientes() {
       if (!id) {
-        console.warn("⚠️ ID no disponible en localStorage");
+        console.warn("ID no disponible en localStorage");
         return;
       }
 
@@ -26,7 +32,7 @@ export default function PageClientes() {
         const data = await getClientesPorAdministrador(id);
         setClientes(Array.isArray(data) ? data : []);
       } catch (err) {
-        console.error("❌ Error al cargar clientes:", err);
+        console.error("Error al cargar clientes:", err);
         setError("No se pudieron cargar los clientes.");
       } finally {
         setLoading(false);
@@ -36,20 +42,24 @@ export default function PageClientes() {
     fetchClientes();
   }, [id]);
 
-  async function handleSearch(e) {
-    e.preventDefault();
+async function handleSearch(e) {
+  if (e) e.preventDefault(); 
 
-    if (!search.trim()) {
-      const data = await getClientesPorAdministrador(id);
-      setClientes(Array.isArray(data) ? data : []);
-      return;
-    }
-
-    const filtered = clientes.filter(cliente =>
-      cliente.nombre?.toLowerCase().includes(search.trim().toLowerCase())
-    );
-    setClientes(filtered);
+  if (!search.trim()) {
+    const data = await getClientesPorAdministrador(id);
+    setClientes(Array.isArray(data) ? data : []);
+    return;
   }
+
+  const filtered = clientes.filter(cliente =>
+    cliente.nombre?.toLowerCase().includes(search.trim().toLowerCase())
+  );
+  setClientes(filtered);
+}
+const indiceInicio = (paginaActual - 1) * clientesPorPagina;
+const clientesPaginados = clientes.slice(indiceInicio, indiceInicio + clientesPorPagina);
+const totalPaginas = Math.ceil(clientes.length / clientesPorPagina);
+
 
   return (
     <div className="clientes-page card">
@@ -109,23 +119,27 @@ export default function PageClientes() {
                   </td>
                 </tr>
               ) : (
-                clientes.map(cliente => (
-                  <tr
-                    key={cliente.id}
-                    className={!cliente.estado ? "row-inactive" : ""}
-                  >
-                    <td>{cliente.id}</td>
-                    <td>{cliente.nombre}</td>
-                    <td>{cliente.apaterno || "-"}</td>
-                    <td>{cliente.amaterno || "-"}</td>
-                    <td>{cliente.email}</td>
-                    <td>{cliente.telefono}</td>
-                    <td>{cliente.estado ? "Activo" : "Inactivo"}</td>
-                  </tr>
-                ))
+                clientesPaginados.map(cliente => (
+                <tr key={cliente.id}>
+                  <td>{cliente.id}</td>
+                  <td>{cliente.nombre}</td>
+                  <td>{cliente.apellidoPaterno || "-"}</td>
+                  <td>{cliente.apellidoMaterno || "-"}</td>
+                  <td>{cliente.email}</td>
+                  <td>{cliente.telefono}</td>
+                  <td>{cliente.estado ? "Activo" : "Inactivo"}</td>
+                </tr>
+              ))
+
               )}
             </tbody>
           </table>
+          <Paginacion
+            paginaActual={paginaActual}
+            totalPaginas={totalPaginas}
+            onPageChange={setPaginaActual}
+          />
+
         </div>
       )}
     </div>
