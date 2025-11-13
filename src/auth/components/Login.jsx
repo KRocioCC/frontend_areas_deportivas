@@ -38,12 +38,13 @@ const Login = () => {
       } else if (roles.includes('ROLE_CLIENTE')) {
         redirectTo = '/inicio';
       } else if (roles.includes('ROLE_ADMINISTRADOR')) {
-        redirectTo = '/admin/dashboard';
-      } else if (roles.includes('ROLE_SUPERUSUARIO')) {
-        redirectTo = '/solicitudes';
+        navigate('/admin/mi_area');
+      } else if (roles.includes('ROLE_CLIENTE')) {
+        navigate('/canchas');
+      } else {
+        setError('Tu cuenta no tiene un rol válido asignado.');
       }
 
-      navigate(redirectTo, { replace: true });
     } catch (err) {
       setError(err.message || 'Error al iniciar sesión.');
     } finally {

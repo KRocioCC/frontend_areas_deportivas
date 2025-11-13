@@ -60,7 +60,7 @@ import ReservaPage from "../features/RolCliente/Reserva/ReservaPage22.jsx";
 import ConfirmacionFinalReservaHorario from "../features/RolCliente/Reserva/ConfirmacionFinal.jsx";
 
 //import { ProtectedRoute } from '../auth/components/ProtectedRoute.jsx';
-
+import Calendar from "../features/RolAdministrador/calendar/Calendar";
 function AppRouter() {
 
   const pageVariants = {
@@ -296,24 +296,11 @@ function AppRouter() {
 
           {/* RUTAS NUEVAS PARA ADMINISTRADOR - DashboardLayoutAdmin */}
           <Route
-            path="/admin/dashboard"
-            element={
-              <ProtectedRoute requireAdmin>
-                <DashboardLayoutAdmin>
-                  <div className="p-6">
-                    <h1 className="text-2xl font-bold text-[#17252A] mb-4">Dashboard Administrador</h1>
-                    <p className="text-gray-600">Bienvenido al panel de administración</p>
-                  </div>
-                </DashboardLayoutAdmin>
-              </ProtectedRoute>
-            }
-          />
-          <Route
             path="/admin/mi_area"
             element={
               <ProtectedRoute requireAdmin>
                 <DashboardLayoutAdmin>
-                  <MiAreaPage />
+                   <MiAreaPage />
                 </DashboardLayoutAdmin>
               </ProtectedRoute>
             }
@@ -324,6 +311,27 @@ function AppRouter() {
               <ProtectedRoute requireAdmin>
                 <DashboardLayoutAdmin>
                   <CanchasAdmin />
+
+                </DashboardLayoutAdmin>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/dashboard"
+            element={
+              <ProtectedRoute requireAdmin>
+                <DashboardLayoutAdmin>
+                    <Dashboard />
+                </DashboardLayoutAdmin>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/usuarios/control"
+            element={
+              <ProtectedRoute requireAdmin>
+                <DashboardLayoutAdmin>
+                  <PageUsuariosControl/>
                 </DashboardLayoutAdmin>
               </ProtectedRoute>
             }
@@ -339,14 +347,11 @@ function AppRouter() {
             }
           />
           <Route
-            path="/admin/reportes"
+            path="/admin/calendario"
             element={
               <ProtectedRoute requireAdmin>
                 <DashboardLayoutAdmin>
-                  <div className="p-6">
-                    <h1 className="text-2xl font-bold text-[#17252A] mb-4">Reportes</h1>
-                    <p className="text-gray-600">Funcionalidad en desarrollo</p>
-                  </div>
+                  <Calendar />
                 </DashboardLayoutAdmin>
               </ProtectedRoute>
             }
@@ -356,10 +361,7 @@ function AppRouter() {
             element={
               <ProtectedRoute requireAdmin>
                 <DashboardLayoutAdmin>
-                  <div className="p-6">
-                    <h1 className="text-2xl font-bold text-[#17252A] mb-4">Notificaciones</h1>
-                    <p className="text-gray-600">Funcionalidad en desarrollo</p>
-                  </div>
+                  <div>Notificaciones</div>
                 </DashboardLayoutAdmin>
               </ProtectedRoute>
             }
