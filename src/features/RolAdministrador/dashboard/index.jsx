@@ -5,9 +5,9 @@ import MetaMensual from './components/MetaMensual';
 import TablaPedidosRecientes from './components/TablaPedidosRecientes';
 
 export default function DashboardAdministrador() {
-  const { currentUser } = useContext(AuthContext); // 👈 ahora sí lo usas
+  const { currentUser } = useContext(AuthContext); 
 
-  console.log('🧩 Usuario en DashboardAdministrador:', currentUser);
+  console.log('Usuario en DashboardAdministrador:', currentUser);
 
   return (
     <div className="min-h-screen bg-gray-100 p-6 space-y-8">

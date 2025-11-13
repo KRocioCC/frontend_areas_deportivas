@@ -1,0 +1,16 @@
+.fc .fc-button {
+  background-color: #41BFB3 !important;
+  border: none;
+  color: white !important;
+}
+
+.fc .fc-button:hover {
+  background-color: #3AA89F !important;
+}
+
+.fc-toolbar-title {
+  font-size: 1.95rem;       /* tamaño más grande */
+  font-weight: 600;         /* semibold */
+  color: #1F2937;           /* gris oscuro */
+  font-family: 'Inter', sans-serif; /* o la fuente que uses en tu app */
+}
