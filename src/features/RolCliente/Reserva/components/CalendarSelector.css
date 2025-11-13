@@ -1,0 +1,100 @@
+/* src/Reserva/components/CalendarSelector.css */
+
+.custom-calendar-large {
+  border: none !important;
+  font-family: var(--font-josefin) !important;
+  color: var(--color-t-1);
+  width: 100% !important;
+  font-size: 1rem !important;
+}
+
+.custom-calendar-large .react-calendar__navigation {
+  margin-bottom: 1.5rem;
+  height: 50px;
+}
+
+.custom-calendar-large .react-calendar__navigation button {
+  color: var(--color-p-3);
+  font-weight: 700;
+  font-size: 1.1rem;
+  min-width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: transparent;
+  transition: all 0.3s ease;
+}
+
+.custom-calendar-large .react-calendar__navigation button:hover {
+  background-color: var(--color-p-1) !important;
+  color: var(--color-p-8) !important;
+}
+
+.custom-calendar-large .react-calendar__navigation__label {
+  font-family: var(--font-Alumni) !important;
+  font-size: 1.5rem !important;
+  color: var(--color-p-8);
+  font-weight: bold;
+  pointer-events: none;
+}
+
+.custom-calendar-large .react-calendar__month-view__weekdays {
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--color-p-8);
+  margin-bottom: 1rem;
+}
+
+.custom-calendar-large .react-calendar__tile {
+  height: 58px !important;
+  width: 58px !important;
+  border-radius: 16px !important;
+  font-weight: 600;
+  font-size: 1.05rem;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.custom-calendar-large .react-calendar__tile:hover {
+  background-color: var(--color-p-9) !important;
+  transform: scale(1.05);
+}
+
+.custom-calendar-large .react-calendar__tile.today-large {
+  background: var(--color-p-1) !important;
+  color: white !important;
+  border-radius: 100px;
+  font-weight: 800 !important;
+  box-shadow: 0 4px 12px rgba(110, 61, 21, 0.4);
+  border-radius: 50%;
+}
+
+.custom-calendar-large .react-calendar__tile.selected-large {
+  background: rgb(190, 70, 22) !important;
+  color: var(--color-p-4) !important;
+  border: 3px solid var(--color-p-1) !important;
+  font-weight: 800 !important;
+  border-radius: 100px;
+  box-shadow: 0 0 0 4px rgba(192, 20, 40, 0.2);
+  border-radius: 50%;
+  animation: pulse 1.5s infinite;
+}
+
+.custom-calendar-large .react-calendar__tile.saturday {
+  color: var(--color-p-5);
+  font-weight: 600;
+}
+
+.custom-calendar-large .react-calendar__month-view__days__day--neighboringMonth {
+  color: #757272 !important;
+  opacity: 0.4;
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 4px rgba(214, 23, 39, 0.2); }
+  50% { box-shadow: 0 0 0 8px rgba(214, 23, 39, 0.1); }
+  100% { box-shadow: 0 0 0 4px rgba(214, 23, 39, 0.2); }
+}

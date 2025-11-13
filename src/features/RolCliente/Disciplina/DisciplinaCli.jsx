@@ -2,14 +2,14 @@ import { useState, useEffect } from "react";
 import { FaFutbol, FaVolleyballBall, FaBasketballBall } from "react-icons/fa";
 import { getDisciplinasActivas } from "../../../api/DisciplinaApi";
 
-export default function DisciplinaCli({ canchaId, onSelectDisciplina }) {
+export default function DisciplinaCli({ idCancha, onSelectDisciplina }) {
   const [disciplinas, setDisciplinas] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchDisciplinas = async () => {
       try {
-        const data = await getDisciplinasActivas(canchaId);
+        const data = await getDisciplinasActivas(idCancha);
         console.log("📦 Disciplinas cargadas:", data);
         setDisciplinas(data);
       } catch (error) {
@@ -19,7 +19,7 @@ export default function DisciplinaCli({ canchaId, onSelectDisciplina }) {
       }
     };
     fetchDisciplinas();
-  }, [canchaId]);
+  }, [idCancha]);
 
   const getIcon = (nombre) => {
     const n = nombre?.toLowerCase();
@@ -34,6 +34,9 @@ export default function DisciplinaCli({ canchaId, onSelectDisciplina }) {
     return <p className="text-gray-500 text-center">No hay disciplinas disponibles.</p>;
 
   return (
+
+
+
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
       {disciplinas.map((disciplina) => (
         <button

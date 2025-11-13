@@ -62,7 +62,7 @@ export default function CanchaDetalle() {
     }
     setError("");
 
-    const url = `/reservascli?canchaId=${cancha.id}&disciplinaId=${disciplina.id}`;
+    const url = `/reservascli?canchaId=${cancha.idCancha}&disciplinaId=${disciplina.idDisciplina}`;
 
     if (currentUser && isClient) {
       // usuario cliente ya logueado
@@ -72,6 +72,8 @@ export default function CanchaDetalle() {
       navigate("/login", { state: { from: url } });
     }
   };
+  console.log("Cancha:", cancha);
+  console.log("Disciplina:", disciplina);
   
   return (
     <motion.div
@@ -105,16 +107,16 @@ export default function CanchaDetalle() {
               </h3>
 
               {/* PASAMOS setDisciplina como onSelectDisciplina */}
-              <DisciplinaCli canchaId={cancha.id} onSelectDisciplina={(d) => setDisciplina(d)} />
+              <DisciplinaCli canchaId={cancha.idCancha} onSelectDisciplina={(d) => setDisciplina(d)} />
 
               {disciplina && (
                 <div className="mt-3 text-sm text-gray-700">
-                  Seleccionado: <strong>{disciplina.nombre}</strong>
+                  Seleccionado: <strong>{disciplina.nombre || JSON.stringify(disciplina)}</strong>
                 </div>
               )}
 
               {error && <div className="mt-2 text-sm text-red-500">{error}</div>}
-
+              
             </div>
 
           </div>

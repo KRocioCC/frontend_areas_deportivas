@@ -56,7 +56,7 @@ import CanchaDetalle from "../features/RolCliente/Canchas/CanchaDetalle.jsx"
 //import Notificaciones from "../feature/RolCliente/Notificaciones/Notificaciones"; // si existe
 //import HistorialReserva from "../feature/RolCliente/Areadeportiva/HistorialReserva/HistorialReserva";
 //import Notificaciones from "../feature/RolCliente/Notificaciones/Notificaciones"; // si existe
-import ReservaPage from "../features/RolCliente/Reserva/ReservaPage.jsx";
+import ReservaPage from "../features/RolCliente/Reserva/ReservaPage22.jsx";
 import ConfirmacionFinalReservaHorario from "../features/RolCliente/Reserva/ConfirmacionFinal.jsx";
 
 //import { ProtectedRoute } from '../auth/components/ProtectedRoute.jsx';
