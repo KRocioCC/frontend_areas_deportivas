@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate,useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import authService from '../services/authService';
 import PasswordInput from '../components/PasswordInput';
@@ -12,6 +12,8 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
+  //la ubicaion de la url
+  const location = useLocation();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,6 +22,7 @@ const Login = () => {
 
     try {
       const response = await login(username, password);
+
       localStorage.setItem('user', JSON.stringify(response));
       localStorage.setItem('id', response.id); // guarda el ID 
 
@@ -27,19 +30,22 @@ const Login = () => {
       authService.setupAxiosInterceptors(response.token);
 
       const roles = response.roles || [];
-      
-      if (roles.includes('ROLE_SUPERUSUARIO')) {
-        navigate('/solicitudes');
-      } else if (roles.includes('ROLE_ADMINISTRADOR')) {
-        navigate('/admin/dashboard');
+      let redirectTo = '/inicio';
+
+      // SI VENÍA DE UNA RUTA PROTEGIDA → REDIRIGIR AHÍ
+      if (location.state?.from) {
+        redirectTo = location.state.from;
       } else if (roles.includes('ROLE_CLIENTE')) {
-        navigate('/canchas');
-      } else {https://github.com/JosueMisaelLopezHuanca/frontend-espacios-qr/pull/17/conflict?name=src%252Fauth%252Fcomponents%252FLogin.jsx&ancestor_oid=ae9533122609bd0f6d23be97cd9a2d9c31288e82&base_oid=46247c4735c4897a0733e5043e1a526c76d4bb62&head_oid=ac9f4a9f9e0e89f022eb6e6a4e5f292165619034
-        setError('Tu cuenta no tiene un rol válido asignado.');
+        redirectTo = '/inicio';
+      } else if (roles.includes('ROLE_ADMINISTRADOR')) {
+        redirectTo = '/admin/dashboard';
+      } else if (roles.includes('ROLE_SUPERUSUARIO')) {
+        redirectTo = '/solicitudes';
       }
 
+      navigate(redirectTo, { replace: true });
     } catch (err) {
-      setError(err.message || 'Error al iniciar sesión. Comprueba tus credenciales.');
+      setError(err.message || 'Error al iniciar sesión.');
     } finally {
       setIsLoading(false);
     }
@@ -102,6 +108,16 @@ const Login = () => {
           <Link to="/register" className="auth-link">
             ¿No tienes cuenta? Regístrate
           </Link>
+        </div>
+
+        <div className="mt-6 text-center">
+          <button
+            type="button"
+            onClick={() => navigate("/inicio")}
+            className="text-[var(--accent1)] hover:underline text-sm"
+          >
+            ← Volver al inicio
+          </button>
         </div>
 
         <div className="auth-debug">

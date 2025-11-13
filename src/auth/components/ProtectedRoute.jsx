@@ -1,6 +1,7 @@
 import React from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate ,useLocation} from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+
 
 const ProtectedRoute = ({
   children,
@@ -18,6 +19,7 @@ const ProtectedRoute = ({
     roles,
     isLoading,
   } = useAuth();
+   const location = useLocation();
 
   // 🐞 Consola para debuguear estado de autenticación
   console.log("🔐 ProtectedRoute Debug:");
@@ -32,10 +34,28 @@ const ProtectedRoute = ({
   if (isLoading) {
     return <div className="flex justify-center items-center h-screen">Cargando...</div>;
   }
+/*
+  if (!isAuthenticated) {
+    console.warn("⛔ Usuario no autenticado. Redirigiendo al login.");
+    return <Navigate to="/inicio" replace />;
+  }*/
 
   if (!isAuthenticated) {
     console.warn("⛔ Usuario no autenticado. Redirigiendo al login.");
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/login" state={{ from: location.pathname }} replace />;
+  }
+
+  if (!currentUser) {
+    // guarda la ruta completa (objeto) para que Login pueda redirigir correctamente
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+  //Si no tiene rol de admin o superusuario, lo manda a /inicio
+  if (requireAdmin && !roles.some(r => r.includes("ADMIN") || r.includes("SUPERUSUARIO"))) {
+    return <Navigate to="/inicio" replace />;
+  }
+  //Si no tiene rol de cliente, también lo manda a /inicio.
+  if (requireClient && !roles.includes("ROLE_CLIENTE")) {
+    return <Navigate to="/inicio" replace />;
   }
 
   if (currentUser?.estado === 'PENDIENTE') {
@@ -52,10 +72,10 @@ const ProtectedRoute = ({
     console.warn("🔒 Ruta requiere ADMIN o SUPERUSUARIO. Redirigiendo.");
     return <Navigate to="/canchas" replace />;
   }
-
+  //vuelvesara
   if (requireClient && !isClient) {
-    console.warn("🔒 Ruta requiere CLIENTE. Redirigiendo.");
-    return <Navigate to="/solicitud" replace />;
+    console.warn("Ruta requiere CLIENTE. Redirigiendo.");
+    return <Navigate to="/inicio" replace />;
   }
 
   if (requireControl && !roles.includes('ROL_CONTROL')) {

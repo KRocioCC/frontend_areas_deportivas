@@ -1,10 +1,10 @@
 // src/features/RolCliente/Cancha/Cancha.jsx
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { getCanchasPorArea } from "../../../api/CanchaApi";
+import { getCanchasPorArea } from "../../../api/CanchaApi.js";
 import { getAreadeportivaById } from "../../../api/AreadeportivaApi"; 
 import { FaArrowLeft, FaDollarSign, FaUsers } from "react-icons/fa";
-import CanchaModal from "./CanchaModal";
+//import CanchaModal from "./CanchaModal";
 import { useNavigate } from "react-router-dom";
 // ...
 
@@ -102,7 +102,7 @@ export default function Cancha() {
                   </button>
                   <button
                     className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm"
-                    onClick={() => navigate(`/canchacli/detalle/${cancha.id}`)}
+                    onClick={() => navigate(`/canchacli/detalle/${cancha.idCancha}`)}
                   >
                     Realizar Reserva
                   </button>
@@ -114,13 +114,13 @@ export default function Cancha() {
       </div>
 
       {/* Modal de detalle de cancha */}
-      {selectedCancha && (
+      {/*{selectedCancha && (
         <CanchaModal
           cancha={selectedCancha}
           area={area}
           onClose={() => setSelectedCancha(null)}
         />
-      )}
+      )}*/}
     </div>
   );
 }

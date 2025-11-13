@@ -3,6 +3,13 @@ import api from "./api"; // instancia base de Axios (con baseURL y headers confi
 
 const URL_BASE = "/pagos";
 
+export async function getPagos() {
+  const res = await api.get(URL_BASE);
+  return res.data;
+}
+
+
+
 /* -----------------------------------------------------------
    CRUD PRINCIPAL
 ----------------------------------------------------------- */

@@ -51,10 +51,15 @@ import Inicio from "../features/RolCliente/Inicio/InicioCli.jsx";
 //import Seccion1 from "../feature/RolCliente/Inicio/Seccion1";
 import Areadeportiva from "../features/RolCliente/AreaDeportiva/AreaDeportiva.jsx"
 import Cancha from "../features/RolCliente/Canchas/Cancha.jsx"
-import CanchaDetalle from "../features/RolCliente/Canchas/CanchaDetalleModal.jsx"
+import CanchaDetalle from "../features/RolCliente/Canchas/CanchaDetalle.jsx"
 //import HistorialReserva from "../feature/RolCliente/Areadeportiva/HistorialReserva/HistorialReserva";
 //import Notificaciones from "../feature/RolCliente/Notificaciones/Notificaciones"; // si existe
+//import HistorialReserva from "../feature/RolCliente/Areadeportiva/HistorialReserva/HistorialReserva";
+//import Notificaciones from "../feature/RolCliente/Notificaciones/Notificaciones"; // si existe
+import ReservaPage from "../features/RolCliente/Reserva/ReservaPage.jsx";
+import ConfirmacionFinalReservaHorario from "../features/RolCliente/Reserva/ConfirmacionFinal.jsx";
 
+//import { ProtectedRoute } from '../auth/components/ProtectedRoute.jsx';
 
 function AppRouter() {
 
@@ -85,24 +90,14 @@ function AppRouter() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        {loading ? (
+        {/*{loading ? (
             <Preloader onFinish={() => setLoading(false)} />
-          ) : (
+          ) : (*/}
         <Routes>
           
           {/* Redirección por defecto → inicio */}
           {/* Ruta pública: inicio */}
           <Route path="/" element={<Navigate to="/inicio" replace />} />
-          
-          <Route
-            path="/inicio"
-            element={
-              <LayoutCliente>
-                <Inicio />
-              </LayoutCliente>
-            }
-          />
-
 
           {/* Redirección por defecto → login */}
           {/*<Route path="/" element={<Navigate to="/login" replace />} />*/}
@@ -114,6 +109,16 @@ function AppRouter() {
           <Route path="/register/administrador" element={<RegisterAdministrador />} />
 
           {/*paginas publicas */}
+
+          <Route
+            path="/inicio"
+            element={
+              <LayoutCliente>
+                <Inicio />
+              </LayoutCliente>
+            }
+          />
+
           <Route
             path="/areadeportivacli"
             element={
@@ -146,6 +151,28 @@ function AppRouter() {
               >
                 <CanchaDetalle />
               </motion.div>
+            }
+          />
+              {/* CLIENTE - Reservas protegidas */}
+          <Route
+            path="/reservascli"
+            element={
+              <ProtectedRoute requireCliente>
+                <LayoutCliente>
+                  <ReservaPage />
+                </LayoutCliente>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/cliente/reservas/confirmacion/:id"
+            element={
+              <ProtectedRoute requireCliente>
+                <LayoutCliente>
+                  <ConfirmacionFinalReservaHorario />
+                </LayoutCliente>
+              </ProtectedRoute>
             }
           />
 
@@ -341,7 +368,7 @@ function AppRouter() {
           {/* Ruta 404 - Redirigir a login */}
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
-        )}
+        {/*)}*/}
       </BrowserRouter>
     </AuthProvider>
   );
