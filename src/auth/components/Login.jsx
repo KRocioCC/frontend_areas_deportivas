@@ -30,20 +30,22 @@ const Login = () => {
       authService.setupAxiosInterceptors(response.token);
 
       const roles = response.roles || [];
+      console.log('Roles recibidos:', roles);
       let redirectTo = '/inicio';
 
       // SI VENÍA DE UNA RUTA PROTEGIDA → REDIRIGIR AHÍ
       if (location.state?.from) {
         redirectTo = location.state.from;
+      } else if (roles.includes('ROLE_ADMINISTRADOR')) {
+        redirectTo = '/admin/dashboard';
       } else if (roles.includes('ROLE_CLIENTE')) {
         redirectTo = '/inicio';
-      } else if (roles.includes('ROLE_ADMINISTRADOR')) {
-        navigate('/admin/mi_area');
-      } else if (roles.includes('ROLE_CLIENTE')) {
-        navigate('/canchas');
+      } else if (roles.includes('ROLE_SUPERUSUARIO')) {
+        redirectTo = '/solicitudes';
       } else {
         setError('Tu cuenta no tiene un rol válido asignado.');
       }
+      navigate(redirectTo, { replace: true });
 
     } catch (err) {
       setError(err.message || 'Error al iniciar sesión.');
@@ -127,7 +129,7 @@ const Login = () => {
             <div className="debug-content">
               <p><strong>Superusuario:</strong> /solicitudes</p>
               <p><strong>Administrador:</strong> /admin/dashboard</p>
-              <p><strong>Cliente:</strong> /canchas</p>
+              <p><strong>Cliente:</strong> /inicio</p>
             </div>
           </details>
         </div>
