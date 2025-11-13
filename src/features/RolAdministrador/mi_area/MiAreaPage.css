@@ -3,22 +3,22 @@
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  min-height: 100vh;
-  background-color: #f9fafb;
+  
+ 
 }
 
 .mi-area-card {
   background: #ffffff;
   border-radius: 18px;
   padding: 2.5rem;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
   width: 100%;
   max-width: 1200px;
   border: 1px solid #e5e7eb;
 }
 
 .mi-area-card h1 {
-  font-size: 1.9rem;
+  font-size: 2.4rem;
   font-weight: 700;
   margin-bottom: 0.5rem;
   color: #1f2937;
@@ -41,7 +41,7 @@
 }
 
 .mi-area-image {
-  width: 580px;
+  width: 380px;
   height: 380px;
   background: #fafafa;
   border-radius: 16px;
@@ -49,19 +49,10 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  overflow: hidden;        /* Evita desbordes */
-  padding: 0;              /* Sin padding interno */
   color: #6b7280;
   font-size: 0.95rem;
   text-align: center;
-}
-
-.mi-area-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;        /*  Rellena y recorta si es necesario */
-  display: block;
-  border-radius: 12px;
+  padding: 1rem;
 }
 
 .mi-area-row {
@@ -90,7 +81,7 @@
   border-color: #2563eb;
   background: white;
   outline: none;
-  box-shadow: 0 0 5px rgba(37, 99, 235, 0.3);
+  box-shadow: 0 0 5px rgba(37,99,235,0.3);
 }
 
 .two-cols {
@@ -130,35 +121,28 @@
   background: #d1d5db;
 }
 
-.mi-area-loading,
-.mi-area-error {
-  text-align: center;
-  font-size: 1.2rem;
-  color: #374151;
-  margin-top: 4rem;
+h1 {
+  font-size: 3.9rem;         /* Más grande */
+  font-weight: 800;          /* Súper negrita */
+  color: #222;               /* Color oscuro elegante */
+  margin-bottom: 0.5rem;
+  font-family: 'Segoe UI', sans-serif;
 }
 
-.mi-area-meta {
-  background: #f3f4f6;
-  border: 1px dashed #9ca3af;
-  padding: 0.8rem;
-  border-radius: 10px;
-  font-size: 0.85rem;
-  color: #374151;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+p {
+  font-size: 1.2rem;         /* Un poco más grande que lo normal */
+  font-weight: 500;          /* Semi-negrita */
+  color: #444;               /* Gris oscuro para suavizar */
+  margin-bottom: 1rem;
+  line-height: 1.6;
+  font-family: 'Segoe UI', sans-serif;
 }
 
-.btn-debug {
-  background: #f3f4f6;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  font-size: 0.75rem;
-  padding: 4px 10px;
-  cursor: pointer;
-}
-
-.btn-debug:hover {
-  background: #e5e7eb;
+h3 {
+  font-size: 1.2rem;         /* Más grande que lo normal */
+  font-weight: 700;          /* Negrita */
+  color: #333;               /* Oscuro pero no negro */
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  font-family: 'Segoe UI', sans-serif;
 }

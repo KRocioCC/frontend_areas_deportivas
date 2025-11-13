@@ -85,3 +85,6 @@ npm install @fullcalendar/react @fullcalendar/daygrid @fullcalendar/timegrid @fu
 
 npm install @fullcalendar/core --legacy-peer-deps
 
+npm install date-fns
+
+

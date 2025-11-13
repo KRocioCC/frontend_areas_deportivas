@@ -31,7 +31,7 @@ import UsuarioControlPage from "../features/personas/pages/UsuarioControlPage";
 import InvitadoPage from "../features/personas/pages/InvitadoPage";
 
 // ADMINISTRADOR
-import MiAreaPage from '../features/RolAdministrador/mi_area/MiAreaPage';
+import MiAreaPage from '../features/RolAdministrador/mi_area/MiAreaPage.js';
 import CanchasAdmin from "../features/RolAdministrador/canchas/CanchasAdmin";
 
 import PageClientes from "../features/RolAdministrador/usuarios/clientes/PageClientes";
@@ -160,7 +160,7 @@ function AppRouter() {
             element={
               <ProtectedRoute requireAdmin>
                 <DashboardLayoutAdmin>
-                   <MiAreaPage />
+                    <MiAreaPage />
                 </DashboardLayoutAdmin>
               </ProtectedRoute>
             }
