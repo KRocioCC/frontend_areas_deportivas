@@ -37,7 +37,7 @@ import CanchasAdmin from "../features/RolAdministrador/canchas/CanchasAdmin";
 import PageClientes from "../features/RolAdministrador/usuarios/clientes/PageClientes";
 import PageUsuariosControl from "../features/RolAdministrador/usuarios/usuarios_control/PageUsuariosControl";
 import Dashboard from "../features/RolAdministrador/dashboard/index.jsx";
-
+import Calendar from "../features/RolAdministrador/calendar/Calendar";
 function AppRouter() {
   return (
     <AuthProvider>
@@ -211,7 +211,7 @@ function AppRouter() {
             element={
               <ProtectedRoute requireAdmin>
                 <DashboardLayoutAdmin>
-                  <div>Reportes</div>
+                  <Calendar />
                 </DashboardLayoutAdmin>
               </ProtectedRoute>
             }

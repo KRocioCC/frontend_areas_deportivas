@@ -77,3 +77,11 @@ npm install lucide-react framer-motion
 npm install react-icons recharts
 
 npm install react-apexcharts apexcharts
+
+
+# para el calendario de ADMINISTRADOR Ks
+npm install @fullcalendar/react @fullcalendar/daygrid @fullcalendar/timegrid @fullcalendar/interaction
+
+
+npm install @fullcalendar/core --legacy-peer-deps
+
