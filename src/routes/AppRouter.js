@@ -207,7 +207,7 @@ function AppRouter() {
             }
           />
           <Route
-            path="/admin/reportes"
+            path="/admin/calendario"
             element={
               <ProtectedRoute requireAdmin>
                 <DashboardLayoutAdmin>

@@ -31,7 +31,7 @@ const Login = () => {
       if (roles.includes('ROLE_SUPERUSUARIO')) {
         navigate('/solicitudes');
       } else if (roles.includes('ROLE_ADMINISTRADOR')) {
-        navigate('/admin/dashboard');
+        navigate('/admin/mi_area');
       } else if (roles.includes('ROLE_CLIENTE')) {
         navigate('/canchas');
       } else {

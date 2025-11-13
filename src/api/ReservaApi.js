@@ -54,6 +54,13 @@ export async function getReservasPorDia(fecha) {
   return res.data;
 }
 
+//  Obtener reservas del administrador en un rango de fechas
+// Se usa en el dashboard y calendario para mostrar solo las reservas de sus canchas
+export async function getReservasPorAdministradorEnRango(idAdministrador, inicio, fin) {
+  const res = await api.get(`${API_URL}/administrador/${idAdministrador}/rango-fechas?inicio=${inicio}&fin=${fin}`);
+  return res.data;
+}
+
 // Validaciones
 export async function validarDisponibilidad(fecha, horaInicio, horaFin) {
   const res = await api.get(`${API_URL}/disponibilidad?fecha=${fecha}&horaInicio=${horaInicio}&horaFin=${horaFin}`);
