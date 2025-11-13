@@ -8,6 +8,9 @@ import { getCanchas } from "../../../../api/CanchaApi";
 import ConfirmDialog from "../../../../components/ui/ConfirmDialog";
 import ToastMensaje from "../../../../components/ui/ToastMensaje";
 import "./ModalCanchasUsuarioControl.css";
+import Alert from '@mui/material/Alert';
+import AlertTitle from '@mui/material/AlertTitle';
+import Stack from '@mui/material/Stack';
 
 export default function ModalCanchasUsuarioControl({ usuario, onClose }) {
   const [canchasDisponibles, setCanchasDisponibles] = useState([]);
@@ -16,6 +19,7 @@ export default function ModalCanchasUsuarioControl({ usuario, onClose }) {
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState(null);
   const [confirmarQuitar, setConfirmarQuitar] = useState(null);
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false); 
 
   useEffect(() => {
     async function loadData() {
@@ -27,7 +31,7 @@ export default function ModalCanchasUsuarioControl({ usuario, onClose }) {
         setCanchasAsignadas(asignadas);
         setSeleccionadas([]);
       } catch (err) {
-        console.error("❌ Error al cargar canchas:", err);
+        console.error("Error al cargar canchas:", err);
       } finally {
         setLoading(false);
       }
@@ -52,14 +56,19 @@ export default function ModalCanchasUsuarioControl({ usuario, onClose }) {
     for (const id of nuevas) {
       try {
         await asignarCanchaASupervisor(usuario.id, id);
-        console.log(`✅ Cancha ${id} asignada`);
+        console.log(`Cancha ${id} asignada`);
       } catch (err) {
-        console.error(`❌ Error al asignar cancha ${id}:`, err);
+        console.error(`Error al asignar cancha ${id}:`, err);
       }
     }
 
-    setToast("Canchas asignadas con éxito");
-    onClose(); // recarga desde el padre
+    setShowSuccessAlert(true); 
+    setSeleccionadas([]);
+
+    setTimeout(() => {
+      setShowSuccessAlert(false);
+      onClose(); // recarga desde el padre
+    }, 2500);
   }
 
   async function handleQuitar(idCancha) {
@@ -68,35 +77,51 @@ export default function ModalCanchasUsuarioControl({ usuario, onClose }) {
       setCanchasAsignadas(prev => prev.filter(c => c.idCancha !== idCancha));
       setToast("Cancha desasignada con éxito");
     } catch (err) {
-      console.error(`❌ Error al quitar cancha ${idCancha}:`, err);
+      console.error(`Error al quitar cancha ${idCancha}:`, err);
     }
     setConfirmarQuitar(null);
   }
 
   return (
     <div className="modal-overlay">
-      <div className="modal-content small">
-        <h3>Canchas de {usuario.nombre}</h3>
+      <div className="modal-content wide">
+        <h3>Canchas asignadas al Usuario Control {usuario.nombre}</h3>
+
+        {showSuccessAlert && (
+          <div className="alert-overlay">
+            <Stack sx={{ width: '100%' }} spacing={2}>
+              <Alert severity="success" onClose={() => setShowSuccessAlert(false)}>
+                <AlertTitle>Asignación exitosa</AlertTitle>
+                Las canchas fueron asignadas correctamente.
+              </Alert>
+            </Stack>
+          </div>
+        )}
 
         {loading ? (
           <p>Cargando canchas...</p>
         ) : (
           <>
-            <div className="form-row">
-              <label>Asignar nuevas canchas</label>
-              <div className="checkbox-group">
-                {canchasDisponibles.map(c => (
-                  <div key={c.idCancha || c.id} className="checkbox-item">
-                    <label className="checkbox-label">
-                      <input
-                        type="checkbox"
-                        checked={seleccionadas.includes(c.idCancha || c.id)}
-                        onChange={() => toggleSeleccion(c.idCancha || c.id)}
-                      />
-                      {c.nombre}
-                    </label>
-                  </div>
-                ))}
+            <div className="section">
+              <h4>Asignar nuevas canchas</h4>
+              <div className="card-grid">
+                {canchasDisponibles.map(c => {
+                  const id = c.idCancha || c.id;
+                  const yaAsignada = canchasAsignadas.some(a => a.idCancha === id);
+                  return (
+                    <div key={id} className={`card-item ${yaAsignada ? "disabled" : ""}`}>
+                      <label>
+                        <input
+                          type="checkbox"
+                          disabled={yaAsignada}
+                          checked={seleccionadas.includes(id)}
+                          onChange={() => toggleSeleccion(id)}
+                        />
+                        <span>{c.nombre}</span>
+                      </label>
+                    </div>
+                  );
+                })}
               </div>
               <button
                 className="btn btn-primary"
@@ -108,12 +133,12 @@ export default function ModalCanchasUsuarioControl({ usuario, onClose }) {
             </div>
 
             {canchasAsignadas.length > 0 && (
-              <div className="form-row">
-                <label>Canchas ya asignadas</label>
-                <ul className="asignadas-list">
+              <div className="section">
+                <h4>Canchas ya asignadas</h4>
+                <div className="asignadas-container">
                   {canchasAsignadas.map(c => (
-                    <li key={c.idCancha}>
-                      {c.nombre}
+                    <div key={c.idCancha} className="asignada-item">
+                      <span>{c.nombre}</span>
                       <button
                         type="button"
                         className="btn-remove"
@@ -121,9 +146,9 @@ export default function ModalCanchasUsuarioControl({ usuario, onClose }) {
                       >
                         Quitar
                       </button>
-                    </li>
+                    </div>
                   ))}
-                </ul>
+                </div>
               </div>
             )}
           </>
