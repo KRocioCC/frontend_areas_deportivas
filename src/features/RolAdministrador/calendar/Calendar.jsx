@@ -33,7 +33,7 @@ const Calendar = () => {
     Warning: "warning",
   };
 
-  // 🔥 Consumir reservas del backend
+  // reservas del backend
   useEffect(() => {
     const fetchReservas = async () => {
       if (!idAdministrador) return;
@@ -87,7 +87,7 @@ const Calendar = () => {
   };
 
 const handleEventClick = (clickInfo) => {
-  const calendarEvent = clickInfo.event; // evita la global 'event'
+  const calendarEvent = clickInfo.event; 
   setSelectedEvent({
     ...calendarEvent.extendedProps,
     start: calendarEvent.start,
