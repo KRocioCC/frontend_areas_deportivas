@@ -15,12 +15,12 @@ export default function Navbar() {
   const { currentUser, logout, isClient } = useAuth();
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 30);
+    const handleScroll = () => setScrolled(window.scrollY > 10);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // 🔹 Items base
+  // 🔹 Items base (sin cambios)
   const baseItems = [
     { name: "Inicio", path: "/inicio" },
     {
@@ -43,7 +43,6 @@ export default function Navbar() {
     },
   ];
 
-  // 🔹 Agregar sección de reservas solo si es cliente
   const navItems = isClient
     ? [
         ...baseItems,
@@ -73,191 +72,371 @@ export default function Navbar() {
     navigate("/inicio", { replace: true });
   };
 
-return (
-  <motion.nav
-    className={`fixed top-0 left-0 right-0 z-50 px-4 md:px-6 py-3 transition-all duration-500 ${
-      scrolled
-        ? "bg-[var(--color-pb-5)]/95 backdrop-blur-lg shadow-lg border-b border-[var(--color-b-3)]"
-        : "bg-black/50 backdrop-blur-sm"
-    }`}
-    initial={{ y: -100 }}
-    animate={{ y: 0 }}
-    transition={{ type: "spring", stiffness: 250, damping: 25 }}
-  >
-    <div className="max-w-6xl mx-auto flex items-center justify-between">
-      {/* Logo */}
-      <motion.div
-        whileHover={{ scale: 1.05 }}
-        className="cursor-pointer"
-        onClick={() => handleNavigate("/inicio")}
+  return (
+    <>
+      {/* NAVBAR */}
+      <motion.nav
+        className={`fixed top-0 left-0 right-0 z-50 px-4 md:px-6 py-3 transition-all duration-400 flex justify-center ${
+          scrolled
+            ? "bg-[rgba(8,10,12,0.88)] backdrop-blur-sm shadow-sm"
+            : "bg-transparent"
+        }`}
+        initial={{ y: -18 }}
+        animate={{ y: 0 }}
+        transition={{ type: "spring", stiffness: 200, damping: 24 }}
       >
-        <img
-          src={scrolled ? "../../logoScroll.svg" : "../../logo.svg"}
-          alt="Logo ReservaYA"
-          className="w-24 h-12 drop-shadow-[0_0_6px_rgba(0,0,0,0.6)]"
-        />
-      </motion.div>
-
-      {/* Botón menú móvil */}
-      <div className="md:hidden">
-        <motion.button
-          whileTap={{ scale: 0.9 }}
-          onClick={() => setMenuOpen(!menuOpen)}
-          className="text-white"
-        >
-          {menuOpen ? <X size={26} /> : <Menu size={26} />}
-        </motion.button>
-      </div>
-
-      {/* Menú escritorio */}
-      <div className="hidden md:flex gap-6 items-center">
-        {navItems.map((item, i) => (
-          <div key={item.path} className="relative group">
-            <button
-              onClick={() => (item.children ? null : handleNavigate(item.path))}
-              className={`font-medium text-base transition-colors ${
-                activePath.startsWith(item.path)
-                  ? "text-[var(--accent1)]"
-                  : "text-gray-300 hover:text-[var(--secondary)]"
-              }`}
-            >
-              {item.name}
-            </button>
-
-            {item.children && (
-              <motion.div className="absolute left-0 mt-2 w-44 bg-[var(--color-pb-3)]/95 rounded-lg shadow-md border border-[var(--color-b-3)] opacity-0 group-hover:opacity-100 invisible group-hover:visible backdrop-blur-md">
-                {item.children.map((child) => (
-                  <button
-                    key={child.path}
-                    onClick={() => handleNavigate(child.path)}
-                    className={`block w-full text-left px-4 py-2 text-sm ${
-                      activePath === child.path
-                        ? "bg-[var(--color-p-3)] text-white"
-                        : "text-gray-200 hover:bg-[var(--color-pb-2)] hover:text-white"
-                    }`}
-                  >
-                    {child.name}
-                  </button>
-                ))}
-              </motion.div>
-            )}
-          </div>
-        ))}
-
-        {/* Notificaciones y usuario */}
-        <div className="flex items-center gap-5">
-          <motion.div whileHover={{ scale: 1.1 }} className="relative cursor-pointer">
-            <Bell className="text-[var(--accent1)] w-5 h-5" />
-            <span className="absolute -top-1 -right-1 bg-[var(--color-danger)] text-white text-xs rounded-full px-1">
-              3
-            </span>
+        <div className="w-full max-w-6xl mx-auto flex items-center justify-between">
+          {/* Logo */}
+          <motion.div
+            whileHover={{ scale: 1.03 }}
+            className="cursor-pointer flex items-center"
+            onClick={() => handleNavigate("/inicio")}
+          >
+            <img
+              src={scrolled ? "../../logo.svg" : "../../logo.svg"}
+              alt="LOGO QUEJUEGO"
+              className="w-28 h-10 object-contain"
+            />
           </motion.div>
 
-          {/* Si el usuario está logueado */}
-          {currentUser ? (
-            <div className="relative group">
-              <div className="flex items-center gap-2 bg-[var(--color-pb-3)] px-3 py-1.5 rounded-full cursor-pointer">
-                <User className="w-5 h-5 text-white" />
-                <span className="text-white text-sm font-medium">
-                  {currentUser.nombre || currentUser.username}
-                </span>
-              </div>
-
-              {/* Submenú de usuario */}
-              <motion.div className="absolute right-0 mt-2 w-40 bg-[var(--color-pb-3)]/95 rounded-lg shadow-md border border-[var(--color-b-3)] opacity-0 group-hover:opacity-100 invisible group-hover:visible backdrop-blur-md">
-                <button
-                  onClick={handleLogout}
-                  className="w-full text-left px-4 py-2 text-sm text-[var(--color-danger)] hover:bg-[var(--color-pb-2)] hover:text-white flex items-center gap-2"
-                >
-                  <LogOut size={16} /> Cerrar sesión
-                </button>
-              </motion.div>
-            </div>
-          ) : (
+          {/* Botón menú móvil */}
+          <div className="md:hidden">
             <motion.button
               whileTap={{ scale: 0.95 }}
-              onClick={() => handleNavigate("/login")}
-              className="relative px-5 py-2 font-semibold rounded-full overflow-hidden group"
+              onClick={() => setMenuOpen(!menuOpen)}
+              aria-label="menu"
+              className={`p-2 rounded-md transition-colors ${
+                scrolled ? "text-[var(--color-p-5)]" : "text-white"
+              }`}
             >
-              <span className="absolute inset-0 bg-gradient-to-r from-[var(--color-p-1)] to-[var(--color-accent)] transition-transform duration-300 translate-x-[-100%] group-hover:translate-x-0"></span>
-              <span className="relative text-white group-hover:text-white transition-all duration-300">
-                Iniciar Sesión
-              </span>
+              {menuOpen ? <X size={26} /> : <Menu size={24} />}
             </motion.button>
-          )}
-        </div>
-      </div>
-    </div>
+          </div>
 
-    {/* Menú móvil */}
-    <AnimatePresence>
-      {menuOpen && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -10 }}
-          className="md:hidden mt-3 bg-[var(--color-pb-3)]/95 rounded-lg p-3 space-y-3 border"
-        >
-          {navItems.map((item, i) => (
-            <div key={item.path}>
-              <button
-                onClick={() =>
-                  item.children
-                    ? handleAccordionToggle(i)
-                    : handleNavigate(item.path)
-                }
-                className={`flex justify-between w-full text-left text-white text-base font-medium ${
-                  accordionOpen === i || activePath.startsWith(item.path)
-                    ? "text-[var(--accent1)]"
-                    : ""
-                }`}
-              >
-                {item.name}
-              </button>
+          {/* Menú escritorio */}
+          <div className="hidden md:flex items-center gap-6">
+            <nav className="flex items-center gap-6">
+              {navItems.map((item) => (
+                <div key={item.path} className="relative group">
+                  <button
+                    onClick={() =>
+                      item.children ? null : handleNavigate(item.path)
+                    }
+                    className={`font-[var(--font-Balo)] text-[0.88rem] font-medium tracking-tight px-2 py-2 transition-colors duration-200 ${
+                      activePath.startsWith(item.path)
+                        ? "text-[var(--color-p-2)]"
+                        : scrolled
+                        ? "text-[var(--color-p-4)]"
+                        : "text-white"
+                    }`}
+                  >
+                    {item.name}
+                  </button>
 
-              {item.children && accordionOpen === i && (
-                <div className="ml-4 mt-1 space-y-1">
-                  {item.children.map((child) => (
-                    <button
-                      key={child.path}
-                      onClick={() => handleNavigate(child.path)}
-                      className={`block w-full text-left text-sm ${
-                        activePath === child.path
-                          ? "text-[var(--accent1)]"
-                          : "text-gray-300 hover:text-white"
-                      }`}
+                  {/* SUBMENÚ → MÁS OSCURO + MÁS MINIMALISTA */}
+                  {item.children && (
+                    <div
+                      className="
+                        absolute left-0 mt-2 min-w-[13rem] rounded-lg 
+                        bg-[rgba(10,12,14,0.96)] shadow-lg shadow-black/30 
+                        py-2 opacity-0 invisible group-hover:opacity-100 
+                        group-hover:visible transition-all duration-200
+                      "
                     >
-                      {child.name}
-                    </button>
-                  ))}
+                      <div className="flex flex-col">
+                        {item.children.map((child) => (
+                          <button
+                            key={child.path}
+                            onClick={() => handleNavigate(child.path)}
+                            className="
+                              text-[0.85rem] text-[var(--color-p-4)] text-left 
+                              px-4 py-2 rounded-md transition-all duration-150 
+                              hover:bg-[rgba(255,255,255,0.08)] 
+                              hover:text-[var(--color-p-2)]
+                            "
+                          >
+                            {child.name}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
+              ))}
+            </nav>
+
+            {/* Divider sutil */}
+            <div className="w-px h-6 bg-white/10 mx-2" />
+
+            {/* Notificaciones + Usuario */}
+            <div className="flex items-center gap-3">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.98 }}
+                className={`p-2 rounded-md transition-colors ${
+                  scrolled ? "text-[var(--color-p-5)]" : "text-white"
+                }`}
+                aria-label="notificaciones"
+              >
+                <div className="relative">
+                  <Bell className="w-5 h-5" />
+                  <span className="absolute -top-1 -right-1 bg-[var(--color-p-2)] text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-medium">
+                    3
+                  </span>
+                </div>
+              </motion.button>
+
+              {currentUser ? (
+                <div className="relative group">
+                  {/* Botón principal del usuario */}
+                  <button
+                    className={`
+                      flex items-center gap-2 px-3 py-1.5 rounded-lg transition-colors 
+                      ${scrolled ? "bg-[rgba(255,255,255,0.08)] text-[var(--color-p-5)]" : "bg-white/10 text-white"}
+                    `}
+                  >
+                    <User className="w-4 h-4" />
+                    <span className="text-sm font-[var(--font-Balo)]">
+                      {currentUser.nombre || currentUser.username}
+                    </span>
+                  </button>
+
+                  {/* SUBMENÚ DEL USUARIO - Mismo estilo que los otros submenús */}
+                  <div
+                    className="
+                      absolute right-0 mt-2 min-w-[12rem] rounded-lg 
+                      bg-[rgba(10,12,14,0.96)] shadow-xl shadow-black/40 
+                      py-2 opacity-0 invisible group-hover:opacity-100 
+                      group-hover:visible transition-all duration-200
+                    "
+                  >
+                    <div className="flex flex-col">
+                      <button
+                        onClick={() => handleNavigate('/perfil')}
+                        className="
+                          text-[0.85rem] text-[var(--color-p-4)] text-left 
+                          px-4 py-2 rounded-md transition-all duration-150 
+                          hover:bg-[rgba(255,255,255,0.08)] 
+                          hover:text-[var(--color-p-2)]
+                        "
+                      >
+                        Mi Perfil
+                      </button>
+
+                      <button
+                        onClick={handleLogout}
+                        className="
+                          text-[0.85rem] text-red-400 text-left 
+                          px-4 py-2 rounded-md transition-all duration-150 
+                          hover:bg-red-500/20 
+                          hover:text-white
+                        "
+                      >
+                        Cerrar sesión
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <motion.button
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => handleNavigate("/login")}
+                  className="px-4 py-2 rounded-md font-[var(--font-josefin)] text-sm bg-[var(--color-p-2)] text-white shadow-sm"
+                >
+                  Iniciar
+                </motion.button>
               )}
             </div>
-          ))}
-
-          <div className="flex justify-between items-center mt-4">
-            <Bell className="text-[var(--accent1)] w-5 h-5" />
-            {currentUser ? (
-              <button
-                onClick={handleLogout}
-                className="px-4 py-2 bg-white text-[var(--color-p-2)] rounded-full flex items-center gap-1 text-sm font-semibold"
-              >
-                <LogOut size={12} /> Cerrar sesión
-              </button>
-            ) : (
-              <button
-                onClick={() => handleNavigate("/login")}
-                className="px-5 py-2 bg-gradient-to-r from-[var(--color-p-2)] to-[var(--color-accent)] text-white font-semibold rounded-full text-sm"
-              >
-                Iniciar Sesión
-              </button>
-            )}
           </div>
-          
-        </motion.div>
-      )}
-    </AnimatePresence>
-  </motion.nav>
-);
 
+
+
+        </div>
+
+
+      </motion.nav>
+
+      {/* OVERLAY cuando el menú móvil está abierto (mejora legibilidad) */}
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            key="overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.45 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.18 }}
+            onClick={() => setMenuOpen(false)}
+            className="fixed inset-0 z-40 bg-black"
+            aria-hidden="true"
+          />
+        )}
+      </AnimatePresence>
+
+      {/* MENÚ MÓVIL: ahora aparece desde abajo (slide-up) */}
+
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            key="mobileMenu"
+            initial={{ y: "100%", opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: "100%", opacity: 0 }}
+            transition={{ type: "spring", stiffness: 200, damping: 25 }}
+            className="fixed inset-0 z-50 bg-[rgba(10,12,14,0.98)] backdrop-blur-lg"
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b border-[rgba(255,255,255,0.05)]">
+              <img 
+                src="../../logo.svg" 
+                alt="logo" 
+                className="w-24 h-8 object-contain" 
+              />
+
+              <motion.button
+                whileTap={{ scale: 0.9 }}
+                onClick={() => setMenuOpen(false)}
+                className="p-2 rounded-xl bg-[rgba(255,255,255,0.05)] text-[var(--color-p-4)] hover:text-white transition"
+              >
+                <X size={20} />
+              </motion.button>
+            </div>
+
+            {/* Content scroll */}
+            <div className="h-[calc(100vh-80px)] overflow-y-auto px-4 py-5">
+              
+              {/* MAIN ITEMS */}
+              <div className="space-y-1 mb-6">
+                {navItems.map((item, i) => (
+                  <div key={item.path} className="border-b border-[rgba(255,255,255,0.03)] last:border-b-0">
+                    
+                    {/* Main button */}
+                    <button
+                      onClick={() =>
+                        item.children ? handleAccordionToggle(i) : handleNavigate(item.path)
+                      }
+                      className={`w-full text-left py-3 px-3 text-base font-[var(--font-Balo)] flex justify-between items-center rounded-lg transition 
+                        ${
+                          accordionOpen === i || activePath.startsWith(item.path)
+                            ? "text-[var(--color-p-2)] bg-[rgba(255,255,255,0.05)]"
+                            : "text-[var(--color-p-4)] hover:text-white hover:bg-[rgba(255,255,255,0.03)]"
+                        }`}
+                    >
+                      <span>{item.name}</span>
+
+                      {item.children && (
+                        <motion.span
+                          animate={{ rotate: accordionOpen === i ? 180 : 0 }}
+                          className="text-[var(--color-p-5)] text-xs"
+                        >
+                          ▼
+                        </motion.span>
+                      )}
+                    </button>
+
+                    {/* Submenu */}
+                    {item.children && accordionOpen === i && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="ml-3 mt-1 mb-2 space-y-1"
+                      >
+                        {item.children.map((child) => (
+                          <button
+                            key={child.path}
+                            onClick={() => handleNavigate(child.path)}
+                            className={`w-full text-left py-2 px-3 text-sm rounded-md transition 
+                              ${
+                                activePath === child.path
+                                  ? "text-white bg-[var(--color-p-5)]"
+                                  : "text-[var(--color-p-4)] hover:text-white hover:bg-[rgba(255,255,255,0.05)]"
+                              }`}
+                          >
+                            {child.name}
+                          </button>
+                        ))}
+                      </motion.div>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {/* NOTIFICATIONS */}
+              <div className="mb-6">
+                <div className="flex items-center gap-3 p-3 rounded-lg bg-[rgba(255,255,255,0.03)] hover:bg-[rgba(255,255,255,0.05)] transition">
+                  <div className="relative">
+                    <Bell className="w-5 h-5 text-[var(--color-p-5)]" />
+                    <span className="absolute -top-2 -right-2 bg-[var(--color-p-2)] text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-bold">
+                      3
+                    </span>
+                  </div>
+
+                  <div>
+                    <span className="text-[var(--color-p-4)] font-[var(--font-Balo)] text-sm block">
+                      Notificaciones
+                    </span>
+                    <span className="text-[var(--color-p-5)] text-xs">3 nuevas</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* USER SECTION */}
+              <div className="border-t border-[rgba(255,255,255,0.05)] pt-5">
+                {currentUser ? (
+                  <div className="space-y-3">
+
+                    {/* User info */}
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-[rgba(255,255,255,0.03)]">
+                      <div className="w-9 h-9 rounded-full bg-[var(--color-p-5)] flex items-center justify-center">
+                        <User className="w-4 h-4 text-white" />
+                      </div>
+
+                      <div>
+                        <span className="text-white font-[var(--font-Balo)] font-semibold text-sm block">
+                          {currentUser.nombre || currentUser.username}
+                        </span>
+                        <span className="text-[var(--color-p-5)] text-xs">Mi cuenta</span>
+                      </div>
+                    </div>
+
+                    {/* Buttons */}
+                    <div className="grid grid-cols-2 gap-2">
+                      <motion.button
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => handleNavigate("/perfil")}
+                        className="py-2 px-3 rounded-lg bg-[var(--color-p-5)] text-white text-sm font-[var(--font-Balo)] hover:bg-[var(--color-p-5)]/90 transition"
+                      >
+                        Perfil
+                      </motion.button>
+
+                      <motion.button
+                        whileTap={{ scale: 0.95 }}
+                        onClick={handleLogout}
+                        className="py-2 px-3 rounded-lg bg-[rgba(255,255,255,0.05)] text-[var(--color-p-2)] text-sm font-[var(--font-Balo)] border border-[var(--color-p-2)]/30 hover:bg-[var(--color-p-2)] hover:text-white transition"
+                      >
+                        Salir
+                      </motion.button>
+                    </div>
+
+                  </div>
+                ) : (
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => handleNavigate("/login")}
+                    className="w-full py-3 px-3 text-sm font-[var(--font-josefin)] font-bold text-white bg-gradient-to-r from-[var(--color-p-2)] to-[var(--color-p-1)] rounded-lg shadow hover:shadow-md transition"
+                  >
+                    Iniciar Sesión
+                  </motion.button>
+                )}
+              </div>
+
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+    </>
+  );
 }
