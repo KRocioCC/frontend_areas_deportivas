@@ -28,7 +28,7 @@ export async function getDisciplinas() {
 
 // Obtener una disciplina por ID
 export async function getDisciplinaById(id) {
-  const res = await api.get(`${API_URL}/${id}`);
+  const res = await api.get(`${API_URL}/porid/${id}`);
   return res.data;
 }
 

@@ -34,7 +34,6 @@ export default function ReservaPage() {
     reserva.setCancha({ idCancha: canchaId });
     reserva.setDisciplina({ idDisciplina: disciplinaId });
     reserva.setHorariosSeleccionados(horarios);
-
     // Console logs antes de navegar
     console.log("ENVIANDO A CONFIRMACIÓN:");
     console.log("  Fecha:", reserva.fecha ? reserva.fecha.toISOString().split("T")[0] : null);
@@ -42,7 +41,22 @@ export default function ReservaPage() {
     console.log("  Disciplina ID:", disciplinaId);
     console.log("  Horarios seleccionados:", horarios);
 
-    navigate("/confirmacion-cliente", { state: { reserva } });
+    const fecha = reserva.fecha.toISOString().split("T")[0]; // YYYY-MM-DD
+    const horaInicio = horarios[0]; // ejemplo: primer horario
+    const horaFin = horarios[horarios.length - 1]; // ejemplo: último horario
+
+    navigate("/reservas/cliente", 
+      {  state: {
+          reserva: {
+            fecha,
+            horaInicio,
+            horaFin,
+            canchaId,
+            disciplinaId,
+          }
+        }
+      }
+);
   };
 
   return (
@@ -71,7 +85,7 @@ export default function ReservaPage() {
               canchaId={canchaId}
               fecha={reserva.fecha.toISOString().split("T")[0]}
               onSelectRango={(seleccionados) => {
-                console.log("Horarios seleccionados:", seleccionados);
+                console.log("Horarios seleccionados fin:", seleccionados);
                 setHorarios(seleccionados);
               }}
             />
@@ -119,6 +133,7 @@ export default function ReservaPage() {
             >
               Siguiente
             </button>
+            
           </div>
         </div>
       </div>

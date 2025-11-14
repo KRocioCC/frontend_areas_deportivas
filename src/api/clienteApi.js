@@ -42,3 +42,8 @@ export async function cambiarEstado(id, estado) {
   const res = await api.patch(url);
   return res.data;
 }
+
+export const getClienteByEmail = async (email) => {
+  const res = await api.get(`${API_URL}/buscar/email/${email}`);
+  return res.data;
+};
