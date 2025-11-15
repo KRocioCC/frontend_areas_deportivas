@@ -43,8 +43,7 @@ import Dashboard from "../features/RolAdministrador/dashboard/index.jsx";
 import Preloader from "../components/ComponentsCli/Preloader.jsx";
 import { AnimatePresence, motion } from "framer-motion";
 import LayoutCliente from "../components/ComponentsCli/LayoutCliente.jsx";  
-//import Navbar from "../componentsCli/Navbar";
-//import Hero from "../componentsCli/Hero";
+
 
 // CLIENTE - páginas
 import Inicio from "../features/RolCliente/Inicio/InicioCli.jsx";
@@ -58,9 +57,14 @@ import CanchaDetalle from "../features/RolCliente/Canchas/CanchaDetalle.jsx"
 //import Notificaciones from "../feature/RolCliente/Notificaciones/Notificaciones"; // si existe
 import ReservaPage from "../features/RolCliente/Reserva/ReservaPage22.jsx";
 import ConfirmacionFinalReservaHorario from "../features/RolCliente/Reserva/ConfirmacionFinal.jsx";
+import ReservaCliente from "../features/RolCliente/Reserva/ReservaCliente.jsx";
 
+import ReservaConfirmacion from "../features/RolCliente/Reserva/ReservaConfirmacion.jsx";
 //import { ProtectedRoute } from '../auth/components/ProtectedRoute.jsx';
 import Calendar from "../features/RolAdministrador/calendar/Calendar";
+import ComoFunciona from "../features/RolCliente/Inicio/ComoFunciona.jsx";
+import SistemaQR from "../features/RolCliente/Inicio/SistemaQR.jsx";
+
 function AppRouter() {
 
   const pageVariants = {
@@ -87,6 +91,7 @@ function AppRouter() {
   };
 
   const [loading, setLoading] = useState(true);
+
   return (
     <AuthProvider>
       <BrowserRouter>
@@ -128,6 +133,23 @@ function AppRouter() {
             }
           />
 
+          <Route
+            path="/reservar/como-funciona"
+            element={
+              <LayoutCliente>
+                <ComoFunciona />
+              </LayoutCliente>
+            }
+          />
+          <Route
+            path="/reservar/qr"
+            element={
+              <LayoutCliente>
+                <SistemaQR />
+              </LayoutCliente>
+            }
+          />
+
           {/*Pagiinas publicas Canchas */}
 
           <Route
@@ -153,13 +175,34 @@ function AppRouter() {
               </motion.div>
             }
           />
-              {/* CLIENTE - Reservas protegidas */}
+          {/* CLIENTE - Reservas protegidas */}
           <Route
             path="/reservascli"
             element={
               <ProtectedRoute requireCliente>
                 <LayoutCliente>
                   <ReservaPage />
+                </LayoutCliente>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/reservas/cliente"
+            element={
+              <ProtectedRoute requireCliente>
+                <LayoutCliente>
+                  <ReservaCliente />
+                </LayoutCliente>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/reservas/confirmacion"
+            element={
+              <ProtectedRoute requireCliente>
+                <LayoutCliente>
+                  <ReservaConfirmacion />
                 </LayoutCliente>
               </ProtectedRoute>
             }
@@ -175,6 +218,8 @@ function AppRouter() {
               </ProtectedRoute>
             }
           />
+
+            
 
             {/*  <Route
               path="/reservas/historial"

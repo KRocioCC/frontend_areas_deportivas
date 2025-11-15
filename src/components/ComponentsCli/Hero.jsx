@@ -3,56 +3,35 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 
 export default function Hero() {
-  // Lista de fondos (usar rutas desde public/ para que funcionen en producción)
   const backgrounds = [
-    { type: "image", src: "/contenido/images.jpg", alt: "Personas jugando fútbol" },
-    { type: "image", src: "/contenido/descarga.jpg", alt: "Cancha iluminada" }
+    { src: "/contenido/imagen1.jpg", alt: "Personas jugando fútbol" },
+    { src: "/contenido/imagen2.jpg", alt: "Personas jugando basquet" },
+    { src: "/contenido/imagen3.jpg", alt: "Personas jugan voley" },
+    { src: "/contenido/imagen4.jpg", alt: "Personas jugando disciplia" },
+    { src: "/contenido/imagen5.jpg", alt: "Personas jugando" }
   ];
 
   const [index, setIndex] = useState(0);
-  const [errorFallback, setErrorFallback] = useState(null);
+  const [errorFallback, setErrorFallback] = useState(backgrounds[0].src);
 
-  // Pre-cargar imágenes (mejora UX) y limpiar
   useEffect(() => {
     const imgs = backgrounds.map((b) => {
-      if (b.type !== "image") return null;
       const img = new Image();
       img.src = b.src;
-      img.onload = () => {};
-      img.onerror = () => {
-        // si falla, marcar fallback (usa la primera imagen disponible)
-        setErrorFallback(backgrounds[0].src);
-      };
+      img.onerror = () => setErrorFallback(backgrounds[0].src);
       return img;
     });
-    return () => {
-      imgs.forEach((i) => {
-        if (i) {
-          i.onload = null;
-          i.onerror = null;
-        }
-      });
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    return () => imgs.forEach((i) => (i.onload = i.onerror = null));
   }, []);
 
-  // Cambiar fondo cada 8 segundos
   useEffect(() => {
-    const interval = setInterval(() => {
-      setIndex((prev) => (prev + 1) % backgrounds.length);
-    }, 8000);
+    const interval = setInterval(() => setIndex((prev) => (prev + 1) % backgrounds.length), 8000);
     return () => clearInterval(interval);
-  }, [backgrounds.length]);
-
-  const handleImgError = (e) => {
-    if (errorFallback && e.target.src !== errorFallback) {
-      e.target.src = errorFallback;
-    }
-  };
+  }, []);
 
   return (
-    <section className="relative h-screen min-h-[480px] overflow-hidden">
-      {/* Fondo dinámico con animación de fade */}
+    <section id="inicio" className="relative h-screen min-h-[600px] overflow-hidden">
+      {/* Fondo dinámico */}
       <AnimatePresence mode="wait">
         {backgrounds.map(
           (bg, i) =>
@@ -64,107 +43,94 @@ export default function Hero() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 1.2, ease: "easeInOut" }}
-                aria-hidden={bg.type !== "image"}
               >
-                {bg.type === "video" ? (
-                  <video
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                    className="w-full h-full object-cover"
-                    aria-hidden="true"
-                  >
-                    <source src={bg.src} type="video/mp4" />
-                  </video>
-                ) : (
-                  <img
-                    src={bg.src}
-                    alt={bg.alt || "Fondo deportivo"}
-                    onError={handleImgError}
-                    loading="lazy"
-                    className="w-full h-full object-cover object-center"
-                    style={{ minHeight: "480px" }}
-                  />
-                )}
+                <img
+                  src={bg.src}
+                  alt={bg.alt}
+                  onError={(e) => (e.target.src = errorFallback)}
+                  className="w-full h-full object-cover object-center"
+                  loading="eager"
+                />
               </motion.div>
             )
         )}
       </AnimatePresence>
 
-      {/* Overlay oscuro para contraste */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent pointer-events-none" />
+      {/* Overlay degradado */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-black/80 pointer-events-none" />
 
       {/* Contenido principal */}
-      <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-4">
+      <div className="relative z-10 flex flex-col items-center justify-center text-center w-full h-full px-4">
+        {/* Título */}
         <motion.h1
-          className="text-3xl sm:text-4xl md:text-6xl font-extrabold mb-4 drop-shadow-lg leading-tight"
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-        >
-          <span className="block">
-            <span className="text-white">¡Bienvenidos a</span>{" "}
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-red-500 via-orange-500 to-blue-500">
-              ReservaYA!
-            </span>
-          </span>
-        </motion.h1>
-
-        <motion.p
-          className="text-lg md:text-2xl text-gray-200 max-w-3xl mb-8 px-2"
+          className="text-4xl sm:text-5xl md:text-6xl font-[var(--font-Oswald)] font-bold mb-4 leading-snug text-white"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.5 }}
+          transition={{ duration: 0.8 }}
         >
-          Encuentra y reserva tu cancha ideal en segundos. ¡Juega hoy mismo!
+          Encuentra tu cancha ideal
+        </motion.h1>
+
+        {/* Subtítulo */}
+        <motion.p
+          className="text-sm sm:text-base md:text-lg text-[var(--color-p-4)] mb-8 max-w-xl leading-relaxed font-[var(--font-Balo)]"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.3 }}
+        >
+          Reserva en segundos y asegura tu espacio sin complicaciones.
         </motion.p>
 
-        {/* Cuadro de filtros */}
+        {/* Filtros minimalistas */}
         <motion.form
           onSubmit={(e) => e.preventDefault()}
-          className="bg-black/40 backdrop-blur-sm rounded-2xl p-4 sm:p-6 shadow-2xl border border-white/10 max-w-4xl w-full mx-4"
+          className="bg-black/20 backdrop-blur-sm rounded-xl p-4 sm:p-6 w-full max-w-3xl flex flex-col md:flex-row gap-3"
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6, delay: 0.8 }}
+          transition={{ duration: 0.6, delay: 0.5 }}
         >
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-            <label className="sr-only" htmlFor="deporte-select">Deporte</label>
-            <select id="deporte-select" className="p-3 bg-white/10 text-white border border-white/20 rounded-lg focus:ring-2 focus:ring-red-500 outline-none">
-              <option value="">Deporte</option>
-              <option>Fútbol</option>
-              <option>Básquet</option>
-              <option>Vóley</option>
-            </select>
+          <select className="flex-1 p-3 rounded-lg bg-white/10 text-white placeholder-gray-400 outline-none font-[var(--font-Balo)]">
+            <option value="">Deporte</option>
+            <option>Fútbol</option>
+            <option>Básquet</option>
+            <option>Vóley</option>
+            <option>Tenis</option>
+          </select>
 
-            <label className="sr-only" htmlFor="zona-select">Zona</label>
-            <select id="zona-select" className="p-3 bg-white/10 text-white border border-white/20 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none">
-              <option value="">Zona</option>
-              <option>Norte</option>
-              <option>Sur</option>
-              <option>Este</option>
-              <option>Oeste</option>
-            </select>
+          <select className="flex-1 p-3 rounded-lg bg-white/10 text-white placeholder-gray-400 outline-none font-[var(--font-Balo)]">
+            <option value="">Zona</option>
+            <option>Norte</option>
+            <option>Sur</option>
+            <option>Este</option>
+            <option>Oeste</option>
+            <option>Centro</option>
+          </select>
 
-            <label className="sr-only" htmlFor="fecha-input">Fecha</label>
-            <input
-              id="fecha-input"
-              type="date"
-              className="p-3 bg-white/10 text-white border border-white/20 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-              placeholder="Fecha"
-            />
+          <input
+            type="date"
+            className="flex-1 p-3 rounded-lg bg-white/10 text-white outline-none font-[var(--font-Balo)]"
+          />
 
-            <motion.button
-              type="submit"
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.98 }}
-              className="bg-gradient-to-r from-red-600 to-orange-600 text-white font-bold rounded-lg p-3 shadow-lg hover:shadow-xl transition"
-              aria-label="Buscar cancha"
-            >
-              🔍 Buscar Cancha
-            </motion.button>
-          </div>
+          <button
+            type="submit"
+            className="bg-gradient-to-r from-[var(--color-p-1)] to-[var(--color-p-2)] text-white font-[var(--font-josefin)] font-bold rounded-lg p-3 hover:scale-105 transition-transform duration-300"
+          >
+            Buscar
+          </button>
         </motion.form>
+
+        {/* Indicadores de fondo */}
+        <motion.div className="flex gap-2 mt-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }}>
+          {backgrounds.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setIndex(i)}
+              className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                i === index ? "bg-[var(--color-p-2)] scale-125" : "bg-white/40 hover:bg-white/60"
+              }`}
+            />
+          ))}
+        </motion.div>
       </div>
     </section>
   );

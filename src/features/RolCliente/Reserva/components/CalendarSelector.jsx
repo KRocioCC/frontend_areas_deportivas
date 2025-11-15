@@ -11,10 +11,10 @@ export default function CalendarSelector({ fecha, onChange }) {
 
   return (
     <div
-      className="bg-p-6 p-8 rounded-2xl shadow-lg border border-p-6"
+      className="bg-p-5 p-4 rounded-2xl shadow-lg border border-p-6"
       style={{
         fontFamily: "var(--font-Balo)",
-        maxWidth: "580px", 
+        maxWidth: "560px", 
         margin: "0 auto",
       }}
     >
@@ -29,6 +29,7 @@ export default function CalendarSelector({ fecha, onChange }) {
           minDate={new Date()}
           locale="es"
           className="custom-calendar-large"
+          weekStartsOn={1} 
           tileClassName={({ date, view }) => {
             if (view !== "month") return "";
 
@@ -46,7 +47,7 @@ export default function CalendarSelector({ fecha, onChange }) {
             return classes;
           }}
           formatShortWeekday={(locale, date) =>
-            ["D", "L", "M", "M", "J", "V", "S"][date.getDay()]
+            ["L", "M", "M", "J", "V", "S", "D"][(date.getDay() + 6) % 7]
           }
           next2Label={null}
           prev2Label={null}
@@ -63,7 +64,7 @@ export default function CalendarSelector({ fecha, onChange }) {
           <span>Hoy</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full border-3 border-p-6 bg-p-2"></div>
+          <div className="w-3 h-3 rounded-full border-3 border-p-6 bg-b-2"></div>
           <span>Seleccionada</span>
         </div>
       </div>

@@ -28,13 +28,22 @@ export default function Areadeportiva() {
 
   const manualNavigate = (newIndex) => {
     pauseAuto();
-    setCurrentIndex(newIndex);//cambia estado para que el carrusel muestre elemento en esa posiscion
-    // scroll al elemento
+    setCurrentIndex(newIndex);
+    
     const g = galleryRef.current;
     if (!g) return;
     const child = g.children[newIndex];
-    if (child && typeof child.scrollIntoView === "function") {
-      child.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+    if (child) {
+      const containerWidth = g.offsetWidth;
+      const childLeft = child.offsetLeft;
+      const childWidth = child.offsetWidth;
+      
+      const scrollPosition = childLeft - (containerWidth / 2) + (childWidth / 2);
+      
+      g.scrollTo({
+        left: scrollPosition,
+        behavior: 'smooth'
+      });
     }
   };
 
@@ -67,14 +76,14 @@ export default function Areadeportiva() {
   // Auto-scroll cada 5 segundos (pausable tras interacción y hover)
   useEffect(() => {
     if (!areas || areas.length <= 1) return;
-    // limpia si ya hay uno
+
     if (autoIntervalRef.current) clearInterval(autoIntervalRef.current);
 
     autoIntervalRef.current = setInterval(() => {
       if (!pausedRef.current) {
         setCurrentIndex((prev) => (prev + 1) % areas.length);
       }
-    }, 5000);
+    }, 4000);
 
     return () => {
       if (autoIntervalRef.current) clearInterval(autoIntervalRef.current);
@@ -83,14 +92,33 @@ export default function Areadeportiva() {
   }, [areas]);
 
   // Scroll hacia el elemento activo cuando cambia currentIndex
+// Scroll horizontal SIN afectar scroll vertical del body
   useEffect(() => {
     const g = galleryRef.current;
     if (!g) return;
+
     const child = g.children[currentIndex];
-    if (child && typeof child.scrollIntoView === "function") {
-      child.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
-    }
+    if (!child) return;
+
+    // coordenadas del hijo relativo al contenedor
+    const containerWidth = g.clientWidth;
+    const childLeft = child.offsetLeft;
+    const childWidth = child.offsetWidth;
+
+    // posición centrada
+    const scrollX = childLeft - (containerWidth / 2) + (childWidth / 2);
+
+    g.scrollTo({
+      left: scrollX,
+      behavior: "smooth"
+    });
+
+    // ❌ NO USAR scrollIntoView
+    // ❌ NO USAR window.scrollTo
   }, [currentIndex]);
+
+
+
   //sprinter animado
   if (loading) {
     return (
@@ -125,11 +153,15 @@ export default function Areadeportiva() {
       <div
         className="relative"
         // pausamos auto al hacer hover en la galería completa 
-        onMouseEnter={() => { pausedRef.current = true; }}//pausamo el autoplay
+        onMouseEnter={() => {
+          pausedRef.current = true;
+        }}
         onMouseLeave={() => {
-          // reanudar con pequeño retraso para evitar saltos
           if (resumeTimeoutRef.current) clearTimeout(resumeTimeoutRef.current);
-          resumeTimeoutRef.current = setTimeout(() => { pausedRef.current = false; resumeTimeoutRef.current = null; }, 700);
+          resumeTimeoutRef.current = setTimeout(() => {
+            pausedRef.current = false;
+            resumeTimeoutRef.current = null;
+          }, 1000); // Reanudar después de 1 segundo
         }}
       >
         {/* Contenedor del carrusel*/}

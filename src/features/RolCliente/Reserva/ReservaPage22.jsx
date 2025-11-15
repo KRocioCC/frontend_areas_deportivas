@@ -34,7 +34,6 @@ export default function ReservaPage() {
     reserva.setCancha({ idCancha: canchaId });
     reserva.setDisciplina({ idDisciplina: disciplinaId });
     reserva.setHorariosSeleccionados(horarios);
-
     // Console logs antes de navegar
     console.log("ENVIANDO A CONFIRMACIÓN:");
     console.log("  Fecha:", reserva.fecha ? reserva.fecha.toISOString().split("T")[0] : null);
@@ -42,83 +41,113 @@ export default function ReservaPage() {
     console.log("  Disciplina ID:", disciplinaId);
     console.log("  Horarios seleccionados:", horarios);
 
-    navigate("/confirmacion-cliente", { state: { reserva } });
+    const fecha = reserva.fecha.toISOString().split("T")[0]; // YYYY-MM-DD
+    const horaInicio = horarios[0]; // ejemplo: primer horario
+    const horaFin = horarios[horarios.length - 1]; // ejemplo: último horario
+
+    navigate("/reservas/cliente", 
+      {  state: {
+          reserva: {
+            fecha,
+            horaInicio,
+            horaFin,
+            canchaId,
+            disciplinaId,
+          }
+        }
+      }
+);
   };
 
   return (
     <div
-      className="min-h-screen"
-      style={{ backgroundColor: "var(--color-p-4)", fontFamily: "var(--font-Balo)" }}
-    >
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        <h2
-          className="text-4xl font-bold mb-8 text-center"
-          style={{ fontFamily: "var(--font-Alumni)", color: "var(--color-p-1)" }}
-        >
-          Selecciona tu fecha y horario
-        </h2>
+  className="min-h-screen relative overflow-hidden"
+    style={{
+      backgroundImage: `url('/Fondos/Deporte3.png')`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundAttachment: 'fixed',
+      fontFamily: "var(--font-Balo)",
+    }}
+  >
+    {/* 1. FONDO: Imagen + overlay + blur (z-index bajo) */}
+    {/*<div 
+      className="absolute inset-0 bg-black/4 backdrop-blur-sm"
+      style={{ zIndex: 1 }}
+    ></div>*/}
+      
+     <div className="relative z-10 min-h-screen flex flex-col">
+      <div className="flex-1 max-w-6xl mx-auto px-4 py-8 w-full">
+          <h2
+            className="text-4xl font-bold mb-8 text-center"
+            style={{ fontFamily: "var(--font-Alumni)", color: "var(--color-p-1)" }}
+          >
+            Selecciona tu fecha y horario
+          </h2>
 
-        <div className="grid lg:grid-cols-2 gap-8">
-          <CalendarSelector
-            fecha={reserva.fecha}
-            onChange={(d) => {
-              console.log("Fecha cambiada desde ReservaPage:", d.toISOString().split("T")[0]);
-              reserva.setFecha(d);
-            }}
-          />
-          {reserva.fecha && (
-            <HorariosDisponibles
-              canchaId={canchaId}
-              fecha={reserva.fecha.toISOString().split("T")[0]}
-              onSelectRango={(seleccionados) => {
-                console.log("Horarios seleccionados:", seleccionados);
-                setHorarios(seleccionados);
+          <div className="grid lg:grid-cols-2 gap-8">
+            <CalendarSelector
+              fecha={reserva.fecha}
+              onChange={(d) => {
+                console.log("Fecha cambiada desde ReservaPage:", d.toISOString().split("T")[0]);
+                reserva.setFecha(d);
               }}
             />
-          )}
-        </div>
+            {reserva.fecha && (
+              <HorariosDisponibles
+                canchaId={canchaId}
+                fecha={reserva.fecha.toISOString().split("T")[0]}
+                onSelectRango={(seleccionados) => {
+                  console.log("Horarios seleccionados fin:", seleccionados);
+                  setHorarios(seleccionados);
+                }}
+              />
+            )}
+          </div>
 
-        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-10 pt-6 border-t border-gray-300">
-          <button
-            onClick={() => navigate(-1)}
-            className="flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all"
-            style={{
-              backgroundColor: "var(--color-white)",
-              color: "var(--color-p-1)",
-              border: "2px solid var(--color-p-1)",
-              fontFamily: "var(--font-josefin)",
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "var(--color-p-1)")}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "var(--color-white)")}
-          >
-            <FaArrowLeft /> Volver
-          </button>
-
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-10 pt-6 border-t border-gray-300">
             <button
-              onClick={() => navigate("/")}
+              onClick={() => navigate(-1)}
               className="flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all"
               style={{
-                backgroundColor: "var(--color-danger)",
-                color: "var(--color-white)",
+                backgroundColor: "var(--color-white)",
+                color: "var(--color-p-1)",
+                border: "2px solid var(--color-p-1)",
                 fontFamily: "var(--font-josefin)",
               }}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "var(--color-p-1)")}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "var(--color-white)")}
             >
-              <FaTimes /> Salir
+              <FaArrowLeft /> Volver
             </button>
 
-            <button
-              onClick={handleSiguiente}
-              className="flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-white transition-all shadow-lg"
-              style={{
-                backgroundColor: "var(--color-p-1)",
-                fontFamily: "var(--font-josefin)",
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#b51e2a")}
-              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "var(--color-p-1)")}
-            >
-              Siguiente
-            </button>
+            <div className="flex gap-3">
+              <button
+                onClick={() => navigate("/")}
+                className="flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all"
+                style={{
+                  backgroundColor: "var(--color-danger)",
+                  color: "var(--color-white)",
+                  fontFamily: "var(--font-josefin)",
+                }}
+              >
+                <FaTimes /> Salir
+              </button>
+
+              <button
+                onClick={handleSiguiente}
+                className="flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-white transition-all shadow-lg"
+                style={{
+                  backgroundColor: "var(--color-p-1)",
+                  fontFamily: "var(--font-josefin)",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#b51e2a")}
+                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "var(--color-p-1)")}
+              >
+                Siguiente
+              </button>
+              
+            </div>
           </div>
         </div>
       </div>
