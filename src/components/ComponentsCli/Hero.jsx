@@ -30,7 +30,7 @@ export default function Hero() {
   }, []);
 
   return (
-    <section className="relative h-screen min-h-[600px] overflow-hidden">
+    <section id="inicio" className="relative h-screen min-h-[600px] overflow-hidden">
       {/* Fondo dinámico */}
       <AnimatePresence mode="wait">
         {backgrounds.map(

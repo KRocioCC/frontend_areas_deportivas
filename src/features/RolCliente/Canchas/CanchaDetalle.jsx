@@ -8,9 +8,8 @@ import CanchaHeader from "./CanchaHeader";
 import CanchaInfo from "./CanchaInfo";
 import CanchaDetallesExtras from "./CanchaDetallesExtras";
 import CanchaMapa from "./CanchaMapa";
-import { FaArrowLeftLong } from "react-icons/fa6";
+import { FaArrowLeft } from "react-icons/fa";
 import { useAuth } from "../../../auth/hooks/useAuth";
-
 
 export default function CanchaDetalle() {
   const { id } = useParams();
@@ -35,25 +34,27 @@ export default function CanchaDetalle() {
     fetchData();
   }, [id]);
 
-  if (loading)
+  if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin h-12 w-12 border-t-2 border-[var(--secondary)] rounded-full"></div>
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="w-10 h-10 border-4 border-gray-200 border-t-gray-600 rounded-full animate-spin"></div>
       </div>
     );
+  }
 
-  if (!cancha)
+  if (!cancha) {
     return (
-      <div className="flex flex-col justify-center items-center h-64 text-[var(--color-t-2)]">
-        <p>Cancha no encontrada.</p>
+      <div className="flex flex-col items-center justify-center min-h-screen text-center px-4">
+        <p className="text-gray-600 text-lg mb-4">Cancha no encontrada.</p>
         <button
           onClick={() => navigate(-1)}
-          className="mt-4 text-[var(--secondary)] hover:underline"
+          className="flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium transition-colors"
         >
-          ← Volver
+          <FaArrowLeft /> Volver
         </button>
       </div>
     );
+  }
 
   const handleReservar = () => {
     if (!disciplina) {
@@ -65,77 +66,97 @@ export default function CanchaDetalle() {
     const url = `/reservascli?canchaId=${cancha.idCancha}&disciplinaId=${disciplina.idDisciplina}`;
 
     if (currentUser && isClient) {
-      // usuario cliente ya logueado
       navigate(url);
     } else {
-      // no logueado o no cliente: mandar al login guardando la URL destino
       navigate("/login", { state: { from: url } });
     }
   };
-  console.log("Cancha:", cancha);
-  console.log("Disciplina:", disciplina);
-  
+
   return (
-    <motion.div
-      className="min-h-screen font-[var(--font-Balo)]"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
+    <div
+      className="min-h-screen bg-cover bg-center bg-fixed"
       style={{
-        background: `linear-gradient(135deg, var(--color-p-3) 40%, var(--color-p-5) 100%)`,
+        backgroundImage: `url('/Fondos/Deporte1.png')`,
       }}
     >
-      <div className="max-w-6xl mx-auto p-6">
-        {/* Botón volver */}
-        <button
-          onClick={() => navigate(-1)}
-          className="mb-6 flex items-center gap-2 text-[var(--color-p-6)] hover:text-[var(--color-p-4)] transition-all font-[var(--font-Oswald)]"
-        >
-          <FaArrowLeftLong className="text-lg" />
-          <span>Volver</span>
-        </button>
+      {/* Overlay oscuro */}
+      <div className="fixed inset-0 bg-black/60 -z-10"></div>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.4 }}
+        className="relative z-10 min-h-screen flex flex-col"
+      >
+        <div className="flex-1 max-w-5xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+          {/* Botón Volver */}
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-2 text-white hover:text-blue-300 font-medium text-sm mb-8 transition-colors"
+          >
+            <FaArrowLeft className="text-lg" />
+            Volver
+          </button>
 
-        {/* Contenido principal */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Izquierda: Imagen + Disciplinas */}
-          <div className="space-y-4">
-            <CanchaHeader cancha={cancha} />
+          {/* Grid Principal */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Columna Izquierda: Imagen + Disciplinas */}
+            <div className="space-y-6">
+              <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg border border-white/20 p-6">
+                <CanchaHeader cancha={cancha} />
+              </div>
 
-            <div className="bg-[var(--color-p-6)] rounded-xl p-4 shadow-sm">
-              <h3 className="font-[var(--font-Oswald)] text-lg text-[var(--primary)] mb-2">
-                Disciplinas
-              </h3>
+              {/* Selector de Disciplinas */}
+              <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg border border-white/20 p-6">
+                <h3 className="font-semibold text-gray-900 mb-5 text-lg">Selecciona una Disciplina</h3>
+                <DisciplinaCli
+                  canchaId={cancha.idCancha}
+                  onSelectDisciplina={(d) => setDisciplina(d)}
+                />
 
-              {/* PASAMOS setDisciplina como onSelectDisciplina */}
-              <DisciplinaCli canchaId={cancha.idCancha} onSelectDisciplina={(d) => setDisciplina(d)} />
+                {disciplina && (
+                  <p className="mt-3 text-sm text-green-700 font-medium">
+                    ✓ {disciplina.nombre}
+                  </p>
+                )}
 
-              {disciplina && (
-                <div className="mt-3 text-sm text-gray-700">
-                  Seleccionado: <strong>{disciplina.nombre || JSON.stringify(disciplina)}</strong>
-                </div>
-              )}
-
-              {error && <div className="mt-2 text-sm text-red-500">{error}</div>}
-              
+                {error && (
+                  <p className="mt-2 text-sm text-red-600">{error}</p>
+                )}
+              </div>
             </div>
 
-          </div>
+            {/* Columna Derecha */}
+            <div className="lg:col-span-2 space-y-6">
+              <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg border border-white/20 p-6">
+                <CanchaInfo cancha={cancha} />
+              </div>
 
-          {/* Derecha: Info + Detalles + Mapa */}
-          <div className="flex flex-col gap-4">
-            <CanchaInfo cancha={cancha} />
-            <CanchaDetallesExtras cancha={cancha} />
-            <CanchaMapa cancha={cancha} />
+              <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg border border-white/20 p-6">
+                <CanchaDetallesExtras cancha={cancha} />
+              </div>
 
-             <div className="text-center mt-4">
-              <button onClick={handleReservar} className="px-6 py-3 bg-[var(--secondary)] hover:bg-[var(--color-b-2)] text-white rounded-xl font-[var(--font-josefin)] text-lg shadow-md transition-all">
-                Ver Horarios y Reservar
-              </button>
+              <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg border border-white/20 p-6">
+                <CanchaMapa cancha={cancha} />
+              </div>
+
+              {/* Botón Reservar */}
+              <div className="flex justify-center mt-8">
+                <button
+                  onClick={handleReservar}
+                  disabled={!disciplina}
+                  className={`w-full sm:w-auto px-10 py-4 rounded-xl font-bold text-white text-lg shadow-xl transition-all transform hover:scale-105 active:scale-100 ${
+                    disciplina
+                      ? "bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
+                      : "bg-gray-400 cursor-not-allowed"
+                  }`}
+                >
+                  Ver Horarios y Reservar
+                </button>
+              </div>
             </div>
-            
           </div>
         </div>
-      </div>
-    </motion.div>
+      </motion.div>
+    </div>
   );
 }

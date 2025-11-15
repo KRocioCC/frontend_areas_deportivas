@@ -13,6 +13,9 @@ module.exports = {
   ],
   theme: {
     extend: {
+      animation: {
+        'path-draw': 'draw 2s ease-out forwards',
+      },
       fontFamily: {
         oswald: ['var(--font-Oswald)'],
         alumni: ['var(--font-Alumni)'],

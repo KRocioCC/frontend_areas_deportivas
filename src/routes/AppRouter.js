@@ -62,6 +62,9 @@ import ReservaCliente from "../features/RolCliente/Reserva/ReservaCliente.jsx";
 import ReservaConfirmacion from "../features/RolCliente/Reserva/ReservaConfirmacion.jsx";
 //import { ProtectedRoute } from '../auth/components/ProtectedRoute.jsx';
 import Calendar from "../features/RolAdministrador/calendar/Calendar";
+import ComoFunciona from "../features/RolCliente/Inicio/ComoFunciona.jsx";
+import SistemaQR from "../features/RolCliente/Inicio/SistemaQR.jsx";
+
 function AppRouter() {
 
   const pageVariants = {
@@ -126,6 +129,23 @@ function AppRouter() {
             element={
               <LayoutCliente>
                 <Areadeportiva />
+              </LayoutCliente>
+            }
+          />
+
+          <Route
+            path="/reservar/como-funciona"
+            element={
+              <LayoutCliente>
+                <ComoFunciona />
+              </LayoutCliente>
+            }
+          />
+          <Route
+            path="/reservar/qr"
+            element={
+              <LayoutCliente>
+                <SistemaQR />
               </LayoutCliente>
             }
           />

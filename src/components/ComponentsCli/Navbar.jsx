@@ -22,24 +22,26 @@ export default function Navbar() {
 
   // 🔹 Items base (sin cambios)
   const baseItems = [
-    { name: "Inicio", path: "/inicio" },
-    {
-      name: "Sobre nosotros",
-      path: "/sobre-nosotros",
+    { name: "Inicio", path: "/inicio#inicio" },
+    { name: "Servicios", path: "/inicio#servicios" },
+    { name: "Áreas", path: "/areasdeportivas" },
+    { 
+      name: "Reservar", 
+      path: "/reservar",
       children: [
-        { name: "Historia", path: "/sobre-nosotros/historia" },
-        { name: "Ubicación", path: "/sobre-nosotros/ubicacion" },
-        { name: "Contacto", path: "/sobre-nosotros/contacto" },
-      ],
+        { name: "Cómo Funciona", path: "/reservar/como-funciona" },
+        { name: "Sistema QR", path: "/reservar/qr" },
+      ]
     },
+  
     {
-      name: "Disciplinas",
-      path: "/disciplinas",
+      name: "¿Quienes Somos?",
+      path: "/empresa", 
       children: [
-        { name: "Fútbol", path: "/disciplinas/futbol" },
-        { name: "Básquet", path: "/disciplinas/basquet" },
-        { name: "Tenis", path: "/disciplinas/tenis" },
-      ],
+        { name: "Nosotros", path: "/inicio#nosotros" },
+        { name: "Misión y Visión", path: "/inicio#misionvision" },
+        { name: "Contacto", path: "/inicio#contacto" },
+      ]
     },
   ];
 
@@ -47,7 +49,7 @@ export default function Navbar() {
     ? [
         ...baseItems,
         {
-          name: "Reservas",
+          name: "MisReservas",
           path: "/cliente/reservas",
           children: [
             { name: "Nueva reserva", path: "/cliente/reservas/nueva" },
@@ -58,11 +60,41 @@ export default function Navbar() {
     : baseItems;
 
   const handleNavigate = (path) => {
-    setActivePath(path);
-    setMenuOpen(false);
-    navigate(path);
-  };
+    const [basePath, hash] = path.split("#");
 
+    // Si ya estás en basePath (ej: /inicio) y sólo cambia el hash → no navegar, solo scrollear
+    if (basePath === location.pathname && hash) {
+      // Scroll al elemento
+      setTimeout(() => {
+        const el = document.getElementById(hash);
+        if (el) {
+          const offset = 67; // altura de la navbar fija
+          const y = el.getBoundingClientRect().top + window.scrollY - offset;
+          window.scrollTo({ top: y, behavior: "smooth" });
+        }
+      }, 50);
+      setActivePath(path); // actualiza estado visual
+    } else {
+      // Navegar a otra página
+      navigate(basePath);
+      // Si hay hash, scrollear después del render
+      if (hash) {
+        setTimeout(() => {
+          const el = document.getElementById(hash);
+          if (el) {
+            const offset = 80;
+            const y = el.getBoundingClientRect().top + window.scrollY - offset;
+            window.scrollTo({ top: y, behavior: "smooth" });
+          }
+          setActivePath(path);
+        }, 300); // más tiempo para asegurar render
+      } else {
+        setActivePath(path);
+      }
+    }
+
+    setMenuOpen(false);
+  };
   const handleAccordionToggle = (index) => {
     setAccordionOpen(accordionOpen === index ? null : index);
   };

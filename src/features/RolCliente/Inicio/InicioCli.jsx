@@ -1,15 +1,22 @@
 // src/features/RolCliente/Inicio/Inicio.jsx
 import Hero from "../../../components/ComponentsCli/Hero";
 import AreaDeportiva from "../AreaDeportiva/AreaDeportiva"
-//import Seccion1 from "./Seccion1"; // o lo que tengas
+import Servicios from "./Servicios";
+import Nosotros from "./Nosotros";
+import MisionVision from "./MisionVision"
+import Contacto from "./Contacto"
+import Footer from "./Footer"
 
 export default function Inicio() {
   return (
-    <div>
+    <div style={{ overflow: "hidden" }}>
       <Hero />
-      <AreaDeportiva/>
-      {/*<Seccion1 />*/}
-      {/* Otras secciones aquí */}
+      <Servicios />
+      <AreaDeportiva />
+      <Nosotros/>
+      <MisionVision/>
+      <Contacto/> 
+      <Footer/> 
     </div>
   );
 }
