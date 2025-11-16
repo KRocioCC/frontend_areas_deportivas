@@ -302,8 +302,14 @@ const MiAreaPage = () => {
   // MODO NORMAL - Administrador con área existente
   if (!area) {
     return (
-      <div className="mi-area-container">
-        <div className="mi-area-card">
+      <div className="mi-area-container"
+       style={{
+        backgroundImage: `url('/Fondos/Deporte6.png')`,
+      }}>
+        <div className="mi-area-card"
+         style={{
+        backgroundImage: `url('/Fondos/Deporte6.png')`,
+      }}>
           <div className="mi-area-error">
             <h2>No se pudo cargar la información del área</h2>
             <p>Intenta recargar la página o contacta al administrador del sistema.</p>
@@ -320,8 +326,12 @@ const MiAreaPage = () => {
   }
 
   return (
-    <div className="mi-area-container">
-      <div className="mi-area-card">
+    <div className="mi-area-container"
+ >
+      <div className="mi-area-card"
+       style={{
+        backgroundImage: `url('/Fondos/Deporte6.png')`,
+      }}>
         <h1>Mi Área Deportiva: {area.nombreArea || 'Sin nombre'}</h1>
         <p className="mi-area-zona">
           Zona: {area.zona?.nombre || "No asignada"}

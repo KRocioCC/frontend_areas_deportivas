@@ -118,11 +118,12 @@ const CanchaCard = ({
           {!desactivada && (
             <>
               <button
-                onClick={() => navigate(`/cliente/cancha/${cancha.idCancha}`)}
-className="w-full py-3 bg-[#41BFB3] text-white rounded-xl hover:bg-[#3aa9a0] transition-all duration-300 font-semibold text-sm shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-              >
-                Realizar Reserva
-              </button>
+                onClick={() => navigate(`/admin/cancha/${cancha.idCancha}`)}
+            className="w-full py-3 bg-[#41BFB3] text-white rounded-xl hover:bg-[#3aa9a0] transition-all duration-300 font-semibold text-sm shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+            >
+            Realizar Reserva
+            </button>
+
 
 {/* NO HAY ELIMINACION LOGICA EN EL BACKEND :=0 
               <button

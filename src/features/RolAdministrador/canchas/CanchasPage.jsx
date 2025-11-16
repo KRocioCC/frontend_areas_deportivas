@@ -155,7 +155,10 @@ const CanchasPage = () => {
   if (err) return <p className="text-center text-red-600">{err}</p>;
 
   return (
-    <div className="w-full px-6 py-8">
+    <div className="w-full px-6 py-8"
+    style={{
+        backgroundImage: `url('/Fondos/Deporte11.png')`,
+      }}>
       {/* Buscador centrado */}
       <div className="max-w-5xl mx-auto flex items-center gap-4">
         <BuscadorCanchas

@@ -38,6 +38,10 @@ import PageClientes from "../features/RolAdministrador/usuarios/clientes/PageCli
 import PageUsuariosControl from "../features/RolAdministrador/usuarios/usuarios_control/PageUsuariosControl";
 import Dashboard from "../features/RolAdministrador/dashboard/index.jsx";
 
+import CanchaDetalleAdmin from "../features/RolAdministrador/canchas/CanchaDetalleAdmin";
+import ReservaPageAdmin from "../features/RolAdministrador/Reserva/ReservaPageAdmin";
+
+
 //CLIENTE
 // CLIENTE - componentes visuales
 import Preloader from "../components/ComponentsCli/Preloader.jsx";
@@ -361,6 +365,28 @@ function AppRouter() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/admin/cancha/:id"
+            element={
+              <ProtectedRoute requireAdmin>
+                <DashboardLayoutAdmin>
+                  <CanchaDetalleAdmin />
+                </DashboardLayoutAdmin>
+              </ProtectedRoute>
+            }
+          />
+
+        <Route
+          path="/admin/reservascli"
+          element={
+            <ProtectedRoute requireAdmin>
+              <DashboardLayoutAdmin>
+                <ReservaPageAdmin />
+              </DashboardLayoutAdmin>
+            </ProtectedRoute>
+          }
+        />
+
           <Route
             path="/admin/dashboard"
             element={
