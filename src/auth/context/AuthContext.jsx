@@ -42,6 +42,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const value = {
+    user: currentUser,//para que funcione el login de cliente
     currentUser,
     isLoading,
     login,

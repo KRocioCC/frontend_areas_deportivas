@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import DashboardLayout from "../components/layout/DashboardLayout";
 import DashboardLayoutAdmin from "../components/layout/DashboardLayoutAdmin";
@@ -37,21 +37,206 @@ import CanchasPage from "../features/RolAdministrador/canchas/CanchasPage";
 import PageClientes from "../features/RolAdministrador/usuarios/clientes/PageClientes";
 import PageUsuariosControl from "../features/RolAdministrador/usuarios/usuarios_control/PageUsuariosControl";
 import Dashboard from "../features/RolAdministrador/dashboard/index.jsx";
+
+//CLIENTE
+// CLIENTE - componentes visuales
+import Preloader from "../components/ComponentsCli/Preloader.jsx";
+import { AnimatePresence, motion } from "framer-motion";
+import LayoutCliente from "../components/ComponentsCli/LayoutCliente.jsx";  
+
+
+// CLIENTE - páginas
+import Inicio from "../features/RolCliente/Inicio/InicioCli.jsx";
+//import Seccion1 from "../feature/RolCliente/Inicio/Seccion1";
+import Areadeportiva from "../features/RolCliente/AreaDeportiva/AreaDeportiva.jsx"
+import Cancha from "../features/RolCliente/Canchas/Cancha.jsx"
+import CanchaDetalle from "../features/RolCliente/Canchas/CanchaDetalle.jsx"
+//import HistorialReserva from "../feature/RolCliente/Areadeportiva/HistorialReserva/HistorialReserva";
+//import Notificaciones from "../feature/RolCliente/Notificaciones/Notificaciones"; // si existe
+//import HistorialReserva from "../feature/RolCliente/Areadeportiva/HistorialReserva/HistorialReserva";
+//import Notificaciones from "../feature/RolCliente/Notificaciones/Notificaciones"; // si existe
+import ReservaPage from "../features/RolCliente/Reserva/ReservaPage22.jsx";
+import ConfirmacionFinalReservaHorario from "../features/RolCliente/Reserva/ConfirmacionFinal.jsx";
+import ReservaCliente from "../features/RolCliente/Reserva/ReservaCliente.jsx";
+
+import ReservaConfirmacion from "../features/RolCliente/Reserva/ReservaConfirmacion.jsx";
+//import { ProtectedRoute } from '../auth/components/ProtectedRoute.jsx';
 import Calendar from "../features/RolAdministrador/calendar/Calendar";
+import ComoFunciona from "../features/RolCliente/Inicio/ComoFunciona.jsx";
+import SistemaQR from "../features/RolCliente/Inicio/SistemaQR.jsx";
+
 function AppRouter() {
+
+  const pageVariants = {
+    initial: (direction) => ({
+      x: direction > 0 ? 300 : -300,
+      opacity: 0,
+      position: "absolute",
+      width: "100%"
+    }),
+    animate: {
+      x: 0,
+      opacity: 1,
+      position: "relative",
+      width: "100%",
+      transition: { type: "tween", duration: 0.5 }
+    },
+    exit: (direction) => ({
+      x: direction > 0 ? -300 : 300,
+      opacity: 0,
+      position: "absolute",
+      width: "100%",
+      transition: { type: "tween", duration: 0.5 }
+    })
+  };
+
+  const [loading, setLoading] = useState(true);
+
   return (
     <AuthProvider>
       <BrowserRouter>
+        {/*{loading ? (
+            <Preloader onFinish={() => setLoading(false)} />
+          ) : (*/}
         <Routes>
           
+          {/* Redirección por defecto → inicio */}
+          {/* Ruta pública: inicio */}
+          <Route path="/" element={<Navigate to="/inicio" replace />} />
+
           {/* Redirección por defecto → login */}
-          <Route path="/" element={<Navigate to="/login" replace />} />
+          {/*<Route path="/" element={<Navigate to="/login" replace />} />*/}
 
           {/* Rutas de autenticación públicas */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<RegisterTypeSelector />} />
           <Route path="/register/cliente" element={<RegisterCliente />} />
           <Route path="/register/administrador" element={<RegisterAdministrador />} />
+
+          {/*paginas publicas */}
+
+          <Route
+            path="/inicio"
+            element={
+              <LayoutCliente>
+                <Inicio />
+              </LayoutCliente>
+            }
+          />
+
+          <Route
+            path="/areadeportivacli"
+            element={
+              <LayoutCliente>
+                <Areadeportiva />
+              </LayoutCliente>
+            }
+          />
+
+          <Route
+            path="/reservar/como-funciona"
+            element={
+              <LayoutCliente>
+                <ComoFunciona />
+              </LayoutCliente>
+            }
+          />
+          <Route
+            path="/reservar/qr"
+            element={
+              <LayoutCliente>
+                <SistemaQR />
+              </LayoutCliente>
+            }
+          />
+
+          {/*Pagiinas publicas Canchas */}
+
+          <Route
+            path="/canchacli"
+            element={
+              <LayoutCliente>
+                <Cancha />
+              </LayoutCliente>
+            }
+          />
+
+           <Route
+            path="canchacli/detalle/:id"
+            element={
+              <motion.div
+                variants={pageVariants}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                custom={1}
+              >
+                <CanchaDetalle />
+              </motion.div>
+            }
+          />
+          {/* CLIENTE - Reservas protegidas */}
+          <Route
+            path="/reservascli"
+            element={
+              <ProtectedRoute requireCliente>
+                <LayoutCliente>
+                  <ReservaPage />
+                </LayoutCliente>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/reservas/cliente"
+            element={
+              <ProtectedRoute requireCliente>
+                <LayoutCliente>
+                  <ReservaCliente />
+                </LayoutCliente>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/reservas/confirmacion"
+            element={
+              <ProtectedRoute requireCliente>
+                <LayoutCliente>
+                  <ReservaConfirmacion />
+                </LayoutCliente>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/cliente/reservas/confirmacion/:id"
+            element={
+              <ProtectedRoute requireCliente>
+                <LayoutCliente>
+                  <ConfirmacionFinalReservaHorario />
+                </LayoutCliente>
+              </ProtectedRoute>
+            }
+          />
+
+            
+
+            {/*  <Route
+              path="/reservas/historial"
+              element={
+                <ProtectedRoute>
+                  <HistorialReserva />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/notificaciones"
+              element={
+                <ProtectedRoute>
+                  <Notificaciones />
+                </ProtectedRoute>
+              }
+            />
 
           {/* Ruta accesible para cualquier usuario autenticado */}
           <Route
@@ -230,6 +415,7 @@ function AppRouter() {
           {/* Ruta 404 - Redirigir a login */}
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
+        {/*)}*/}
       </BrowserRouter>
     </AuthProvider>
   );

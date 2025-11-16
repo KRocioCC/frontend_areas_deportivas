@@ -1,90 +1,129 @@
-import api from './api';
+// src/api/ReservaApi.js
+import api from "./api";
 
-const API_URL = '/reservas';
+const URL_BASE = "/reservas";
 
-// CRUD
-export async function getReservas() {
-  const res = await api.get(API_URL);
+/* -----------------------------------------------------------
+   CRUD BÁSICO
+----------------------------------------------------------- */
+export const getReservas = async () => {
+  const res = await api.get(`${URL_BASE}`);
   return res.data;
-}
+};
 
-export async function createReserva(payload) {
-  const res = await api.post(API_URL, payload);
+export const getReservaPorId = async (id) => {
+  const res = await api.get(`${URL_BASE}/${id}`);
   return res.data;
-}
+};
 
-export async function updateReserva(id, payload) {
-  const res = await api.put(`${API_URL}/${id}`, payload);
+export const createReserva = async (payload) => {
+  const res = await api.post(`${URL_BASE}`, payload);
   return res.data;
-}
+};
 
-export async function deleteReserva(id) {
-  const res = await api.delete(`${API_URL}/${id}`);
+export const updateReserva = async (id, payload) => {
+  const res = await api.put(`${URL_BASE}/${id}`, payload);
   return res.data;
-}
+};
 
-export async function getReservaPorId(id) {
-  const res = await api.get(`${API_URL}/${id}`);
+export const deleteReserva = async (id) => {
+  const res = await api.delete(`${URL_BASE}/${id}`);
   return res.data;
-}
+};
 
-// Búsquedas
-export async function getReservasPorCliente(idCliente) {
-  const res = await api.get(`${API_URL}/cliente/${idCliente}`);
+/* -----------------------------------------------------------
+   BÚSQUEDAS
+----------------------------------------------------------- */
+export const getReservasPorCliente = async (idCliente) => {
+  const res = await api.get(`${URL_BASE}/cliente/${idCliente}`);
   return res.data;
-}
+};
 
-export async function getReservasPorEstado(estado) {
-  const res = await api.get(`${API_URL}/estado/${estado}`);
+export const getReservasPorEstado = async (estado) => {
+  const res = await api.get(`${URL_BASE}/estado/${estado}`);
   return res.data;
-}
+};
 
-export async function getReservasPorRangoFechas(inicio, fin) {
-  const res = await api.get(`${API_URL}/rango-fechas?inicio=${inicio}&fin=${fin}`);
+export const getReservasPorRangoFechas = async (inicio, fin) => {
+  const res = await api.get(`${URL_BASE}/rango-fechas`, { params: { inicio, fin } });
   return res.data;
-}
+};
 
-export async function getReservasActivasPorCliente(idCliente) {
-  const res = await api.get(`${API_URL}/cliente/${idCliente}/activas`);
+export const getReservasActivasPorCliente = async (idCliente) => {
+  const res = await api.get(`${URL_BASE}/cliente/${idCliente}/activas`);
   return res.data;
-}
+};
 
-export async function getReservasPorDia(fecha) {
-  const res = await api.get(`${API_URL}/dia/${fecha}`);
+export const getReservasActivasDelCliente = async (idCliente) => {
+  const res = await api.get(`${URL_BASE}/activas/cliente/${idCliente}`);
   return res.data;
-}
+};
+
+export const getReservasPorDia = async (fecha) => {
+  const res = await api.get(`${URL_BASE}/dia/${fecha}`);
+  return res.data;
+};
+
+/* -----------------------------------------------------------
+   DISPONIBILIDAD Y HORARIOS
+----------------------------------------------------------- */
+export const getHorasDisponibles = async (canchaId, fecha) => {
+  const res = await api.get(`${URL_BASE}/horario-disponible`, {
+    params: { canchaId, fecha },
+  });
+  return res.data;
+};
+
+export const validarDisponibilidad = async (fecha, horaInicio, horaFin) => {
+  const res = await api.get(`${URL_BASE}/disponibilidad`, {
+    params: { fecha, horaInicio, horaFin },
+  });
+  return res.data;
+};
+
+/* -----------------------------------------------------------
+   OPERACIONES DE NEGOCIO
+----------------------------------------------------------- */
+export const marcarEnCurso = async (id) => {
+  const res = await api.post(`${URL_BASE}/${id}/en-curso`);
+  return res.data;
+};
 
 //  Obtener reservas del administrador en un rango de fechas
 // Se usa en el dashboard y calendario para mostrar solo las reservas de sus canchas
 export async function getReservasPorAdministradorEnRango(idAdministrador, inicio, fin) {
-  const res = await api.get(`${API_URL}/administrador/${idAdministrador}/rango-fechas?inicio=${inicio}&fin=${fin}`);
+  const res = await api.get(`${URL_BASE}/administrador/${idAdministrador}/rango-fechas?inicio=${inicio}&fin=${fin}`);
   return res.data;
 }
 
-// Validaciones
-export async function validarDisponibilidad(fecha, horaInicio, horaFin) {
-  const res = await api.get(`${API_URL}/disponibilidad?fecha=${fecha}&horaInicio=${horaInicio}&horaFin=${horaFin}`);
+export const completarReserva = async (id) => {
+  const res = await api.post(`${URL_BASE}/${id}/completar`);
   return res.data;
-}
+};
 
-// Operaciones de negocio
-export async function marcarEnCurso(id) {
-  const res = await api.post(`${API_URL}/${id}/en-curso`);
+export const marcarNoShow = async (id) => {
+  const res = await api.post(`${URL_BASE}/${id}/no-show`);
   return res.data;
-}
+};
 
-export async function completarReserva(id) {
-  const res = await api.post(`${API_URL}/${id}/completar`);
+export const cancelarReserva = async (id, motivo) => {
+  const res = await api.post(`${URL_BASE}/${id}/cancelar`, { motivo });
   return res.data;
-}
+};
 
-export async function marcarNoShow(id) {
-  const res = await api.post(`${API_URL}/${id}/no-show`);
+/**
+ * 🔥 Este endpoint es el más importante, usado en la generación de QR y
+ * actualización del estado de pago de la reserva.
+ */
+export const actualizarEstadoPago = async (id) => {
+  const res = await api.put(`${URL_BASE}/${id}/actualizar-pago`);
   return res.data;
-}
+};
 
-// Health check
-export async function healthCheck() {
-  const res = await api.get(`${API_URL}/health`);
+/* -----------------------------------------------------------
+   HEALTH CHECK
+----------------------------------------------------------- */
+export const healthCheckReserva = async () => {
+  const res = await api.get(`${URL_BASE}/health`);
   return res.data;
-}
+};

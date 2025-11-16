@@ -10,7 +10,7 @@ export async function getCanchas() {
 
 //  Obtener una cancha por ID
 export async function getCancha(id) {
-  const res = await api.get(`${API_URL}/${id}`);
+  const res = await api.get(`${API_URL}/porid/${id}`);
   return res.data;
 }
 
@@ -35,5 +35,74 @@ export async function deleteCancha(id) {
 // Obtener canchas por área deportiva
 export async function getCanchasPorArea(idArea) {
   const res = await api.get(`${API_URL}/area/${idArea}`);
+  return res.data;
+}
+
+// ============================
+// ⚙️ ESTADO Y FILTROS
+// ============================
+export async function cambiarEstadoCancha(id, nuevoEstado) {
+  const res = await api.patch(`${API_URL}/${id}/estado?nuevoEstado=${nuevoEstado}`);
+  return res.data;
+}
+
+export async function buscarCanchasPorNombre(nombre) {
+  const res = await api.get(`${API_URL}/buscar/${nombre}`);
+  return res.data;
+}
+
+export async function buscarCanchasPorFiltros(params) {
+  // params: { horaInicio, horaFin, costo, capacidad, tamano, iluminacion, cubierta }
+  const query = new URLSearchParams(params).toString();
+  const res = await api.get(`${API_URL}/buscar?${query}`);
+  return res.data;
+}
+
+// ============================
+// 🧱 RELACIONES
+// ============================
+export async function getCanchasActivas() {
+  const res = await api.get(`${API_URL}/activos`);
+  return res.data;
+}
+
+
+export async function getEquipamientosPorCancha(id) {
+  const res = await api.get(`${API_URL}/equipamientos/${id}`);
+  return res.data;
+}
+
+export async function getDisciplinasPorCancha(id) {
+  const res = await api.get(`${API_URL}/disciplinas/${id}`);
+  return res.data;
+}
+
+// ============================
+// 🧩 IMÁGENES
+// ============================
+export async function agregarImagenesCancha(id, archivosImagenes) {
+  const formData = new FormData();
+  archivosImagenes.forEach((file) => formData.append('archivosImagenes', file));
+  const res = await api.post(`${API_URL}/${id}/imagenes`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return res.data;
+}
+
+export async function eliminarImagenCancha(id, idImagenRelacion) {
+  const res = await api.delete(`${API_URL}/${id}/imagenes/${idImagenRelacion}`);
+  return res.data;
+}
+
+export async function reordenarImagenesCancha(id, idsImagenesOrden) {
+  const res = await api.put(`${API_URL}/${id}/imagenes/reordenar`, idsImagenesOrden);
+  return res.data;
+}
+
+// ============================
+// 🔒 BLOQUEO / CONTROL CONCURRENCIA
+// ============================
+export async function obtenerCanchaConBloqueo(id) {
+  const res = await api.get(`${API_URL}/${id}/lock`);
   return res.data;
 }
