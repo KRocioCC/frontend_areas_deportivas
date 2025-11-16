@@ -24,7 +24,8 @@ const Login = () => {
       const response = await login(username, password);
 
       localStorage.setItem('user', JSON.stringify(response));
-      localStorage.setItem('id', response.id); // guarda el ID 
+      localStorage.setItem('id', response.id); // guarda el ID
+      localStorage.setItem("idPersona", response.idPersona); // ID de la persona (área deportiva) 
 
       // Configura Axios con el token JWT
       authService.setupAxiosInterceptors(response.token);

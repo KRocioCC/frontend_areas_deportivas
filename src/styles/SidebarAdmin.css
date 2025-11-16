@@ -1,6 +1,6 @@
 /* Estilos específicos para el sidebar de administrador */
 .admin-sidebar {
-  background: var(--color-p-3);
+  background: black;
   width: 16rem; /* equivalente a w-64 */
   min-height: 100vh;
   position: fixed;
@@ -8,8 +8,6 @@
   left: 0;
   z-index: 50;
 }
-
-
 .admin-sidebar .sidebar-header {
   padding: 1rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);

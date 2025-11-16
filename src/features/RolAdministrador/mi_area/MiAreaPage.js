@@ -1,6 +1,7 @@
 // src/features/personas/ROL-Administrador/mi_area/MiAreaPage.js
 import React, { useEffect, useMemo, useState } from 'react';
-import { getAreadeportivaPorAdminId, updateAreadeportivaPorAdminId } from "../../../api/AreadeportivaApi";
+import { getAreadeportivaPorAdminId, createAreadeportiva } from "../../../api/AreadeportivaApi";
+import { getZonas } from "../../../api/ZonaApi";
 import { useAuth } from '../../../auth/hooks/useAuth';
 import './MiAreaPage.css';
 
@@ -8,304 +9,335 @@ const MiAreaPage = () => {
   const { currentUser } = useAuth();
 
   const [area, setArea] = useState(null);
-  const [editMode, setEditMode] = useState(false);
-  const [formData, setFormData] = useState({});
   const [loading, setLoading] = useState(true);
-  const [showDebugInfo, setShowDebugInfo] = useState(false); // ← Nuevo estado para debug
+  const [createMode, setCreateMode] = useState(false);
+  const [zonas, setZonas] = useState([]);
+  const [loadingZonas, setLoadingZonas] = useState(false);
+  const [formData, setFormData] = useState({
+    nombreArea: '',
+    descripcionArea: '',
+    latitud: '',
+    longitud: '',
+    telefonoArea: '',
+    emailArea: '',
+    horaInicioArea: '08:00',
+    horaFinArea: '16:00',
+    urlImagen: '',
+    idZona: '',
+    estado: true
+  });
 
-  // --- CARGA INICIAL ---------------------------------------------------------
+  // --- CARGAR ZONAS ----------------------------------------------------------
   useEffect(() => {
-    if (!currentUser?.idPersona) return;
-
-    const fetchArea = async () => {
+    const loadZonas = async () => {
       try {
-        console.log('Iniciando carga del área para admin ID:', currentUser.idPersona);
-        const data = await getAreadeportivaPorAdminId(currentUser.idPersona);
-        console.log(' Área cargada:', data);
-
-        // Guarda el objeto completo para mostrarlo
-        setArea(data);
-
-        // IMPORTANTE: tomar idZona desde data.zona.idZona
-        setFormData({
-          idAreadeportiva: data.idAreadeportiva ?? null,
-          idZona: data?.zona?.idZona ?? '',          // <- zONA
-          estado: data.estado ?? true,
-
-          nombreArea: data.nombreArea || '',
-          descripcionArea: data.descripcionArea || '',
-          latitud: data.latitud ?? '',
-          longitud: data.longitud ?? '',
-          telefonoArea: data.telefonoArea || '',
-          emailArea: data.emailArea || '',
-          horaInicioArea: data.horaInicioArea || '',
-          horaFinArea: data.horaFinArea || '',
-          urlImagen: data.urlImagen || ''
-        });
+        setLoadingZonas(true);
+        console.log('🗺️ Cargando lista de zonas...');
+        const zonasData = await getZonas();
+        console.log('✅ Zonas cargadas:', zonasData);
+        setZonas(zonasData);
       } catch (error) {
-        console.error("Error al cargar el área:", error);
+        console.error('Error al cargar zonas:', error);
+        alert('Error al cargar la lista de zonas');
+      } finally {
+        setLoadingZonas(false);
+      }
+    };
+
+    loadZonas();
+  }, []);
+
+  // --- CARGA INICIAL DEL ÁREA ------------------------------------------------
+  useEffect(() => {
+    if (!currentUser?.idPersona) {
+      console.log(' No hay currentUser.idPersona');
+      setLoading(false);
+      return;
+    }
+
+    const checkAreaExists = async () => {
+      try {
+        console.log('Verificando si existe área para admin ID:', currentUser.idPersona);
+        
+        const data = await getAreadeportivaPorAdminId(currentUser.idPersona);
+        console.log('rea encontrada:', data);
+        
+        if (data) {
+          // Si existe área, la mostramos
+          setArea(data);
+          setCreateMode(false);
+        } else {
+          // Si no existe área, activamos modo creación
+          console.log('📭 No existe área, activando modo creación...');
+          setCreateMode(true);
+        }
+      } catch (error) {
+        console.error('❌ Error al verificar área:', error);
+        
+        // Si hay error 401 (no tiene área), activamos modo creación
+        if (error.response?.status === 401) {
+          console.log('401 - Administrador sin área, activando modo creación');
+          setCreateMode(true);
+        } else {
+          console.error('Error desconocido:', error);
+          setCreateMode(true);
+        }
       } finally {
         setLoading(false);
       }
     };
 
-    fetchArea();
-  }, [currentUser?.idPersona]);
+    checkAreaExists();
+  }, [currentUser]);
 
-  // --- HANDLERS --------------------------------------------------------------
+  // --- HANDLERS PARA MODO CREACIÓN -------------------------------------------
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSave = async () => {
+  const handleCreateArea = async () => {
     try {
-      console.log(' Iniciando guardado...');
       
-      // Validación mínima de zona
-      const idZona = Number(formData.idZona || area?.zona?.idZona);
-      if (!idZona) {
-        alert("No se puede guardar: falta idZona.");
-        return;
-      }
-
-      const payload = {
+      
+        const payload = {
         id: currentUser.idPersona, 
-        idAreadeportiva: formData.idAreadeportiva ?? area?.idAreadeportiva ?? null,
-        idZona: idZona, 
-        
-        // Campos de ubicación (NotNull en el DTO)
-        latitud: formData.latitud === '' ? null : Number(formData.latitud),
-        longitud: formData.longitud === '' ? null : Number(formData.longitud),
-        
-        // Campos obligatorios en el DTO
-        nombreArea: formData.nombreArea?.trim() ?? area?.nombreArea ?? '',
-        horaInicioArea: formData.horaInicioArea ?? area?.horaInicioArea ?? '',
-        horaFinArea: formData.horaFinArea ?? area?.horaFinArea ?? '',
-        estado: formData.estado ?? area?.estado ?? true,
-
-        // Campos opcionales
-        descripcionArea: formData.descripcionArea?.trim() ?? area?.descripcionArea ?? '',
-        telefonoArea: formData.telefonoArea?.trim() ?? '',
-        emailArea: formData.emailArea?.trim() ?? '',
-        urlImagen: formData.urlImagen ?? ''
+        nombreArea: formData.nombreArea.trim(),
+        descripcionArea: formData.descripcionArea?.trim() || '',
+        latitud: formData.latitud ? Number(formData.latitud) : null,
+        longitud: formData.longitud ? Number(formData.longitud) : null,
+        telefonoArea: formData.telefonoArea?.trim() || '',
+        emailArea: formData.emailArea?.trim() || '',
+        horaInicioArea: formData.horaInicioArea || '08:00',
+        horaFinArea: formData.horaFinArea || '16:00',
+        urlImagen: formData.urlImagen || '',
+        idZona: Number(formData.idZona),
+        estado: true
       };
 
-      console.log(' Payload a enviar:', payload);
-      console.log('Campos críticos - id:', payload.id, 'idAreadeportiva:', payload.idAreadeportiva, 'idZona:', payload.idZona);
-
-      console.log('Llamando a updateAreadeportivaPorAdminId...');
-      const updated = await updateAreadeportivaPorAdminId(currentUser.idPersona, payload);
+      // ENDPOINT POST para crear el área
+      const newArea = await createAreadeportiva(payload);
       
-      console.log(' Área actualizada exitosamente:', updated);
-      setArea(updated);
-      setEditMode(false);
-      alert(' Cambios guardados exitosamente');
-    } catch (err) {
-      console.error(" Error al guardar:", err);
-      console.error(" Detalles del error:", err.response?.data);
-      console.error(" Status del error:", err.response?.status);
-      alert(' Error al guardar los cambios. Revisa la consola para más detalles.');
+      console.log(' Área creada exitosamente:', newArea);
+      
+      // Actualizar estado
+      setArea(newArea);
+      setCreateMode(false);
+      
+      alert(' ¡Área deportiva creada exitosamente!');
+      
+    } catch (error) {
+      console.error(' Error al crear área:', error);
+      alert(' Error al crear el área deportiva. Revisa la consola para más detalles.');
     }
   };
 
-  // --- PREVIEW DE IMAGEN (segura: no dispara 401 al backend) -----------------
-  // Solo renderiza <img> si la URL es pública (http/https) y NO corresponde a tu backend protegido.
-const publicImageSrc = useMemo(() => {
-  const u = (formData.urlImagen || area?.urlImagen || '').trim();
-  if (!u) return null;
-
-  const isHttp = /^https?:\/\//i.test(u);
-  const isBackend = /localhost:8032/i.test(u);
-
-  // ✅ Si es una URL completa del backend, permitirla
-  if (isHttp && isBackend) return u;
-
-  // ✅ Si es una URL pública (no backend), permitirla
-  if (isHttp && !isBackend) return u;
-
-  // ❌ Si es una ruta relativa (ej. "img/escalada.jpg"), no mostrar
-  return null;
-}, [area?.urlImagen, formData.urlImagen]);
-
-
   // --- RENDER ----------------------------------------------------------------
-  if (loading) return <div className="mi-area-loading">Cargando área deportiva...</div>;
-  if (!area) return <div className="mi-area-error">No se encontró un área asignada.</div>;
+  if (loading) {
+    return <div className="mi-area-loading">Cargando...</div>;
+  }
 
-  return (
-    <div className="mi-area-container">
-      <div className="mi-area-card">
-        <h1>Área deportiva: {area.nombreArea}</h1>
-        <p className="mi-area-zona">
-          ZONA: {area.zona?.nombre ?? "Sin zona asignada"}
-        </p>
-{/* QUITAR ESTO DESPUES */}
-        {/* Botón para mostrar/ocultar info de debug (opcional) */}
-        {process.env.NODE_ENV === 'development' && (
-          <button 
-            className="btn-debug" 
-            onClick={() => setShowDebugInfo(!showDebugInfo)}
-            style={{
-              padding: '2px 8px',
-              fontSize: '10px',
-              background: '#f0f0f0',
-              border: '1px solid #ccc',
-              borderRadius: '4px',
-              marginBottom: '10px',
-              cursor: 'pointer'
-            }}
-          >
-            {showDebugInfo ? '👁️ Ocultar Debug' : '👁️ Mostrar Debug'}
-          </button>
-        )}
+  // MODO CREACIÓN - Administrador nuevo sin área
+  if (createMode) {
+    return (
+      <div className="mi-area-container">
+        <div className="mi-area-card">
+          <div className="welcome-banner">
+            <h1>¡Bienvenido a QJuego , {currentUser?.username}!</h1>
+            <p>Por favor, registra los datos de tu área deportiva para comenzar</p>
+            
+          </div>
 
-
-
-
-        <div className="mi-area-layout">
-          {/* FORMULARIO */}
           <div className="mi-area-form">
+            <div className="form-section">
+              <h3>Información Básica</h3>
+              
+              <div className="mi-area-row">
+                <label>Nombre del Área *</label>
+                <input 
+                  name="nombreArea" 
+                  value={formData.nombreArea} 
+                  onChange={handleChange}
+                  placeholder="Ej: Cancha Los Olivos, Estadio Municipal, etc."
+                  required
+                />
+              </div>
 
-            {/* Mantener idZona en el payload aunque no se edite */}
-            {editMode && (
-              <input type="hidden" name="idZona" value={formData.idZona} onChange={handleChange} />
-            )}
+              <div className="mi-area-row">
+                <label>Zona *</label>
+                {loadingZonas ? (
+                  <div>Cargando zonas...</div>
+                ) : (
+                  <select 
+                    name="idZona" 
+                    value={formData.idZona} 
+                    onChange={handleChange}
+                    required
+                  >
+                    <option value="">Selecciona una zona</option>
+                    {zonas.map((zona) => (
+                      <option key={zona.idZona} value={zona.idZona}>
+                        {zona.nombre}
+                      </option>
+                    ))}
+                  </select>
+                )}
+                {zonas.length === 0 && !loadingZonas && (
+                  <small style={{color: 'red'}}>
+                    No hay zonas disponibles. Contacta al administrador del sistema.
+                  </small>
+                )}
+              </div>
 
-            <div className="mi-area-row">
-              <label>Teléfono</label>
-              {editMode ? (
-                <input name="telefonoArea" value={formData.telefonoArea} onChange={handleChange} />
-              ) : <span>{area.telefonoArea || 'No especificado'}</span>}
+              <div className="mi-area-row">
+                <label>Descripción</label>
+                <textarea 
+                  name="descripcionArea" 
+                  value={formData.descripcionArea} 
+                  onChange={handleChange}
+                  placeholder="Describe las instalaciones, deportes disponibles, servicios..."
+                  rows="3"
+                />
+              </div>
             </div>
 
-            <div className="mi-area-row">
-              <label>Email</label>
-              {editMode ? (
-                <input name="emailArea" value={formData.emailArea} onChange={handleChange} />
-              ) : <span>{area.emailArea || 'No especificado'}</span>}
+            <div className="form-section">
+              <h3>Contacto</h3>
+              
+              <div className="mi-area-row">
+                <label>Teléfono</label>
+                <input 
+                  name="telefonoArea" 
+                  value={formData.telefonoArea} 
+                  onChange={handleChange}
+                  placeholder="Ej: 76543210"
+                />
+              </div>
+
+              <div className="mi-area-row">
+                <label>Email</label>
+                <input 
+                  name="emailArea" 
+                  value={formData.emailArea} 
+                  onChange={handleChange}
+                  placeholder="Ej: contacto@miarea.com"
+                  type="email"
+                />
+              </div>
             </div>
 
-            <div className="mi-area-row two-cols">
-              <div>
-                <label>Latitud</label>
-                {editMode ? (
+            <div className="form-section">
+              <h3>Ubicación</h3>
+              
+              <div className="mi-area-row two-cols">
+                <div>
+                  <label>Latitud</label>
                   <input 
                     name="latitud" 
                     value={formData.latitud} 
                     onChange={handleChange}
                     placeholder="Ej: -16.123456"
                   />
-                ) : <span>{area.latitud}</span>}
-              </div>
-              <div>
-                <label>Longitud</label>
-                {editMode ? (
+                </div>
+                <div>
+                  <label>Longitud</label>
                   <input 
                     name="longitud" 
                     value={formData.longitud} 
                     onChange={handleChange}
                     placeholder="Ej: -68.123456"
                   />
-                ) : <span>{area.longitud}</span>}
+                </div>
               </div>
             </div>
 
-            <div className="mi-area-row">
-              <label>Descripción</label>
-              {editMode ? (
-                <textarea name="descripcionArea" value={formData.descripcionArea} onChange={handleChange} />
-              ) : <span>{area.descripcionArea}</span>}
-            </div>
-
-            <div className="mi-area-row two-cols">
-              <div>
-                <label>Hora Apertura</label>
-                {editMode ? (
+            <div className="form-section">
+              <h3>Horarios</h3>
+              
+              <div className="mi-area-row two-cols">
+                <div>
+                  <label>Hora Apertura</label>
                   <input 
                     name="horaInicioArea" 
                     value={formData.horaInicioArea} 
                     onChange={handleChange} 
-                    placeholder="08:00" 
+                    type="time"
                   />
-                ) : <span>{area.horaInicioArea || '—'}</span>}
-              </div>
-              <div>
-                <label>Hora Cierre</label>
-                {editMode ? (
+                </div>
+                <div>
+                  <label>Hora Cierre</label>
                   <input 
                     name="horaFinArea" 
                     value={formData.horaFinArea} 
                     onChange={handleChange} 
-                    placeholder="16:00" 
+                    type="time"
                   />
-                ) : <span>{area.horaFinArea || '—'}</span>}
+                </div>
               </div>
             </div>
 
-            {/* Meta - SOLO SE MUESTRA EN MODO DEBUG */}
-            {showDebugInfo && (
-              <div className="mi-area-meta" style={{ 
-                background: '#f5f5f5', 
-                padding: '10px', 
-                borderRadius: '4px',
-                fontSize: '12px',
-                border: '1px dashed #ccc'
-              }}>
-                <h4>Información :</h4>
-                <span>ID Área: {area.idAreadeportiva}</span>
-                <span>Estado: {area.estado ? 'Activo' : 'Inactivo'}</span>
-                <span>ID Zona (payload): {formData.idZona || '—'}</span>
-                <span>ID Admin: {currentUser?.idPersona || '—'}</span>
-              </div>
-            )}
-
             <div className="mi-area-actions">
-              {editMode ? (
-                <>
-                  <button className="btn-primary" onClick={handleSave}>Guardar</button>
-                  <button className="btn-secondary" onClick={() => setEditMode(false)}>Cancelar</button>
-                </>
-              ) : (
-                <>
-                  <button className="btn-primary" onClick={() => setEditMode(true)}>Editar</button>
-                  <button className="btn-secondary">Salir</button>
-                </>
+              <button 
+                className="btn-primary" 
+                onClick={handleCreateArea}
+                disabled={!formData.idZona || !formData.nombreArea.trim() || !currentUser?.idPersona}
+              >
+                Crear Mi Área Deportiva
+              </button>
+              <small style={{display: 'block', marginTop: '10px', color: '#666'}}>
+                * Campos obligatorios
+              </small>
+              {!currentUser?.idPersona && (
+                <small style={{color: 'red', display: 'block', marginTop: '5px'}}>
+                  Error: No se pudo identificar al administrador
+                </small>
               )}
             </div>
           </div>
+        </div>
+      </div>
+    );
+  }
 
-          {/* IMAGEN (segura) */}
-          <div className="mi-area-image">
-            {publicImageSrc ? (
-              <img
-                src={publicImageSrc}
-                alt={`Imagen de ${area.nombreArea}`}
-                loading="lazy"
-                onError={(e) => { 
-                  console.log(' Error cargando imagen:', publicImageSrc);
-                  e.currentTarget.style.display = 'none'; 
-                }}
-              />
-            ) : (
-              <span style={{ color: '#888' }}>Imagen no disponible</span>
-            )}
-
-            {editMode && (
-              <div className="mi-area-row" style={{ width: '100%', marginTop: '1rem' }}>
-                <label>URL Imagen (pública opcional)</label>
-                <input
-                  name="urlImagen"
-                  value={formData.urlImagen}
-                  onChange={handleChange}
-                  placeholder="https://misitio.com/imagen.jpg"
-                />
-                <small style={{ color: '#6b7280' }}>
-                  Se permiten URLs públicas y del backend si son accesibles. Las rutas relativas (ej. <code>/img/…</code>) se ignoran para evitar errores.
-                </small>
-              </div>
-            )}
+  // MODO NORMAL - Administrador con área existente
+  if (!area) {
+    return (
+      <div className="mi-area-container">
+        <div className="mi-area-card">
+          <div className="mi-area-error">
+            <h2>No se pudo cargar la información del área</h2>
+            <p>Intenta recargar la página o contacta al administrador del sistema.</p>
+            <button 
+              className="btn-primary" 
+              onClick={() => window.location.reload()}
+            >
+              Recargar Página
+            </button>
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mi-area-container">
+      <div className="mi-area-card">
+        <h1>Mi Área Deportiva: {area.nombreArea || 'Sin nombre'}</h1>
+        <p className="mi-area-zona">
+          Zona: {area.zona?.nombre || "No asignada"}
+        </p>
+        
+        <div className="mi-area-info">
+          <p><strong>Descripción:</strong> {area.descripcionArea || "Sin descripción"}</p>
+          <p><strong>Teléfono:</strong> {area.telefonoArea || "No especificado"}</p>
+          <p><strong>Email:</strong> {area.emailArea || "No especificado"}</p>
+          <p><strong>Horario:</strong> {area.horaInicioArea || '--:--'} - {area.horaFinArea || '--:--'}</p>
+        </div>
+
+        <div className="mi-area-actions">
+          <button className="btn-secondary">
+            Editar Información
+          </button>
         </div>
       </div>
     </div>
