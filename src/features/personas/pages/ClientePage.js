@@ -287,9 +287,11 @@ export default function ClientePage() {
             <button className="btn btn-accent" onClick={loadClientes}>
               Limpiar
             </button>
+            {/*
             <button className="btn btn-primary" onClick={openCreate}>
               Nuevo Cliente
             </button>
+            */}
           </div>
         </div>
       </div>
