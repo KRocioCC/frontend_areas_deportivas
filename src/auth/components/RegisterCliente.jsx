@@ -14,7 +14,7 @@ const RegisterCliente = () => {
     telefono: '',
     fechaNacimiento: '',
     urlImagen: '',
-    categoria: 'NUEVO' // Valor por defecto
+    categoria: 'NUEVO'
   });
 
   const [error, setError] = useState('');
@@ -64,41 +64,49 @@ const RegisterCliente = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#17252A] via-[#2B7A78] to-[#3AAFA9] py-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 py-8">
       <div className="container mx-auto px-4">
-        <div className="max-w-2xl mx-auto">
-          {/* Header */}
+        <div className="max-w-4xl mx-auto">
+          
+          {/* Header con logo */}
           <div className="text-center mb-8">
+            <div className="mb-6">
+              <img 
+                src="/logo.svg" 
+                alt="Logo" 
+                className="h-24 lg:h-32 mx-auto mb-4 object-contain"
+              />
+              <h1 className="text-3xl lg:text-4xl font-bold text-white mb-2">
+                Registro como <span className="text-[#3AAFA9]">Cliente</span>
+              </h1>
+              <p className="text-gray-300 text-lg">
+                Tu reserva, simple y segura
+              </p>
+            </div>
             <button 
               onClick={() => navigate('/register')}
-              className="inline-flex items-center text-white hover:text-gray-200 transition-colors mb-6"
+              className="inline-flex items-center text-gray-400 hover:text-gray-300 transition-colors"
             >
               <span className="mr-2">←</span>
-              Volver
+              Volver a selección
             </button>
-            <h1 className="text-4xl font-bold text-white mb-4">
-              Registro como <span className="text-[#3AAFA9]">Cliente</span>
-            </h1>
-            <p className="text-white/80 text-lg">
-              Completa tus datos para comenzar a reservar canchas
-            </p>
           </div>
 
           {/* Form Card */}
-          <div className="bg-white rounded-2xl shadow-2xl p-8 transform transition-all duration-300 hover:shadow-3xl">
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl shadow-2xl p-6 lg:p-8 border border-white/20">
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-xl mb-6 animate-shake">
+              <div className="bg-red-500/20 border border-red-500/30 text-red-200 px-6 py-4 rounded-xl mb-6">
                 <div className="flex items-center">
-                  <span className="text-red-500 mr-3">⚠</span>
+                  <span className="text-red-400 mr-3">⚠</span>
                   <span>{error}</span>
                 </div>
               </div>
             )}
 
             {success && (
-              <div className="bg-green-50 border border-green-200 text-green-700 px-6 py-4 rounded-xl mb-6 animate-fade-in">
+              <div className="bg-green-500/20 border border-green-500/30 text-green-200 px-6 py-4 rounded-xl mb-6">
                 <div className="flex items-center">
-                  <span className="text-green-500 mr-3">✅</span>
+                  <span className="text-green-400 mr-3">✅</span>
                   <span>{success}</span>
                 </div>
               </div>
@@ -106,54 +114,54 @@ const RegisterCliente = () => {
 
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Información Personal */}
-              <div className="bg-gray-50 p-6 rounded-xl">
-                <h3 className="text-lg font-semibold text-[#17252A] mb-4 flex items-center">
+              <div className="bg-white/5 p-6 rounded-xl border border-white/10">
+                <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
                   <span className="w-2 h-2 bg-[#3AAFA9] rounded-full mr-3"></span>
                   Información Personal
                 </h3>
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Nombre *</label>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Nombre *</label>
                     <input 
                       type="text" 
                       name="nombre" 
                       value={formData.nombre} 
                       onChange={handleChange} 
                       required 
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3AAFA9] focus:border-transparent transition-all"
+                      className="w-full px-4 py-3 bg-white/5 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3AAFA9] focus:border-transparent transition-all text-white placeholder-gray-400"
                       placeholder="Tu nombre"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Apellido Paterno *</label>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Apellido Paterno *</label>
                     <input 
                       type="text" 
                       name="apellidoPaterno" 
                       value={formData.apellidoPaterno} 
                       onChange={handleChange} 
                       required 
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3AAFA9] focus:border-transparent transition-all"
+                      className="w-full px-4 py-3 bg-white/5 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3AAFA9] focus:border-transparent transition-all text-white placeholder-gray-400"
                       placeholder="Apellido paterno"
                     />
                   </div>
                 </div>
                 
                 <div className="mt-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Apellido Materno *</label>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Apellido Materno *</label>
                   <input 
                     type="text" 
                     name="apellidoMaterno" 
                     value={formData.apellidoMaterno} 
                     onChange={handleChange} 
                     required 
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3AAFA9] focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 bg-white/5 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3AAFA9] focus:border-transparent transition-all text-white placeholder-gray-400"
                     placeholder="Apellido materno"
                   />
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-4 mt-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Teléfono *</label>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Teléfono *</label>
                     <input 
                       type="text" 
                       name="telefono" 
@@ -161,57 +169,57 @@ const RegisterCliente = () => {
                       onChange={handleChange} 
                       required 
                       pattern="[0-9]{8}"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3AAFA9] focus:border-transparent transition-all"
+                      className="w-full px-4 py-3 bg-white/5 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3AAFA9] focus:border-transparent transition-all text-white placeholder-gray-400"
                       placeholder="12345678"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Fecha de Nacimiento *</label>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Fecha de Nacimiento *</label>
                     <input 
                       type="date" 
                       name="fechaNacimiento" 
                       value={formData.fechaNacimiento} 
                       onChange={handleChange} 
                       required 
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3AAFA9] focus:border-transparent transition-all"
+                      className="w-full px-4 py-3 bg-white/5 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3AAFA9] focus:border-transparent transition-all text-white placeholder-gray-400"
                     />
                   </div>
                 </div>
               </div>
 
               {/* Información de Cuenta */}
-              <div className="bg-gray-50 p-6 rounded-xl">
-                <h3 className="text-lg font-semibold text-[#17252A] mb-4 flex items-center">
+              <div className="bg-white/5 p-6 rounded-xl border border-white/10">
+                <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
                   <span className="w-2 h-2 bg-[#3AAFA9] rounded-full mr-3"></span>
                   Información de Cuenta
                 </h3>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Nombre de Usuario *</label>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Nombre de Usuario *</label>
                     <input 
                       type="text" 
                       name="username" 
                       value={formData.username} 
                       onChange={handleChange} 
                       required 
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3AAFA9] focus:border-transparent transition-all"
+                      className="w-full px-4 py-3 bg-white/5 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3AAFA9] focus:border-transparent transition-all text-white placeholder-gray-400"
                       placeholder="usuario123"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Correo Electrónico *</label>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Correo Electrónico *</label>
                     <input 
                       type="email" 
                       name="email" 
                       value={formData.email} 
                       onChange={handleChange} 
                       required 
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3AAFA9] focus:border-transparent transition-all"
+                      className="w-full px-4 py-3 bg-white/5 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3AAFA9] focus:border-transparent transition-all text-white placeholder-gray-400"
                       placeholder="tu@email.com"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Contraseña *</label>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Contraseña *</label>
                     <PasswordInput
                       name="password"
                       value={formData.password}
@@ -219,30 +227,30 @@ const RegisterCliente = () => {
                       required
                       placeholder="Mínimo 6 caracteres"
                       minLength="6"
+                      className="bg-white/5 border border-gray-600 focus:ring-2 focus:ring-[#3AAFA9] focus:border-transparent text-white placeholder-gray-400"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">URL de Imagen (Opcional)</label>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">URL de Imagen (Opcional)</label>
                     <input 
                       type="text" 
                       name="urlImagen" 
                       value={formData.urlImagen} 
                       onChange={handleChange} 
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3AAFA9] focus:border-transparent transition-all"
+                      className="w-full px-4 py-3 bg-white/5 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3AAFA9] focus:border-transparent transition-all text-white placeholder-gray-400"
                       placeholder="https://ejemplo.com/imagen.jpg"
                     />
                   </div>
                 </div>
               </div>
 
-              {/* Campo oculto para categoría */}
               <input type="hidden" name="categoria" value="NUEVO" />
 
               <button 
                 type="submit" 
                 disabled={isLoading}
-                className={`w-full py-4 px-6 text-white font-semibold rounded-xl bg-gradient-to-r from-[#2B7A78] to-[#3AAFA9] hover:from-[#3AAFA9] hover:to-[#2B7A78] transition-all duration-300 transform hover:scale-105 hover:shadow-lg ${
-                  isLoading ? 'opacity-70 cursor-not-allowed' : ''
+                className={`w-full py-4 px-6 text-white font-semibold rounded-xl bg-gradient-to-r from-[#2B7A78] to-[#3AAFA9] hover:from-[#3AAFA9] hover:to-[#2B7A78] transition-all duration-300 ${
+                  isLoading ? 'opacity-70 cursor-not-allowed' : 'hover:shadow-lg'
                 }`}
               >
                 {isLoading ? (
@@ -256,10 +264,10 @@ const RegisterCliente = () => {
               </button>
             </form>
 
-            <div className="mt-8 text-center space-y-3">
+            <div className="mt-8 text-center space-y-4">
               <button 
                 onClick={() => navigate('/login')}
-                className="text-[#2B7A78] hover:text-[#17252A] transition-colors font-medium block w-full"
+                className="text-[#3AAFA9] hover:text-[#2B7A78] transition-colors font-medium block w-full"
               >
                 ¿Ya tienes cuenta? Inicia sesión
               </button>

@@ -324,9 +324,11 @@ export default function UsuarioControlPage() {
             <button className="btn btn-accent" onClick={loadUsuariosControl}>
               Limpiar
             </button>
+            {/*
             <button className="btn btn-primary" onClick={openCreate}>
               Nuevo Usuario
             </button>
+            */}
           </div>
         </div>
       </div>

@@ -1,19 +1,29 @@
+/* ===== Variables de colores azul verdoso ===== */
+:root {
+  --sidebar-bg: #1a2f38;           /* Azul verdoso oscuro principal */
+  --sidebar-hover: #2a4a58;        /* Azul verdoso medio para hover */
+  --sidebar-active: #3aafa9;       /* Azul verdoso claro para activo */
+  --sidebar-text: #e0f2f1;         /* Texto claro */
+  --sidebar-border: #2d4a54;       /* Bordes sutiles */
+  --sidebar-shadow: rgba(0, 0, 0, 0.3); /* Sombras */
+}
 
 /* ===== Sidebar base ===== */
 .sidebar {
   position: fixed;
   top: 60px;
   left: 0;
-  width: 100px;                       
+  width: 100px;
   height: calc(100% - 60px);
-  background: var(--color-p-1);
-  color: var(--color-p-4);
+  background: var(--sidebar-bg);
+  color: var(--sidebar-text);
   overflow: hidden;
   transition: width 0.3s ease;
   z-index: 20;
   padding: 15px;
   font-family: var(--font-Alumni);
-  font-size:medium;
+  font-size: medium;
+  border-right: 1px solid var(--sidebar-border);
 }
 
 /* Expandido/Colapsado */
@@ -29,48 +39,68 @@
 /* Lista y elementos */
 .sidebar ul { 
   list-style: none; 
-  margin: 10; 
+  margin: 0; 
   padding: 0; 
 }
 .sidebar ul li { 
   margin-bottom: 10px; 
+  position: relative;
 }
 
 .sidebar-link {
   display: flex;
   align-items: center;
   gap: 10px;
-  color: var(--color-p-4);
+  color: var(--sidebar-text);
   font-family: var(--font-Alumni);
   text-decoration: none;
   padding: 9px 12px;
   border-radius: 9999px;
-  transition: background 180ms ease, transform 120ms ease, opacity 120ms ease;
-  opacity: 0.95;
-}
-.sidebar-link .icon { 
-  font-size: 1.5rem; 
-  flex: 0 0 auto; 
-}
-.sidebar-link .label { 
-  white-space: nowrap; 
+  transition: all 0.2s ease;
+  opacity: 0.9;
+  border: 1px solid transparent;
 }
 
-.sidebar-link:hover:not(.active-link) { background: var(--color-p-4); color: var(--color-p-2); }
-.sidebar-link:active { transform: scale(0.98); opacity: 0.9; }
+.sidebar-link .icon { 
+  font-size: 1.4rem; 
+  flex: 0 0 auto; 
+  transition: transform 0.2s ease;
+}
+
+.sidebar-link .label { 
+  white-space: nowrap; 
+  font-weight: 500;
+}
+
+.sidebar-link:hover:not(.active-link) { 
+  background: var(--sidebar-hover); 
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px var(--sidebar-shadow);
+}
+
+.sidebar-link:hover .icon {
+  transform: scale(1.1);
+}
+
+.sidebar-link:active { 
+  transform: scale(0.98); 
+  opacity: 0.9; 
+}
 
 /* Estado activo (ruta actual) */
 .active-link {
-  background: var(--color-p-3);
-  color: var(--color-p-4);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.336);
+  background: var(--sidebar-active);
+  color: #ffffff;
+  box-shadow: 0 2px 12px rgba(58, 175, 169, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  opacity: 1;
 }
-.active-link:hover { background: var(--color-p-9); }
-/*
-.sidebar-link:focus-visible {
-  outline: 2px solid rgb(88, 202, 21);
-  outline-offset: 2px;
-}*/
+
+.active-link:hover { 
+  background: #2b7a78; 
+  box-shadow: 0 4px 16px rgba(58, 175, 169, 0.4);
+}
 
 /* Colapsado: iconos en círculos perfectos */
 .sidebar.collapsed .label { display: none; }
@@ -78,10 +108,14 @@
 .sidebar.collapsed .sidebar-link {
   justify-content: center;
   padding: 0;
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   margin: 0 auto;
+}
+
+.sidebar.collapsed .sidebar-link:hover {
+  transform: scale(1.05);
 }
 
 /* Dropdown header */
@@ -89,116 +123,121 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  color: var(--color-p-4);
+  color: var(--sidebar-text);
   padding: 9px 12px;
   border-radius: 50px;
   cursor: pointer;
-  transition: background 180ms ease, transform 120ms ease;
-  opacity: 0.95;
+  transition: all 0.2s ease;
+  opacity: 0.9;
+  border: 1px solid transparent;
 }
 
-.dropdown-header .icon { font-size: 1.3rem; flex: 0 0 auto; }
-.dropdown-header .label { white-space: nowrap; }
+.dropdown-header .icon { 
+  font-size: 1.3rem; 
+  flex: 0 0 auto; 
+  transition: transform 0.2s ease;
+}
+
+.dropdown-header .label { 
+  white-space: nowrap; 
+  font-weight: 500;
+}
+
 .dropdown-header .arrow { 
   margin-left: auto; 
   transition: transform 0.2s ease;
+  font-size: 0.9rem;
 }
-/*
+
 .dropdown-header:hover {
-  background: var(--color-p-1);
-}*/
+  background: var(--sidebar-hover);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.dropdown-header:hover .icon {
+  transform: scale(1.1);
+}
 
 /* Dropdown activo */
 .active-dropdown {
-  background: var(--color-p-3);
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.22);
+  background: var(--sidebar-active);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(58, 175, 169, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .active-dropdown:hover {
-  background: var(--color-p-4);
-  color: var(--color-p-3);
+  background: #2b7a78;
+  box-shadow: 0 4px 12px rgba(58, 175, 169, 0.4);
 }
 
 /* Dropdown menu */
 .dropdown-menu {
   margin-top: 8px;
   padding-left: 20px;
+  animation: slideDown 0.2s ease;
 }
-/*adentro del desplegable*/
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .dropdown-menu .sidebar-link {
   border-radius: 50px;
   padding-left: 40px;
-  /*opacity: 0.8;*/
+  background: rgba(255, 255, 255, 0.05);
+  margin-bottom: 4px;
+}
+
+.dropdown-menu .sidebar-link:hover {
+  background: var(--sidebar-hover);
 }
 
 .dropdown-menu .sub-icon {
   font-size: 1.2rem;
-  opacity: 0.8;
-}
-/*Me falta logica del flotante SARA*/
-/* =sidebar colapsado */
-.dropdown-item {
-  position: relative;
+  opacity: 0.9;
 }
 
-.dropdown-trigger {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: var(--color-p-4);
-  padding: 9px 12px;
-  border-radius: 50px;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: background 180ms ease;
-  opacity: 0.95;
-}
-
-.dropdown-trigger:hover {
-  background: var(--color-p-4);
-  color: var(--color-p-2);
-}
-
-
-.active-trigger {
-  background: var(--color-p-3);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.432);
-}
-
-.active-trigger:hover {
-  background: var(--color-p-9);
-}
-
+/* Menu flotante para sidebar colapsado */
 .floating-menu {
   position: absolute;
   top: 0;
   left: 100%;
   margin-left: 8px;
-  background: var(--color-p-1);
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  background: var(--sidebar-bg);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px var(--sidebar-shadow);
   padding: 8px 0;
-  min-width: 180px;
+  min-width: 200px;
   z-index: 1000;
   opacity: 0;
   visibility: hidden;
   transform: translateX(-10px);
-  transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
+  transition: all 0.3s ease;
+  border: 1px solid var(--sidebar-border);
 }
 
-.dropdown-item:hover .floating-menu {
+.dropdown-container:hover .floating-menu {
   opacity: 1;
   visibility: visible;
   transform: translateX(0);
 }
 
 .floating-menu-title {
-  padding: 6px 16px;
-  font-size: 0.85rem;
-  font-weight: bold;
-  color: var(--color-p-4);
-  opacity: 0.8;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--sidebar-text);
+  opacity: 0.9;
+  border-bottom: 1px solid var(--sidebar-border);
   margin-bottom: 6px;
 }
 
@@ -206,26 +245,64 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  color: var(--color-p-4);
+  color: var(--sidebar-text);
   text-decoration: none;
-  padding: 8px 16px;
-  transition: background 180ms ease;
+  padding: 10px 16px;
+  transition: all 0.2s ease;
+  border-radius: 6px;
+  margin: 0 4px;
 }
 
 .floating-menu-item .icon {
   font-size: 1.2rem;
+  opacity: 0.8;
 }
 
 .floating-menu-item:hover {
-  background: var(--color-p-4);
-  color: var(--color-p-2);
+  background: var(--sidebar-hover);
+  color: #ffffff;
+  transform: translateX(4px);
 }
 
 .floating-menu-item.active {
-  background: var(--color-p-3);
-  color: var(--color-p-4);
+  background: var(--sidebar-active);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(58, 175, 169, 0.3);
 }
 
 .floating-menu-item.active:hover {
-  background: var(--color-p-9);
+  background: #2b7a78;
+}
+
+/* Botón de cerrar sesión */
+.logout-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  margin-top: 10px;
+}
+
+.logout-button:hover {
+  background: #dc3545 !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .sidebar.expanded {
+    width: 220px;
+  }
+  
+  .sidebar.collapsed {
+    width: 50px;
+    padding: 10px 6px;
+  }
+  
+  .sidebar.collapsed .sidebar-link {
+    width: 38px;
+    height: 38px;
+  }
 }

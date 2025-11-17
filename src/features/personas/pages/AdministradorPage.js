@@ -309,9 +309,11 @@ export default function AdministradorPage() {
             <button className="btn btn-accent" onClick={loadAdministradores}>
               Limpiar
             </button>
+            {/* 
             <button className="btn btn-primary" onClick={openCreate}>
               Nuevo Administrador
             </button>
+            */}
           </div>
         </div>
       </div>

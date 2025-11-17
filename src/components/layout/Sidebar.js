@@ -66,7 +66,7 @@ function Sidebar({ open }) {
       { label: "Áreas Deportivas", icon: <TfiLocationPin />, path: "/areadeportiva" },
       { label: "Canchas", icon: <TfiBasketball />, path: "/canchas" },
       { label: "Equipamientos", icon: <TfiLayersAlt />, path: "/equipamientos" },
-      { label: "Calendario", icon: <TfiCalendar />, path: "/reservas/calendario" }
+      //{ label: "Calendario", icon: <TfiCalendar />, path: "/reservas/calendario" }
     );
   }
 
@@ -156,7 +156,7 @@ function Sidebar({ open }) {
             }
           })}
 
-          {/*  Botón de Cerrar sesión */}
+          {/* Botón de Cerrar sesión */}
           <li>
             <button onClick={handleLogout} className="sidebar-link logout-button">
               <span className="icon"><TfiPowerOff /></span>
