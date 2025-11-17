@@ -19,6 +19,13 @@ export default function CanchaDetalleAdmin() {
   const [error, setError] = useState('');
   const [disciplina, setDisciplina] = useState(null);
 
+    // 👇 Aquí agregas el log
+  console.log({
+    DisciplinaAdm,
+    CanchaHeaderAdmin,
+    CanchaInfoAdmin,
+    CanchaDetallesExtrasAdmin
+  });
   useEffect(() => {
     const fetchData = async () => {
       try {

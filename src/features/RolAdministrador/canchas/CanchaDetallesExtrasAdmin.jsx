@@ -1,4 +1,4 @@
-// src/features/RolCliente/Cancha/CanchaDetallesExtras.jsx
+// src/features/Admin/Cancha/CanchaDetallesExtrasAdmin.jsx
 import { 
   FaRulerCombined, 
   FaToolbox, 
@@ -8,7 +8,7 @@ import {
   FaLayerGroup 
 } from "react-icons/fa6";
 
-export default function CanchaDetallesExtras({ cancha }) {
+export default function CanchaDetallesExtrasAdmin({ cancha }) {
   const detalles = [
     { icon: <FaLayerGroup />, titulo: "Tipo de Superficie", valor: cancha.tipoSuperficie },
     { icon: <FaRulerCombined />, titulo: "Tamaño", valor: cancha.tamano },
@@ -21,7 +21,7 @@ export default function CanchaDetallesExtras({ cancha }) {
   return (
     <div className="bg-[var(--color-p-6)] rounded-2xl shadow-sm border border-[var(--color-pb-4)] p-6 transition-all hover:shadow-md">
       <h3 className="font-[var(--font-Oswald)] text-xl text-[var(--primary)] mb-5 tracking-wide">
-        Detalles de la Cancha
+        Detalles de la Cancha (Admin)
       </h3>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
