@@ -6,20 +6,20 @@ import {
 } from "../../../../api/supervisaApi";
 import { getCanchas } from "../../../../api/CanchaApi";
 import ConfirmDialog from "../../../../components/ui/ConfirmDialog";
-import ToastMensaje from "../../../../components/ui/ToastMensaje";
 import "./ModalCanchasUsuarioControl.css";
 import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
 import Stack from '@mui/material/Stack';
+import { FaCheck, FaTimes, FaPlus, FaTrash, FaFutbol, FaUserCog } from "react-icons/fa";
 
 export default function ModalCanchasUsuarioControl({ usuario, onClose }) {
   const [canchasDisponibles, setCanchasDisponibles] = useState([]);
   const [canchasAsignadas, setCanchasAsignadas] = useState([]);
   const [seleccionadas, setSeleccionadas] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [toast, setToast] = useState(null);
   const [confirmarQuitar, setConfirmarQuitar] = useState(null);
-  const [showSuccessAlert, setShowSuccessAlert] = useState(false); 
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+  const [showRemoveAlert, setShowRemoveAlert] = useState(false);
 
   useEffect(() => {
     async function loadData() {
@@ -50,7 +50,7 @@ export default function ModalCanchasUsuarioControl({ usuario, onClose }) {
 
   async function handleAsignar() {
     const nuevas = seleccionadas.filter(
-      id => !canchasAsignadas.some(c => c.idCancha === id)
+      id => !canchasAsignadas.some(a => a.idCancha === id)
     );
 
     for (const id of nuevas) {
@@ -62,12 +62,12 @@ export default function ModalCanchasUsuarioControl({ usuario, onClose }) {
       }
     }
 
-    setShowSuccessAlert(true); 
+    setShowSuccessAlert(true);
     setSeleccionadas([]);
 
     setTimeout(() => {
       setShowSuccessAlert(false);
-      onClose(); // recarga desde el padre
+      onClose();
     }, 2500);
   }
 
@@ -75,7 +75,11 @@ export default function ModalCanchasUsuarioControl({ usuario, onClose }) {
     try {
       await quitarCanchaDeSupervisor(usuario.id, idCancha);
       setCanchasAsignadas(prev => prev.filter(c => c.idCancha !== idCancha));
-      setToast("Cancha desasignada con éxito");
+      setShowRemoveAlert(true);
+      
+      setTimeout(() => {
+        setShowRemoveAlert(false);
+      }, 2500);
     } catch (err) {
       console.error(`Error al quitar cancha ${idCancha}:`, err);
     }
@@ -85,8 +89,21 @@ export default function ModalCanchasUsuarioControl({ usuario, onClose }) {
   return (
     <div className="modal-overlay">
       <div className="modal-content wide">
-        <h3>Canchas asignadas al Usuario Control {usuario.nombre}</h3>
+        {/* Header */}
+        <div className="modal-header">
+          <div className="header-icon">
+            <FaUserCog className="icon" />
+          </div>
+          <div className="header-content">
+            <h3>Gestión de Canchas</h3>
+            <p className="user-info">Usuario Control: <span>{usuario.nombre}</span></p>
+          </div>
+          <button className="close-btn" onClick={onClose}>
+            <FaTimes />
+          </button>
+        </div>
 
+        {/* Alerta de asignación exitosa */}
         {showSuccessAlert && (
           <div className="alert-overlay">
             <Stack sx={{ width: '100%' }} spacing={2}>
@@ -98,52 +115,103 @@ export default function ModalCanchasUsuarioControl({ usuario, onClose }) {
           </div>
         )}
 
+        {/* Alerta de desasignación exitosa */}
+        {showRemoveAlert && (
+          <div className="alert-overlay">
+            <Stack sx={{ width: '100%' }} spacing={2}>
+              <Alert severity="info" onClose={() => setShowRemoveAlert(false)}>
+                <AlertTitle>Desasignación exitosa</AlertTitle>
+                La cancha fue desasignada correctamente.
+              </Alert>
+            </Stack>
+          </div>
+        )}
+
         {loading ? (
-          <p>Cargando canchas...</p>
+          <div className="loading-container">
+            <div className="loading-spinner"></div>
+            <p>Cargando canchas...</p>
+          </div>
         ) : (
           <>
+            {/* Sección para asignar nuevas canchas */}
             <div className="section">
-              <h4>Asignar nuevas canchas</h4>
+              <div className="section-header">
+                <FaPlus className="section-icon" />
+                <h4>Asignar Nuevas Canchas</h4>
+              </div>
+              <p className="section-description">Selecciona las canchas que deseas asignar a este usuario</p>
+              
               <div className="card-grid">
                 {canchasDisponibles.map(c => {
                   const id = c.idCancha || c.id;
                   const yaAsignada = canchasAsignadas.some(a => a.idCancha === id);
                   return (
-                    <div key={id} className={`card-item ${yaAsignada ? "disabled" : ""}`}>
-                      <label>
+                    <div 
+                      key={id} 
+                      className={`card-item ${yaAsignada ? "disabled" : ""} ${seleccionadas.includes(id) ? "selected" : ""}`}
+                      onClick={() => !yaAsignada && toggleSeleccion(id)}
+                    >
+                      <div className="card-checkbox">
                         <input
                           type="checkbox"
                           disabled={yaAsignada}
                           checked={seleccionadas.includes(id)}
                           onChange={() => toggleSeleccion(id)}
                         />
-                        <span>{c.nombre}</span>
-                      </label>
+                        <span className="checkmark"></span>
+                      </div>
+                      <div className="card-content">
+                        <FaFutbol className="card-icon" />
+                        <span className="card-title">{c.nombre}</span>
+                        {yaAsignada && (
+                          <span className="badge assigned">Asignada</span>
+                        )}
+                      </div>
                     </div>
                   );
                 })}
               </div>
-              <button
-                className="btn btn-primary"
-                onClick={handleAsignar}
-                disabled={seleccionadas.length === 0}
-              >
-                Asignar seleccionadas
-              </button>
+              
+              <div className="action-bar">
+                <div className="selection-info">
+                  {seleccionadas.length > 0 && (
+                    <span>{seleccionadas.length} cancha(s) seleccionada(s)</span>
+                  )}
+                </div>
+                <button
+                  className="btn btn-primary"
+                  onClick={handleAsignar}
+                  disabled={seleccionadas.length === 0}
+                >
+                  <FaCheck className="btn-icon" />
+                  Asignar Seleccionadas
+                </button>
+              </div>
             </div>
 
+            {/* Sección de canchas asignadas */}
             {canchasAsignadas.length > 0 && (
               <div className="section">
-                <h4>Canchas ya asignadas</h4>
+                <div className="section-header">
+                  <FaCheck className="section-icon assigned" />
+                  <h4>Canchas Asignadas</h4>
+                </div>
+                <p className="section-description">Canchas actualmente supervisadas por este usuario</p>
+                
                 <div className="asignadas-container">
                   {canchasAsignadas.map(c => (
                     <div key={c.idCancha} className="asignada-item">
-                      <span>{c.nombre}</span>
+                      <div className="asignada-info">
+                        <FaFutbol className="asignada-icon" />
+                        <span>{c.nombre}</span>
+                      </div>
                       <button
                         type="button"
                         className="btn-remove"
                         onClick={() => setConfirmarQuitar(c.idCancha)}
                       >
+                        <FaTrash className="btn-icon" />
                         Quitar
                       </button>
                     </div>
@@ -154,13 +222,13 @@ export default function ModalCanchasUsuarioControl({ usuario, onClose }) {
           </>
         )}
 
-        <div className="form-actions">
-          <button className="btn-cancel" onClick={onClose}>Cerrar</button>
+        {/* Footer */}
+        <div className="modal-footer">
+          <button className="btn-cancel" onClick={onClose}>
+            <FaTimes className="btn-icon" />
+            Cerrar
+          </button>
         </div>
-
-        {toast && (
-          <ToastMensaje mensaje={toast} onClose={() => setToast(null)} />
-        )}
 
         {confirmarQuitar && (
           <ConfirmDialog
