@@ -1,0 +1,139 @@
+/* src/features/reservas/components/ModalReservaList.css */
+
+.modal-reserva-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-reserva-blur {
+  position: absolute;
+  inset: 0;
+  backdrop-filter: blur(4px);
+}
+
+.modal-reserva-container {
+  position: relative;
+  background-color: white;
+  border-radius: 1rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  max-width: 70vw;
+  max-height: 88vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.modal-reserva-content {
+  padding: 1.5rem;
+  overflow-y: auto;
+}
+
+.modal-reserva-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.modal-reserva-close {
+  padding: 0.5rem;
+  border-radius: 9999px;
+  transition: background-color 0.2s;
+}
+
+.modal-reserva-close:hover {
+  background-color: #f3f4f6;
+}
+
+.modal-reserva-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.modal-reserva-image img {
+  width: 100%;
+  height: 240px;
+  object-fit: cover;
+  border-radius: 0.75rem;
+  background-color: #f3f4f6;
+}
+
+.modal-reserva-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.modal-reserva-info h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.modal-reserva-box {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #f9fafb;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+}
+
+.modal-reserva-box.primary {
+  background-color: var(--primary, #2563eb);
+  color: white;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.modal-reserva-box .label {
+  font-size: 0.875rem;
+  opacity: 0.8;
+}
+
+.modal-reserva-box .value {
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.modal-reserva-details {
+  margin-bottom: 2rem;
+}
+
+.modal-reserva-details h4 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #1f2937;
+}
+
+.modal-reserva-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+.modal-reserva-detail-grid .label {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-bottom: 0.25rem;
+}
+
+.modal-reserva-detail-grid .value {
+  font-weight: 500;
+  color: #374151;
+}
+
+.modal-reserva-footer {
+  text-align: right;
+}
