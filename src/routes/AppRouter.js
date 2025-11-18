@@ -40,6 +40,7 @@ import Dashboard from "../features/RolAdministrador/dashboard/index.jsx";
 
 import CanchaDetalleAdmin from "../features/RolAdministrador/canchas/CanchaDetalleAdmin";
 import ReservaPageAdmin from "../features/RolAdministrador/Reserva/ReservaPageAdmin";
+import ReservaListAdmin from "../features/RolAdministrador/reservas/ReservaListAdmin";
 
 
 //CLIENTE
@@ -427,6 +428,18 @@ function AppRouter() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/admin/reservaslist"
+            element={
+              <ProtectedRoute requireAdmin>
+                <DashboardLayoutAdmin>
+                  <ReservaListAdmin />
+                </DashboardLayoutAdmin>
+              </ProtectedRoute>
+            }
+          />
+
+
           <Route
             path="/admin/notificaciones"
             element={

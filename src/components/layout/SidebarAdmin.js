@@ -45,7 +45,7 @@ function SidebarAdmin({ open }) {
       toggle: () => setReservasOpen(!reservasOpen),
       items: [
         { label: "Cancelaciones", path: "/admin/reservas/cancelaciones" },
-        { label: "Todas las Reservas", path: "/admin/reservas/todas" }
+        { label: "Todas las Reservas", path: "/admin/reservaslist" }
       ]
     },
     {
