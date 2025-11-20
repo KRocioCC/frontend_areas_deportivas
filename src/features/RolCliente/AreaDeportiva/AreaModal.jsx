@@ -14,7 +14,8 @@ export default function AreaModal({ area, onClose }) {
       try {
         const data = await getCanchasPorArea(area.idAreadeportiva);
          console.log("✅ Canchas recibidas:", data.canchas);
-        setCanchas(data.slice(0, 3)); // ✅ máximo 3 canchas
+        const canchaArray = Array.isArray(data) ? data : data?.canchas || [];
+        setCanchas(canchaArray.slice(0, 3));
       } catch (error) {
         console.error("❌ Error al obtener canchas:", error);
         setCanchas([]); // si falla, vacío
@@ -44,8 +45,14 @@ export default function AreaModal({ area, onClose }) {
           {/* Fondo de imagen */}
           <div className="absolute inset-0">
             <img
-              src={area.urlImagen || "/images/default-area.jpg"}
-              alt={area.nombreArea}
+              src={area.urlImagen || "/images/defaults/area-default.jpg"}
+              alt={area.nombreArea || "Área deportiva"}
+              loading="eager" // es la imagen principal → prioridad alta
+              fetchpriority="high"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = "/images/defaults/area-default.jpg";
+              }}
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-black/70"></div>
