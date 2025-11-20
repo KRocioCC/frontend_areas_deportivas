@@ -35,7 +35,7 @@ const Login = () => {
       if (location.state?.from) {
         redirectTo = location.state.from;
       } else if (roles.includes('ROLE_ADMINISTRADOR')) {
-        redirectTo = '/admin/dashboard';
+        redirectTo = '/admin/canchas';
       } else if (roles.includes('ROLE_CLIENTE')) {
         redirectTo = '/inicio';
       } else if (roles.includes('ROLE_SUPERUSUARIO')) {
