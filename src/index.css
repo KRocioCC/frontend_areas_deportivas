@@ -25,7 +25,7 @@
   --botoneliminar: #f44336; 
   --botonguardar: #FF9800;
   /*colores para fondo*/
-  --color-p-1: #d61727;
+  --color-p-1: #d40000;
   --color-p-2: #f35734;
   --color-p-3: #f38321;
   --color-p-4: #F2EFEB;
@@ -34,6 +34,8 @@
   --color-p-7: #e7ae9e;
   --color-p-8: #8a2628;
   --color-p-9: #f8f4f465;
+  --color-p-10: #0B0D0E;
+  --color-p-11: #2C7366;
 
   /*titulo super */
   --font-Oswald: 'Oswald', sans-serif ;

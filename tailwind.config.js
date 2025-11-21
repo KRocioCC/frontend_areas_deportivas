@@ -38,6 +38,7 @@ module.exports = {
         'pb-6': 'var(--color-pb-6)',
         'pb-7': 'var(--color-pb-7)',
         'pb-8': 'var(--color-pb-8)',
+        'pb-10': 'var(--color-pb-10)',
         'b-1': 'var(--color-b-1)',
         'b-2': 'var(--color-b-2)',
         'b-3': 'var(--color-b-3)',

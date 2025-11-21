@@ -2,7 +2,7 @@ export default function CanchaHeader({ cancha }) {
   return (
     <div className="relative w-full h-64 rounded-xl overflow-hidden shadow-md">
       <img
-        src={cancha.urlImagen || "/images/default-cancha.jpg"}
+        src={cancha.urlImagen || "/defaults/cancha-default.jpg"}
         alt={cancha.nombre}
         className="w-full h-full object-cover"
       />

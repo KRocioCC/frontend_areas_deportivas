@@ -164,15 +164,9 @@ function AppRouter() {
            <Route
             path="canchacli/detalle/:id"
             element={
-              <motion.div
-                variants={pageVariants}
-                initial="initial"
-                animate="animate"
-                exit="exit"
-                custom={1}
-              >
+              <LayoutCliente>
                 <CanchaDetalle />
-              </motion.div>
+              </LayoutCliente>
             }
           />
           {/* CLIENTE - Reservas protegidas */}

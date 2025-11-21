@@ -68,12 +68,12 @@ export async function getCanchasActivas() {
 
 
 export async function getEquipamientosPorCancha(id) {
-  const res = await api.get(`${API_URL}/equipamientos/${id}`);
+  const res = await api.get(`${API_URL}/${id}/equipamientos`);
   return res.data;
 }
 
 export async function getDisciplinasPorCancha(id) {
-  const res = await api.get(`${API_URL}/disciplinas/${id}`);
+  const res = await api.get(`${API_URL}/${id}/disciplinas`);
   return res.data;
 }
 

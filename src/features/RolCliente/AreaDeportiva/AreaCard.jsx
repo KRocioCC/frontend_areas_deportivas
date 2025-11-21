@@ -21,13 +21,13 @@ const AreaCard = memo(({ area, index, currentIndex, onClick }) => {
     >
       <div className="w-full h-full relative">
         <img
-          src={area.urlImagen || "/images/defaults/area-default.jpg"}
+          src={area.urlImagen || "/frontend-espacios-qr/public/defaults/area-default.jpg"}
           alt={area.nombreArea || "Área deportiva"}
           loading={index === 0 ? "eager" : "lazy"}
-          fetchpriority={index === 0 ? "high" : "low"}
+          fetchPriority={index === 0 ? "high" : "low"}
           onError={(e) => {
             e.target.onerror = null;
-            e.target.src = "/images/defaults/area-default.jpg";
+            e.target.src = "/defaults/area-default.jpg";
           }}
           className="object-cover w-full h-full"
         />

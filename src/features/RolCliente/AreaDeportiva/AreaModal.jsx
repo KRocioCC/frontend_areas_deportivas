@@ -4,8 +4,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { FaTimes, FaPhone, FaMapMarkerAlt, FaClock, FaStar, FaFutbol } from "react-icons/fa";
 import { getCanchasPorArea } from "../../../api/CanchaApi";
-export default function AreaModal({ area, onClose }) {
 
+export default function AreaModal({ area, onClose }) {
   const [canchas, setCanchas] = useState([]);
   const navigate = useNavigate();
   useEffect(() => {
@@ -23,6 +23,13 @@ export default function AreaModal({ area, onClose }) {
     };
     cargarCanchas();
   }, [area?.idAreadeportiva]);
+
+  const handleVerCanchas = () => {
+    // Cierra el modal antes de navegar
+    onClose();
+    // Navega a la página de canchas
+    navigate(`/canchacli?areaId=${area.idAreadeportiva}`);
+  };
 
   return (
     <AnimatePresence>
@@ -45,13 +52,13 @@ export default function AreaModal({ area, onClose }) {
           {/* Fondo de imagen */}
           <div className="absolute inset-0">
             <img
-              src={area.urlImagen || "/images/defaults/area-default.jpg"}
+              src={area.urlImagen || "../../../../public/defaults/area-default.jpg"}
               alt={area.nombreArea || "Área deportiva"}
-              loading="eager" // es la imagen principal → prioridad alta
-              fetchpriority="high"
+              loading="eager"
+              fetchPriority="high"
               onError={(e) => {
                 e.target.onerror = null;
-                e.target.src = "/images/defaults/area-default.jpg";
+                e.target.src = "/defaults/area-default.jpg";
               }}
               className="w-full h-full object-cover"
             />
@@ -95,7 +102,7 @@ export default function AreaModal({ area, onClose }) {
                 {area.descripcionArea ||
                   "Instalaciones deportivas de alto nivel situadas en la costa, perfectas para actividades al aire libre y torneos."}
               </p>
-                    {/*logica de comentarios sar ae flaat  */}
+
               <div className="flex items-center gap-6 mt-2">
                 <div className="flex items-center gap-1 text-yellow-400 text-lg">
                   <span className="text-white font-bold">#56</span>
@@ -104,17 +111,14 @@ export default function AreaModal({ area, onClose }) {
                   ))}
                 </div>
 
+                {/* Botón actualizado */}
                 <button
-                  onClick={() => navigate(`/canchacli?areaId=${area.idAreadeportiva}`)}
+                  onClick={handleVerCanchas} // Llama a la nueva función
                   className="bg-teal-600 hover:bg-teal-700 transition px-6 py-2 rounded-lg text-white font-semibold shadow-lg"
                 >
                   Ver Más Canchas
                 </button>
-
               </div>
-
-
-
             </div>
 
             {/* Columna derecha: canchas */}
@@ -130,17 +134,17 @@ export default function AreaModal({ area, onClose }) {
                       className="relative rounded-lg overflow-hidden group cursor-pointer"
                     >
                       <img
-                        src={cancha.urlImagen || "../../../../public/contenido/descarga.jpg"}
+                        src={cancha.urlImagen || "../../../../public/defaults/cancha-default.jpg"}
                         alt={cancha.nombre}
                         className="w-full h-28 object-cover transform group-hover:scale-105 transition duration-300"
                       />
                       <div className="absolute inset-0 bg-black/40 group-hover:bg-black/60 transition"></div>
                       <div className="absolute bottom-2 left-2 text-white text-xs">
                         <p className="font-bold truncate max-w-[120px]">
-                          {cancha.nombre || `Cancha ${i + 1}`} 
+                          {cancha.nombre || `Cancha ${i + 1}`}
                         </p>
                         <p className="text-gray-300">
-                          S/{cancha.costoHora?.toFixed(2) || "0.00"} 
+                          S/{cancha.costoHora?.toFixed(2) || "0.00"}
                         </p>
                       </div>
                     </div>
