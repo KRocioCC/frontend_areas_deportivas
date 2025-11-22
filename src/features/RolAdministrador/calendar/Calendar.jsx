@@ -10,6 +10,8 @@ import { useModal } from "./hooks/useModal";
 import PageMeta from "./components/common/PageMeta";
 import { getReservasPorAdministradorEnRango } from "../../../api/ReservaApi";
 import { AuthContext } from "../../../auth/context/AuthContext";
+import ReservaCardCalendar from "./ReservaCardCalendar"; 
+
 import "./calendar.css";
 
 
@@ -160,46 +162,36 @@ const handleEventClick = (clickInfo) => {
             />
 
         </div>
-        <Modal
-            isOpen={isOpen}
-            onClose={closeModal}
-            className="max-w-[700px] p-6 lg:p-10"
-            >
-            <div className="flex flex-col px-2 overflow-y-auto custom-scrollbar">
-                <div>
-                <h5 className="mb-2 font-semibold text-gray-800 modal-title text-theme-xl dark:text-white/90 lg:text-2xl">
-                    Detalles de la Reserva
-                </h5>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Información completa de la reserva seleccionada
-                </p>
-                </div>
-
-                {selectedEvent && (
-                <div className="mt-6 space-y-4 text-sm text-gray-700 dark:text-gray-300">
-                    <p><strong>Cliente:</strong> {selectedEvent.cliente?.nombre} {selectedEvent.cliente?.apaterno} {selectedEvent.cliente?.amaterno}</p>
-                    <p><strong>Email:</strong> {selectedEvent.cliente?.email}</p>
-                    <p><strong>Teléfono:</strong> {selectedEvent.cliente?.telefono}</p>
-                    <p><strong>Cancha:</strong> {selectedEvent.cancha?.nombre}</p>
-                    <p><strong>Disciplina:</strong> {selectedEvent.disciplina?.nombre}</p>
-                    <p><strong>Hora:</strong> {selectedEvent?.start?.toLocaleTimeString("es-BO", { hour: "2-digit", minute: "2-digit" })} - {selectedEvent?.end?.toLocaleTimeString("es-BO", { hour: "2-digit", minute: "2-digit" })}</p>
-                    <p><strong>Hora:</strong> {selectedEvent.horaInicio?.slice(0,5)} - {selectedEvent.horaFin?.slice(0,5)}</p>
-                    <p><strong>Estado:</strong> {selectedEvent.estado}</p>
-                    <p><strong>Observaciones:</strong> {selectedEvent.observaciones || "Sin observaciones"}</p>
-                </div>
-                )}
-
-                <div className="flex items-center gap-3 mt-6 modal-footer sm:justify-end">
-                <button
-                    onClick={closeModal}
-                    type="button"
-                    className="flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 sm:w-auto"
-                >
-                    Cerrar
-                </button>
-                </div>
-            </div>
-            </Modal>
+        {isOpen && selectedEvent && (
+  <ReservaCardCalendar
+    reserva={{
+      idReserva: selectedEvent.idReserva || parseInt(selectedEvent.id),
+      fechaReserva: selectedEvent.fechaReserva || selectedEvent.start?.toISOString().split('T')[0],
+      horaInicio: selectedEvent.horaInicio || selectedEvent.extendedProps?.horaInicio,
+      horaFin: selectedEvent.horaFin || selectedEvent.extendedProps?.horaFin,
+      estadoReserva: selectedEvent.estado || selectedEvent.extendedProps?.estadoReserva,
+      observaciones: selectedEvent.observaciones || selectedEvent.extendedProps?.observaciones,
+      totalPagado: selectedEvent.totalPagado || selectedEvent.extendedProps?.totalPagado,
+      saldoPendiente: selectedEvent.saldoPendiente || selectedEvent.extendedProps?.saldoPendiente,
+      pagadaCompleta: selectedEvent.pagadaCompleta || selectedEvent.extendedProps?.pagadaCompleta,
+      duracionMinutos: selectedEvent.duracionMinutos || selectedEvent.extendedProps?.duracionMinutos,
+      eliminado: selectedEvent.eliminado || selectedEvent.extendedProps?.eliminado,
+      activo: selectedEvent.activo !== undefined ? selectedEvent.activo : selectedEvent.extendedProps?.activo,
+      cliente: selectedEvent.cliente || selectedEvent.extendedProps?.cliente,
+      cancha: selectedEvent.cancha || selectedEvent.extendedProps?.cancha,
+      disciplina: selectedEvent.disciplina || selectedEvent.extendedProps?.disciplina
+    }}
+    onClose={closeModal}
+    onCancelarReserva={(reserva) => {
+      console.log('Cancelar reserva:', reserva.idReserva);
+      // Aquí va tu lógica para cancelar la reserva
+    }}
+    onGenerarPDF={(reserva) => {
+      console.log('Generar PDF para:', reserva.idReserva);
+      // Aquí va tu lógica para generar PDF
+    }}
+  />
+)}
 
       </div>
     </>
