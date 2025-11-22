@@ -39,6 +39,7 @@ import PageUsuariosControl from "../features/RolAdministrador/usuarios/usuarios_
 import Dashboard from "../features/RolAdministrador/dashboard/index.jsx";
 import CanchaReservaPage from "../features/RolAdministrador/canchas/CanchaReservasPage";
 import ReservaListAdmin from "../features/RolAdministrador/reservas/ReservaListAdmin.js";
+import CancelacionesListAdmin from "../features/RolAdministrador/cancelaciones/CancelacionesListAdmin.js";
 
 //CLIENTE
 // CLIENTE - componentes visuales
@@ -425,7 +426,16 @@ function AppRouter() {
               </ProtectedRoute>
             }
           />
-          
+          <Route
+            path="/admin/reservas/cancelaciones"
+            element={
+              <ProtectedRoute requireAdmin>
+                <DashboardLayoutAdmin>
+                  <CancelacionesListAdmin/> 
+                </DashboardLayoutAdmin>
+              </ProtectedRoute>
+            }
+          />
 
 
           <Route

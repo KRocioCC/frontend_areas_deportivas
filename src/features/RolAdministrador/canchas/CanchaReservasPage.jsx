@@ -1,82 +1,69 @@
-// src/RolAdministrador/canchas/CanchaReservaPage.jsx
+// src/features/RolAdministrador/canchas/CanchaReservasPage.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import * as reservaService from '../../../api/ReservaApi';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
-const CanchaReservaPage = () => {
-    const { idCancha } = useParams();
-    const navigate = useNavigate();
-    const [reservas, setReservas] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [modal, setModal] = useState({ abierto: false, tipo: '', reserva: null });
+const CanchaReservasPage = () => {
+  const { idCancha } = useParams();
+  const navigate = useNavigate();
+  const [reservas, setReservas] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [modal, setModal] = useState({ abierto: false, tipo: '', reserva: null });
 
-    const abrirModal = (tipo, reserva) => setModal({ abierto: true, tipo, reserva });
-    const cerrarModal = () => setModal({ abierto: false, tipo: '', reserva: null });
+  const abrirModal = (tipo, reserva) => setModal({ abierto: true, tipo, reserva });
+  const cerrarModal = () => setModal({ abierto: false, tipo: '', reserva: null });
 
-    // Confirmar acción (eliminar/cancelar)
-    const confirmarAccion = async () => {
-        if (!modal.reserva) return;
-        
-        try {
+  // Función para confirmar acciones (eliminar/cancelar)
+  const confirmarAccion = async () => {
+    if (!modal.reserva) return;
+    
+    try {
             if (modal.tipo === 'eliminar') {
-                // Usar eliminación lógica en backend (PUT /{id}/eliminar). En UI marcamos la reserva como desactivada
+                // Lógica para eliminar reserva (API export: deleteReserva)
                 await reservaService.deleteReserva(modal.reserva.idReserva);
-                alert("Reserva desactivada correctamente 🗑️");
-                setReservas(prev => prev.map(r =>
-                    r.idReserva === modal.reserva.idReserva
-                        ? { ...r, eliminado: true, activo: false }
-                        : r
-                ));
-            }
-            
-            if (modal.tipo === 'cancelar') {
-                await reservaService.cancelarReserva(modal.reserva.idReserva, "Cancelado por administrador");
-                alert("Reserva cancelada correctamente ✅");
-                setReservas(prev => prev.map(r =>
-                    r.idReserva === modal.reserva.idReserva
-                        ? { ...r, estadoReserva: 'CANCELADA' }
-                        : r
-                ));
-            }
-        } catch (error) {
-            alert(`Error al ${modal.tipo} la reserva`);
-            console.error(`Error al ${modal.tipo} reserva:`, error);
-        }
-        cerrarModal();
-    };
+      } else if (modal.tipo === 'cancelar') {
+        // Lógica para cancelar reserva
+        await reservaService.cancelarReserva(modal.reserva.idReserva);
+      }
+      
+      // Recargar las reservas después de la acción
+      const reservasData = await reservaService.getReservasPorCancha(idCancha);
+      setReservas(reservasData);
+      
+      cerrarModal();
+    } catch (err) {
+      console.error('Error al realizar la acción:', err);
+      setError('Ocurrió un error al realizar la acción. Por favor, intenta de nuevo.');
+      cerrarModal();
+    }
+  };
 
-    // Formatear fecha
-    const formatearFecha = (fechaStr) => {
-        if (!fechaStr) return 'Fecha no disponible';
-        const meses = [
-            'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
-            'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
-        ];
-        
-        try {
-            // Manejar diferentes formatos de fecha
-            let fecha;
-            if (typeof fechaStr === 'string') {
-                if (fechaStr.includes('T')) {
-                    fecha = new Date(fechaStr);
-                } else {
-                    // Asumir formato YYYY-MM-DD
-                    const [anio, mes, dia] = fechaStr.split('-');
-                    fecha = new Date(anio, mes - 1, dia);
-                }
-            } else {
-                fecha = new Date(fechaStr);
-            }
-            
-            return `${fecha.getDate()} de ${meses[fecha.getMonth()]} de ${fecha.getFullYear()}`;
-        } catch (error) {
-            console.error('Error formateando fecha:', error);
-            return fechaStr;
+  const formatearFecha = (fechaStr) => {
+    if (!fechaStr) return 'Fecha no disponible';
+    const meses = [
+      'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+      'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
+    ];
+
+    try {
+      let fecha;
+      if (typeof fechaStr === 'string') {
+        if (fechaStr.includes('T')) fecha = new Date(fechaStr);
+        else {
+          const [anio, mes, dia] = fechaStr.split('-');
+          fecha = new Date(anio, mes - 1, dia);
         }
-    };
+      } else fecha = new Date(fechaStr);
+
+      return `${fecha.getDate()} de ${meses[fecha.getMonth()]} de ${fecha.getFullYear()}`;
+    } catch (err) {
+      console.error('Error formateando fecha:', err);
+      return fechaStr;
+    }
+  };
 
     // Cargar reservas
     useEffect(() => {
@@ -282,8 +269,8 @@ const CanchaReservaPage = () => {
             )}
 
             {/* Contenido principal */}
-            <div className="min-h-screen bg-gray-100 p-6">
-                <div className="bg-white p-8 rounded-xl shadow-lg max-w-6xl mx-auto">
+            <div className="min-h-screen bg-gray-100 p-6 max-w-screen-2xl mx-auto w-full">
+                <div className="bg-white p-8 rounded-xl shadow-lg w-full mx-auto max-w-screen-2xl">
                     {/* Header */}
                     <div className="flex justify-between items-center mb-8">
                         <button
@@ -298,16 +285,16 @@ const CanchaReservaPage = () => {
                         
                         <div className="text-center">
                             <h1 className="text-4xl font-bold text-black mb-2" style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}>
-                                Reservas de la Cancha
+                                Reservas de la cancha 
+                                <p>{reservas?.[0]?.cancha?.nombre ?? 'Nombre no disponible'}</p>
                             </h1>
-                            <p className="text-gray-600" style={{ fontSize: '16px' }}>ID: {idCancha}</p>
                         </div>
                         
                         <div className="w-20"></div> {/* Espacio para balance */}
                     </div>
 
                     {/* Estadísticas */}
-                    <div className="mb-6 p-4 bg-blue-50 rounded-lg">
+                    <div className="mb-6 p-4 bg-gray-400 rounded-lg">
                         <h2 className="text-lg font-semibold text-black mb-2" style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}>Resumen:</h2>
                         <div className="flex flex-wrap gap-4">
                             <span className="px-3 py-1 bg-blue-100 text-black rounded-full text-sm">
@@ -327,26 +314,33 @@ const CanchaReservaPage = () => {
 
                     {/* Lista de reservas */}
                     {reservas.length > 0 ? (
-                        <div className="space-y-6">
+                        <div className="space-y-3">
                             {reservas.map(reserva => (
-                                <div key={reserva.idReserva} className="p-6 bg-white border border-gray-200 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+                                <div key={reserva.idReserva} className="p-4 bg-white border border-gray-200 rounded-lg shadow-md hover:shadow-lg transition-shadow">
                                     {/* Header de la reserva */}
-                                    <div className="flex justify-between items-start mb-4">
-                                        <div>
-                                            <h2 className="text-2xl font-semibold text-black mb-1" style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}>
-                                                Reserva #{reserva.idReserva}
-                                            </h2>
-                                            <div className="flex items-center text-yellow-600">
-                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <div className="flex justify-between items-start mb-2">
+                                        <div class="mb-8">
+                                           {reservas.map((reserva, index) => (
+                                                <h2
+                                                    key={reserva.idReserva}
+                                                    className="text-xl font-semibold text-black mb-1"
+                                                    style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontSize: '18px' }}
+                                                >
+                                                    Reserva #{index + 1}
+                                                </h2>
+                                                ))}
+
+                                            <div className="flex items-center text-blue-600 text-sm">
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                 </svg>
                                                 <span className="font-medium">{reserva.horaInicio} - {reserva.horaFin}</span>
-                                                <span className="mx-2">•</span>
-                                                <span className="text-gray-600">{formatearFecha(reserva.fechaReserva)}</span>
+                                                <span className="mx-1">•</span>
+                                                <span className="text-gray-600 text-xs">{formatearFecha(reserva.fechaReserva)}</span>
                                             </div>
                                         </div>
                                         
-                                        <div className={`px-3 py-1 rounded-full text-sm font-medium ${
+                                        <div className={`px-2 py-1 rounded-full text-xs font-medium ${
                                             (reserva.eliminado || reserva.activo === false) ? 'bg-red-100 text-red-800' :
                                             reserva.estadoReserva === 'CONFIRMADA' ? 'bg-green-100 text-green-800' : 
                                             reserva.estadoReserva === 'PENDIENTE' ? 'bg-yellow-100 text-yellow-800' : 
@@ -358,57 +352,55 @@ const CanchaReservaPage = () => {
                                     </div>
 
                                     {/* Información en grid */}
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 mt-2">
                                         {/* Información de la Cancha */}
                                         <div>
-                                            <h3 className="font-semibold text-gray-800 mb-2" style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontSize: '16px' }}>Información de la Cancha</h3>
+                                            <h2 className="font-semibold text-gray-800 mb-1" style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontSize: '14px' }}>Información de la Cancha</h2>
                                             {reserva.cancha ? (
-                                                <div className="bg-gray-50 p-4 rounded-lg">
-                                                    <p><span className="font-medium">Nombre:</span> {reserva.cancha.nombre}</p>
-                                                    <p><span className="font-medium">Capacidad:</span> {reserva.cancha.capacidad} personas</p>
-                                                    <p><span className="font-medium">Costo:</span> {reserva.cancha.costoHora || 'N/A'} Bs/hora</p>
-                                                    <p><span className="font-medium">Superficie:</span> {reserva.cancha.tipoSuperficie || 'N/A'}</p>
+                                                <div className="bg-gray-50 p-2 rounded-lg">
+                                                    <p className="text-sm"><span className="font-medium">Nombre:</span> {reserva.cancha.nombre}</p>
+                                                    <p className="text-sm"><span className="font-medium">Capacidad:</span> {reserva.cancha.capacidad} personas</p>
+                                                    <p className="text-sm"><span className="font-medium">Costo:</span> {reserva.cancha.costoHora || 'N/A'} Bs/hora</p>
+                                                    <p className="text-sm"><span className="font-medium">Superficie:</span> {reserva.cancha.tipoSuperficie || 'N/A'}</p>
                                                 </div>
                                             ) : (
-                                                <p className="text-gray-500">Información de cancha no disponible</p>
+                                                <p className="text-gray-500 text-sm">Información de cancha no disponible</p>
                                             )}
                                         </div>
                                         
                                         {/* Información del Cliente */}
                                         <div>
-                                            <h3 className="font-semibold text-gray-800 mb-2" style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontSize: '16px' }}>Información del Cliente</h3>
+                                            <h2 className="font-semibold text-gray-800 mb-1" style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontSize: '14px' }}>Información del Cliente</h2>
                                             {reserva.cliente ? (
-                                                <div className="bg-gray-50 p-4 rounded-lg">
-                                                    <p><span className="font-medium">Nombre:</span> {reserva.cliente.nombre} {reserva.cliente.apellidoPaterno || ''} {reserva.cliente.apellidoMaterno || ''}</p>
-                                                    <p><span className="font-medium">Email:</span> {reserva.cliente.email || 'No disponible'}</p>
-                                                    <p><span className="font-medium">Teléfono:</span> {reserva.cliente.telefono || 'No disponible'}</p>
-                                                    {reserva.cliente.categoria && (
-                                                        <p><span className="font-medium">Categoría:</span> {reserva.cliente.categoria}</p>
-                                                    )}
+                                                <div className="bg-gray-50 p-2 rounded-lg">
+                                                    <p className="text-sm"><span className="font-medium">Nombre:</span> {reserva.cliente.nombre} {reserva.cliente.apellidoPaterno || ''} {reserva.cliente.apellidoMaterno || ''}</p>
+                                                    <p className="text-sm"><span className="font-medium">Email:</span> {reserva.cliente.email || 'No disponible'}</p>
+                                                    <p className="text-sm"><span className="font-medium">Teléfono:</span> {reserva.cliente.telefono || 'No disponible'}</p>
+                                                    
                                                 </div>
                                             ) : (
-                                                <p className="text-gray-500">Información del cliente no disponible</p>
+                                                <p className="text-gray-500 text-sm">Información del cliente no disponible</p>
                                             )}
                                         </div>
                                         
                                         {/* Información de Pago y Detalles */}
                                         <div>
-                                            <h3 className="font-semibold text-gray-800 mb-2" style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontSize: '16px' }}>Detalles de Pago</h3>
-                                            <div className="bg-gray-50 p-4 rounded-lg">
-                                                <p><span className="font-medium">Total pagado:</span> {reserva.totalPagado || 0} Bs.</p>
-                                                <p><span className="font-medium">Saldo pendiente:</span> {reserva.saldoPendiente || 0} Bs.</p>
-                                                <p><span className="font-medium">Completamente pagada:</span> 
-                                                    <span className={reserva.pagadaCompleta ? 'text-green-600 ml-2' : 'text-red-600 ml-2'}>
-                                                        {reserva.pagadaCompleta ? 'Sí ✅' : 'No ❌'}
+                                            <h2 className="font-semibold text-gray-800 mb-1" style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontSize: '14px' }}>Detalles de Pago</h2>
+                                            <div className="bg-gray-50 p-2 rounded-lg">
+                                                <p className="text-sm"><span className="font-medium">Total pagado:</span> {reserva.totalPagado || 0} Bs.</p>
+                                                <p className="text-sm"><span className="font-medium">Saldo pendiente:</span> {reserva.saldoPendiente || 0} Bs.</p>
+                                                <p className="text-sm"><span className="font-medium">Completamente pagada:</span> 
+                                                    <span className={reserva.pagadaCompleta ? 'text-green-600 ml-1' : 'text-red-600 ml-1'}>
+                                                        {reserva.pagadaCompleta ? 'Sí' : 'No'}
                                                     </span>
                                                 </p>
                                                 {reserva.duracionMinutos && (
-                                                    <p><span className="font-medium">Duración:</span> {reserva.duracionMinutos} minutos</p>
+                                                    <p className="text-sm"><span className="font-medium">Duración:</span> {reserva.duracionMinutos} minutos</p>
                                                 )}
                                                 {reserva.observaciones && (
-                                                    <p className="mt-2">
+                                                    <p className="mt-1 text-sm">
                                                         <span className="font-medium">Observaciones:</span>
-                                                        <span className="block mt-1 text-gray-600 text-sm">{reserva.observaciones}</span>
+                                                        <span className="block mt-1 text-gray-600">{reserva.observaciones}</span>
                                                     </p>
                                                 )}
                                             </div>
@@ -417,18 +409,7 @@ const CanchaReservaPage = () => {
 
                                     {/* Botones de acción */}
                                     <div className="mt-6 flex justify-end space-x-2 flex-wrap gap-2">
-                                        {/* Botón Eliminar (solo si no está ya desactivada) */}
-                                        {!(reserva.eliminado || reserva.activo === false) && (
-                                          <button
-                                              className="py-2 px-4 bg-red-600 hover:bg-red-700 text-white rounded-lg shadow-md transition-colors flex items-center"
-                                              onClick={() => abrirModal('eliminar', reserva)}
-                                          >
-                                              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                              </svg>
-                                              Eliminar
-                                          </button>
-                                        )}
+                                        
 
                                         {/* Botón Cancelar (solo si no es pasada y está confirmada/pendiente) */}
                                         {!esReservaPasada(reserva) && 
@@ -481,4 +462,4 @@ const CanchaReservaPage = () => {
     );
 };
 
-export default CanchaReservaPage;
+export default CanchaReservasPage;
