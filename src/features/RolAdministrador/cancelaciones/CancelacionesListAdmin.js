@@ -1,4 +1,3 @@
-// src/features/reservas/components/ReservaListAdmin.js
 import React, { useContext, useEffect, useState, useMemo, useCallback } from "react";
 import * as ReservaService from "../../../api/ReservaApi";
 import Button from "../../../components/ui/Button";
@@ -6,11 +5,9 @@ import SearchBar from "../../../components/ui/SearchInput";
 import CRUDTable from "../../../components/ui/CRUDTable";
 import { Eye } from "lucide-react";
 import { AuthContext } from "../../../auth/context/AuthContext";
-import ModalReservaList from "./ModalReservaList";
-
-import "./ReservaListAdmin.css";
-
-export default function ReservaListAdmin() {
+import ModalCancelacionList from "./ModalCancelacionList";
+import "./CancelacionesListAdmin.css";
+export default function CancelacionesListAdmin() {
   const { currentUser } = useContext(AuthContext);
   const idAdministrador = currentUser?.id;
 
@@ -46,17 +43,13 @@ export default function ReservaListAdmin() {
         inicio,
         fin
       );
-      // solo CONFIRMADAS y PENDIENTES
-      const filtradas = Array.isArray(data)
-        ? data.filter(
-            (reserva) =>
-              reserva.estadoReserva === "CONFIRMADA" ||
-              reserva.estadoReserva === "PENDIENTE"
-          )
+      // 👇 Filtramos solo las canceladas
+      const canceladas = Array.isArray(data)
+        ? data.filter((reserva) => reserva.estadoReserva === "CANCELADA")
         : [];
-      setItems(filtradas);
+      setItems(canceladas);
     } catch (err) {
-      setError("No se pudieron cargar las reservas");
+      setError("No se pudieron cargar las cancelaciones");
     } finally {
       setLoading(false);
     }
@@ -73,10 +66,9 @@ export default function ReservaListAdmin() {
       return;
     }
 
-    const filtered = items.filter(
-      (item) =>
-        item.observaciones?.toLowerCase().includes(search.trim().toLowerCase()) ||
-        item.cancha?.nombre?.toLowerCase().includes(search.trim().toLowerCase())
+    const filtered = items.filter(item =>
+      item.observaciones?.toLowerCase().includes(search.trim().toLowerCase()) ||
+      item.cancha?.nombre?.toLowerCase().includes(search.trim().toLowerCase())
     );
     setItems(filtered);
   }
@@ -86,41 +78,28 @@ export default function ReservaListAdmin() {
     setShowForm(true);
   }, []);
 
-  const columns = useMemo(
-    () => [
-      { header: "ID", accessor: "idReserva", width: 80, sortable: true, align: "right" },
-      { header: "Fecha", accessor: "fechaReserva", sortable: true },
-      { header: "Hora", render: (_, row) => `${row.horaInicio} - ${row.horaFin}`, sortable: true },
-      { header: "Estado", accessor: "estadoReserva", sortable: true },
-      {
-        header: "Cancha",
-        render: (_, row) => row.cancha?.nombre || "Sin cancha",
-        sortable: true,
-      },
-      { header: "Observaciones", accessor: "observaciones", truncate: 200 },
-      {
-        header: "Pago",
-        render: (_, row) => (
-          <span className="text-sm">
-            {`Pagado: Bs ${row.totalPagado} / Pendiente: Bs ${row.saldoPendiente}`}
-          </span>
-        ),
-      },
-    ],
-    []
-  );
+  const columns = useMemo(() => [
+    { header: "ID", accessor: "idReserva", width: 80, sortable: true, align: "right" },
+    { header: "Fecha", accessor: "fechaReserva", sortable: true },
+    { header: "Hora", render: (_, row) => `${row.horaInicio} - ${row.horaFin}`, sortable: true },
+    { header: "Estado", accessor: "estadoReserva", sortable: true },
+    { 
+      header: "Cancha", 
+      render: (_, row) => row.cancha?.nombre || "Sin cancha",
+      sortable: true 
+    },
+    { header: "Cliente", render: (_, row) => `${row.cliente?.nombre} ${row.cliente?.apellidoPaterno}`, sortable: true },
+    { header: "Observaciones", accessor: "observaciones", truncate: 200 },
+  ], []);
 
-  const actions = useMemo(
-    () => [
-      { label: "", icon: Eye, variant: "botoncrear", onClick: (row) => openView(row) },
-    ],
-    [openView]
-  );
+  const actions = useMemo(() => [
+    { label: "", icon: Eye, variant: "botoncrear", onClick: (row) => openView(row) },
+  ], [openView]);
 
   return (
-    <div className="ReservaListAdmin card">
+    <div className="CancelacionesListAdmin card">
       <div className="page-header">
-        <h2>Reservas</h2>
+        <h2>Cancelaciones</h2>
 
         <div className="filters-container">
           {/* Selector de rango de fechas */}
@@ -152,10 +131,7 @@ export default function ReservaListAdmin() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               onSearch={() => handleSearch()}
-              onClear={() => {
-                setSearch("");
-                load();
-              }}
+              onClear={() => { setSearch(""); load(); }}
               placeholder="Buscar por observaciones o cancha..."
               size="md"
               className="search-input"
@@ -177,19 +153,19 @@ export default function ReservaListAdmin() {
           pageSize={5}
           initialSort={{ accessor: "idReserva", direction: "asc" }}
           loading={loading}
-          emptyMessage="Sin reservas"
+          emptyMessage="Sin cancelaciones"
         />
       )}
 
-      {showForm && (
-        <ModalReservaList
-          initialData={editing}
-          onCancel={() => {
-            setShowForm(false);
-            setEditing(null);
-          }}
-        />
-      )}
+     {showForm && (
+      <ModalCancelacionList
+        initialData={editing}
+        onCancel={() => {
+          setShowForm(false);
+          setEditing(null);
+        }}
+      />
+    )}
     </div>
   );
 }

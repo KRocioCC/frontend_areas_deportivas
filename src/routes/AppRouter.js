@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import DashboardLayout from "../components/layout/DashboardLayout";
 import DashboardLayoutAdmin from "../components/layout/DashboardLayoutAdmin";
@@ -37,16 +37,13 @@ import CanchasPage from "../features/RolAdministrador/canchas/CanchasPage";
 import PageClientes from "../features/RolAdministrador/usuarios/clientes/PageClientes";
 import PageUsuariosControl from "../features/RolAdministrador/usuarios/usuarios_control/PageUsuariosControl";
 import Dashboard from "../features/RolAdministrador/dashboard/index.jsx";
-
-import CanchaDetalleAdmin from "../features/RolAdministrador/canchas/CanchaDetalleAdmin";
-import ReservaPageAdmin from "../features/RolAdministrador/Reserva/ReservaPageAdmin";
-import ReservaListAdmin from "../features/RolAdministrador/reservas/ReservaListAdmin";
-
+import CanchaReservaPage from "../features/RolAdministrador/canchas/CanchaReservasPage";
+import ReservaListAdmin from "../features/RolAdministrador/reservas/ReservaListAdmin.js";
+import CancelacionesListAdmin from "../features/RolAdministrador/cancelaciones/CancelacionesListAdmin.js";
 
 //CLIENTE
 // CLIENTE - componentes visuales
-import Preloader from "../components/ComponentsCli/Preloader.jsx";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import LayoutCliente from "../components/ComponentsCli/LayoutCliente.jsx";  
 
 
@@ -69,6 +66,7 @@ import ReservaConfirmacion from "../features/RolCliente/Reserva/ReservaConfirmac
 import Calendar from "../features/RolAdministrador/calendar/Calendar";
 import ComoFunciona from "../features/RolCliente/Inicio/ComoFunciona.jsx";
 import SistemaQR from "../features/RolCliente/Inicio/SistemaQR.jsx";
+// ReservaListAdmin import (already declared above)
 
 function AppRouter() {
 
@@ -95,14 +93,12 @@ function AppRouter() {
     })
   };
 
-  const [loading, setLoading] = useState(true);
+  
 
   return (
     <AuthProvider>
       <BrowserRouter>
-        {/*{loading ? (
-            <Preloader onFinish={() => setLoading(false)} />
-          ) : (*/}
+        {/* routes */}
         <Routes>
           
           {/* Redirección por defecto → inicio */}
@@ -346,6 +342,16 @@ function AppRouter() {
 
           {/* RUTAS NUEVAS PARA ADMINISTRADOR - DashboardLayoutAdmin */}
           <Route
+            path="/admin/cancha/ver_reservas/:idCancha"
+            element={
+              <ProtectedRoute requireAdmin>
+                <DashboardLayoutAdmin>
+                  <CanchaReservaPage />
+                </DashboardLayoutAdmin>
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/admin/mi_area"
             element={
               <ProtectedRoute requireAdmin>
@@ -366,27 +372,19 @@ function AppRouter() {
               </ProtectedRoute>
             }
           />
+          
           <Route
-            path="/admin/cancha/:id"
+            path="/admin/reservaslist"
             element={
               <ProtectedRoute requireAdmin>
                 <DashboardLayoutAdmin>
-                  <CanchaDetalleAdmin />
+                    <ReservaListAdmin/> 
                 </DashboardLayoutAdmin>
               </ProtectedRoute>
             }
           />
 
-        <Route
-          path="/admin/reservascli"
-          element={
-            <ProtectedRoute requireAdmin>
-              <DashboardLayoutAdmin>
-                <ReservaPageAdmin />
-              </DashboardLayoutAdmin>
-            </ProtectedRoute>
-          }
-        />
+        
 
           <Route
             path="/admin/dashboard"
@@ -429,11 +427,11 @@ function AppRouter() {
             }
           />
           <Route
-            path="/admin/reservaslist"
+            path="/admin/reservas/cancelaciones"
             element={
               <ProtectedRoute requireAdmin>
                 <DashboardLayoutAdmin>
-                  <ReservaListAdmin />
+                  <CancelacionesListAdmin/> 
                 </DashboardLayoutAdmin>
               </ProtectedRoute>
             }
