@@ -1,69 +1,74 @@
 // src/features/RolAdministrador/canchas/CanchaReservasPage.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import * as reservaService from '../../../api/ReservaApi';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
 const CanchaReservasPage = () => {
-  const { idCancha } = useParams();
-  const navigate = useNavigate();
-  const [reservas, setReservas] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [modal, setModal] = useState({ abierto: false, tipo: '', reserva: null });
+    const { idCancha } = useParams();
+    const navigate = useNavigate();
+    const [reservas, setReservas] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [modal, setModal] = useState({ abierto: false, tipo: '', reserva: null });
 
-  const abrirModal = (tipo, reserva) => setModal({ abierto: true, tipo, reserva });
-  const cerrarModal = () => setModal({ abierto: false, tipo: '', reserva: null });
+    // Buscador: por nombre de cliente y por fecha
+    const [searchTerm, setSearchTerm] = useState('');
+    const [filterDate, setFilterDate] = useState(''); // formato YYYY-MM-DD
 
-  // Función para confirmar acciones (eliminar/cancelar)
-  const confirmarAccion = async () => {
-    if (!modal.reserva) return;
-    
-    try {
+    const abrirModal = (tipo, reserva) => setModal({ abierto: true, tipo, reserva });
+    const cerrarModal = () => setModal({ abierto: false, tipo: '', reserva: null });
+
+    // Función para confirmar acciones (eliminar/cancelar)
+    const confirmarAccion = async () => {
+        if (!modal.reserva) return;
+        
+        try {
             if (modal.tipo === 'eliminar') {
                 // Lógica para eliminar reserva (API export: deleteReserva)
                 await reservaService.deleteReserva(modal.reserva.idReserva);
-      } else if (modal.tipo === 'cancelar') {
-        // Lógica para cancelar reserva
-        await reservaService.cancelarReserva(modal.reserva.idReserva);
-      }
-      
-      // Recargar las reservas después de la acción
-      const reservasData = await reservaService.getReservasPorCancha(idCancha);
-      setReservas(reservasData);
-      
-      cerrarModal();
-    } catch (err) {
-      console.error('Error al realizar la acción:', err);
-      setError('Ocurrió un error al realizar la acción. Por favor, intenta de nuevo.');
-      cerrarModal();
-    }
-  };
-
-  const formatearFecha = (fechaStr) => {
-    if (!fechaStr) return 'Fecha no disponible';
-    const meses = [
-      'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
-      'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
-    ];
-
-    try {
-      let fecha;
-      if (typeof fechaStr === 'string') {
-        if (fechaStr.includes('T')) fecha = new Date(fechaStr);
-        else {
-          const [anio, mes, dia] = fechaStr.split('-');
-          fecha = new Date(anio, mes - 1, dia);
+            } else if (modal.tipo === 'cancelar') {
+                // Lógica para cancelar reserva
+                await reservaService.cancelarReserva(modal.reserva.idReserva);
+            }
+            
+            // Recargar las reservas después de la acción
+            const reservasData = await reservaService.getReservasPorCancha(idCancha);
+            setReservas(reservasData);
+            
+            cerrarModal();
+        } catch (err) {
+            console.error('Error al realizar la acción:', err);
+            setError('Ocurrió un error al realizar la acción. Por favor, intenta de nuevo.');
+            cerrarModal();
         }
-      } else fecha = new Date(fechaStr);
+    };
 
-      return `${fecha.getDate()} de ${meses[fecha.getMonth()]} de ${fecha.getFullYear()}`;
-    } catch (err) {
-      console.error('Error formateando fecha:', err);
-      return fechaStr;
-    }
-  };
+    const formatearFecha = (fechaStr) => {
+        if (!fechaStr) return 'Fecha no disponible';
+        const meses = [
+            'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+            'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
+        ];
+
+        try {
+            let fecha;
+            if (typeof fechaStr === 'string') {
+                if (fechaStr.includes('T')) fecha = new Date(fechaStr);
+                else {
+                    const [anio, mes, dia] = fechaStr.split('-');
+                    fecha = new Date(anio, mes - 1, dia);
+                }
+            } else fecha = new Date(fechaStr);
+
+            return `${fecha.getDate()} de ${meses[fecha.getMonth()]} de ${fecha.getFullYear()}`;
+        } catch (err) {
+            console.error('Error formateando fecha:', err);
+            return fechaStr;
+        }
+    };
+    
 
     // Cargar reservas
     useEffect(() => {
@@ -88,6 +93,61 @@ const CanchaReservasPage = () => {
 
         fetchReservas();
     }, [idCancha, navigate]);
+
+    // Filtrado memoizado por nombre de cliente y por fecha - CORREGIDO
+    const reservasFiltradas = useMemo(() => {
+        const term = (searchTerm || '').trim().toLowerCase();
+        const date = filterDate || '';
+        
+        console.log('Filtrando con:', { term, date, totalReservas: reservas.length });
+        
+        return reservas.filter(r => {
+            // Filtrar por fecha si se proporcionó
+            if (date) {
+                try {
+                    if (!r.fechaReserva) return false;
+                    
+                    // Convertir ambas fechas a formato YYYY-MM-DD para comparar
+                    const fechaReserva = new Date(r.fechaReserva);
+                    const fechaFiltro = new Date(date);
+                    
+                    // Normalizar a medianoche para comparar solo la fecha
+                    const reservaNormalizada = new Date(fechaReserva.getFullYear(), fechaReserva.getMonth(), fechaReserva.getDate());
+                    const filtroNormalizada = new Date(fechaFiltro.getFullYear(), fechaFiltro.getMonth(), fechaFiltro.getDate());
+                    
+                    console.log('Comparando fechas:', {
+                        reserva: reservaNormalizada.toISOString(),
+                        filtro: filtroNormalizada.toISOString(),
+                        iguales: reservaNormalizada.getTime() === filtroNormalizada.getTime()
+                    });
+                    
+                    if (reservaNormalizada.getTime() !== filtroNormalizada.getTime()) {
+                        return false;
+                    }
+                } catch (error) {
+                    console.error('Error comparando fechas:', error);
+                    return false;
+                }
+            }
+
+            // Si no hay término de búsqueda, mostrar todas las que pasaron el filtro de fecha
+            if (!term) return true;
+
+            // Construir cadena de búsqueda con campos del cliente
+            const cliente = r.cliente || {};
+            const textoBusqueda = [
+                cliente.nombre || '',
+                cliente.apellidoPaterno || '',
+                cliente.apellidoMaterno || '',
+                cliente.email || ''
+            ].join(' ').toLowerCase();
+
+            const coincide = textoBusqueda.includes(term);
+            console.log('Buscando cliente:', { textoBusqueda, term, coincide });
+            
+            return coincide;
+        });
+    }, [reservas, searchTerm, filterDate]);
 
     // Función para generar PDF
     const generarPDF = async (reserva) => {
@@ -205,10 +265,20 @@ const CanchaReservasPage = () => {
         try {
             const fechaReserva = new Date(reserva.fechaReserva);
             const hoy = new Date();
+            // Comparar solo fecha (sin tiempo)
+            fechaReserva.setHours(0,0,0,0);
+            hoy.setHours(0,0,0,0);
             return fechaReserva < hoy;
         } catch (error) {
             return false;
         }
+    };
+
+    // Función para limpiar filtros
+    const handleClearFilters = () => {
+        setSearchTerm('');
+        setFilterDate('');
+        console.log('Filtros limpiados');
     };
 
     if (loading) {
@@ -286,49 +356,97 @@ const CanchaReservasPage = () => {
                         <div className="text-center">
                             <h1 className="text-4xl font-bold text-black mb-2" style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}>
                                 Reservas de la cancha 
-                                <p>{reservas?.[0]?.cancha?.nombre ?? 'Nombre no disponible'}</p>
+                                <p className="text-2xl mt-2">{reservas?.[0]?.cancha?.nombre ?? 'Nombre no disponible'}</p>
                             </h1>
                         </div>
                         
                         <div className="w-20"></div> {/* Espacio para balance */}
                     </div>
 
+                    {/* Buscador - MEJORADO con botón de búsqueda */}
+                    <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                        <div className="flex items-center gap-2 w-full md:w-1/2">
+                            <div className="relative flex-1">
+                                <input
+                                    type="text"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    placeholder="Buscar por nombre, apellido o email del cliente..."
+                                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                            <label className="text-sm font-medium text-gray-700 whitespace-nowrap">Filtrar por fecha:</label>
+                            <input
+                                type="date"
+                                value={filterDate}
+                                onChange={(e) => setFilterDate(e.target.value)}
+                                className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                            <button
+                                onClick={handleClearFilters}
+                                className="ml-2 px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors flex items-center"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                                Limpiar
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Información de filtros activos */}
+                    {(searchTerm || filterDate) && (
+                        <div className="mb-4 p-3 bg-blue-50 rounded-lg">
+                            <p className="text-sm text-blue-800">
+                                Reservas encontradas para: 
+                                {searchTerm && ` Cliente: "${searchTerm}"`}
+                                {filterDate && ` Fecha: ${filterDate}`}
+                                {` (Mostrando ${reservasFiltradas.length} de ${reservas.length} reservas)`}
+                            </p>
+                        </div>
+                    )}
+
                     {/* Estadísticas */}
-                    <div className="mb-6 p-4 bg-gray-400 rounded-lg">
+                    <div className="mb-6 p-4 bg-gray-100 rounded-lg">
                         <h2 className="text-lg font-semibold text-black mb-2" style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}>Resumen:</h2>
                         <div className="flex flex-wrap gap-4">
-                            <span className="px-3 py-1 bg-blue-100 text-black rounded-full text-sm">
-                                Total: {reservas.length} reservas
+                            <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
+                                Total: {reservasFiltradas.length} reservas
                             </span>
                             <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
-                                Confirmadas: {reservas.filter(r => r.estadoReserva === 'CONFIRMADA').length}
+                                Confirmadas: {reservasFiltradas.filter(r => r.estadoReserva === 'CONFIRMADA').length}
                             </span>
                             <span className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">
-                                Pendientes: {reservas.filter(r => r.estadoReserva === 'PENDIENTE').length}
+                                Pendientes: {reservasFiltradas.filter(r => r.estadoReserva === 'PENDIENTE').length}
                             </span>
                             <span className="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm">
-                                Canceladas: {reservas.filter(r => r.estadoReserva === 'CANCELADA').length}
+                                Canceladas: {reservasFiltradas.filter(r => r.estadoReserva === 'CANCELADA').length}
                             </span>
                         </div>
                     </div>
 
                     {/* Lista de reservas */}
-                    {reservas.length > 0 ? (
+                    {reservasFiltradas.length > 0 ? (
                         <div className="space-y-3">
-                            {reservas.map(reserva => (
+                            {reservasFiltradas.map((reserva, idx) => (
                                 <div key={reserva.idReserva} className="p-4 bg-white border border-gray-200 rounded-lg shadow-md hover:shadow-lg transition-shadow">
                                     {/* Header de la reserva */}
                                     <div className="flex justify-between items-start mb-2">
-                                        <div class="mb-8">
-                                           {reservas.map((reserva, index) => (
-                                                <h2
-                                                    key={reserva.idReserva}
-                                                    className="text-xl font-semibold text-black mb-1"
-                                                    style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontSize: '18px' }}
-                                                >
-                                                    Reserva #{index + 1}
-                                                </h2>
-                                                ))}
+                                        <div className="mb-8">
+                                            <h2
+                                                className="text-xl font-semibold text-black mb-1"
+                                                style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontSize: '18px' }}
+                                            >
+                                                Reserva #{idx + 1}
+                                            </h2>
 
                                             <div className="flex items-center text-blue-600 text-sm">
                                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -409,7 +527,18 @@ const CanchaReservasPage = () => {
 
                                     {/* Botones de acción */}
                                     <div className="mt-6 flex justify-end space-x-2 flex-wrap gap-2">
-                                        
+                                        {/* Botón Eliminar (solo si no está ya desactivada) */}
+                                        {!(reserva.eliminado || reserva.activo === false) && (
+                                            <button
+                                                className="py-2 px-4 bg-red-600 hover:bg-red-700 text-white rounded-lg shadow-md transition-colors flex items-center"
+                                                onClick={() => abrirModal('eliminar', reserva)}
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg>
+                                                Eliminar
+                                            </button>
+                                        )}
 
                                         {/* Botón Cancelar (solo si no es pasada y está confirmada/pendiente) */}
                                         {!esReservaPasada(reserva) && 
@@ -445,8 +574,16 @@ const CanchaReservasPage = () => {
                             <svg xmlns="http://www.w3.org/2000/svg" className="mx-auto h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
-                            <h2 className="mt-4 text-xl font-semibold text-gray-600">No se encontraron reservas para esta cancha</h2>
-                            <p className="mt-2 text-gray-500">Esta cancha no tiene reservas registradas.</p>
+                            <h2 className="mt-4 text-xl font-semibold text-gray-600">
+                                {reservas.length === 0 
+                                    ? "No se encontraron reservas para esta cancha" 
+                                    : "No hay reservas que coincidan con los filtros aplicados"}
+                            </h2>
+                            <p className="mt-2 text-gray-500">
+                                {reservas.length === 0 
+                                    ? "Esta cancha no tiene reservas registradas." 
+                                    : "Intenta con otros términos de búsqueda o fecha."}
+                            </p>
                             
                             <button
                                 onClick={handleVolver}
