@@ -28,7 +28,8 @@ export async function updateCancha(id, payload) {
 
 // Desactivar (eliminar lógica) una cancha
 export async function deleteCancha(id) {
-  const res = await api.put(`${API_URL}/${id}/eliminar`);
+  // En lugar de eliminar, cambiamos el estado a false (desactivar) K
+  const res = await api.patch(`${API_URL}/${id}/estado?nuevoEstado=false`);
   return res.data;
 }
 
@@ -50,6 +51,7 @@ export async function buscarCanchasPorNombre(nombre) {
   const res = await api.get(`${API_URL}/buscar/${nombre}`);
   return res.data;
 }
+
 
 export async function buscarCanchasPorFiltros(params) {
   // params: { horaInicio, horaFin, costo, capacidad, tamano, iluminacion, cubierta }

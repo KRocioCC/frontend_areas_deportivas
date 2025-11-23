@@ -103,30 +103,30 @@ const CanchaCard = ({
   return (
     <div className={`rounded-2xl shadow-lg transition-all duration-300 overflow-hidden flex flex-col h-[680px] w-full max-w-[420px] mx-auto border ${desactivada ? "bg-red-50 border-red-300" : "bg-white border-gray-100 hover:shadow-2xl"}`}>
       
-      {/* Debug Info - Solo en desarrollo */}
+      {/* Debug Info - Solo en desarrollo
       {process.env.NODE_ENV === 'development' && (
         <div className="bg-blue-50 p-2 text-xs border-b">
           <div><strong>Cancha:</strong> {cancha.nombre} (ID: {cancha.idCancha})</div>
           <div><strong>Imágenes encontradas:</strong> {cancha.imagenes ? cancha.imagenes.length : 0}</div>
           <div><strong>Estado:</strong> {cargando ? '🔄 Cargando...' : '✅ Listo'}</div>
         </div>
-      )}
+      )}  */}
 
       {/* Imagen Principal */}
-      <div className="h-[340px] w-full relative overflow-hidden">
-        {cargando ? (
-          <div className="w-full h-full flex flex-col items-center justify-center bg-gray-200">
-            <div className="text-gray-500 mb-2">Cargando imagen...</div>
-            <div className="text-xs text-gray-400">Cancha: {cancha.nombre}</div>
-          </div>
-        ) : (
-          <>
-            <img
-              src={imagenPrincipal}
-              alt={cancha.nombre}
-              className={`w-full h-full object-cover transition-transform duration-500 ${desactivada ? "grayscale" : "hover:scale-105"}`}
-              onLoad={() => console.log("✅ Imagen renderizada en el DOM")}
-              onError={(e) => {
+        <div className="h-[460px] w-full relative overflow-hidden">
+          {cargando ? (
+            <div className="w-full h-full flex flex-col items-center justify-center bg-gray-200">
+          <div className="text-gray-500 mb-2">Cargando imagen...</div>
+          <div className="text-xs text-gray-400">Cancha: {cancha.nombre}</div>
+            </div>
+          ) : (
+            <>
+          <img
+            src={imagenPrincipal}
+            alt={cancha.nombre}
+            className={`w-full h-full object-cover transition-transform duration-500 ${desactivada ? "grayscale" : "hover:scale-105"}`}
+            onLoad={() => console.log("✅ Imagen renderizada en el DOM")}
+            onError={(e) => {
                 console.error("❌ Error en la etiqueta img, usando placeholder");
                 e.target.src = "https://placehold.co/600x400?text=Error+Mostrando+Imagen";
               }}
@@ -223,7 +223,7 @@ const CanchaCard = ({
           {/* Badges */}
           <div className="flex items-center gap-2 mb-4">
             <span className={`px-3 py-1 rounded-full text-xs font-medium ${cancha.cubierta === "cubierta" ? "bg-blue-100 text-blue-800" : "bg-green-100 text-green-800"}`}>
-              {cancha.cubierta === "cubierta" ? "🌤️ Cubierta" : "☀️ Abierta"}
+              {cancha.cubierta === "cubierta" ? " Cubierta" : " Abierta"}
             </span>
             <span className="px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
               {cancha.tipoSuperficie || "Natural"}
@@ -246,18 +246,17 @@ const CanchaCard = ({
         </div>
 
         {/* Footer */}
-        <div className="mt-auto pt-4 border-t border-gray-100 space-y-3">
-          {!desactivada && (
-            <>
-              <button
-                onClick={() => navigate(`/admin/cancha/ver_reservas/${cancha.idCancha}`)}
-                className="w-full py-3 bg-[#a6b969] text-white rounded-xl hover:bg-[#3aa9a0] transition-all duration-300 font-semibold text-sm shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-              >
-                Ver Reservas
-              </button>
-            </>
-          )}
-        </div>
+        <div className="mt-auto pt-4 border-t border-gray-100 flex justify-end">
+        {!desactivada && (
+          <button
+            onClick={() => navigate(`/admin/cancha/ver_reservas/${cancha.idCancha}`)}
+            className="w-1/3 py-3 bg-black text-white rounded-xl hover:bg-gray-800 transition-all duration-300 font-semibold text-sm shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+          >
+            Ver Reservas
+          </button>
+        )}
+      </div>
+
       </div>
     </div>
   );

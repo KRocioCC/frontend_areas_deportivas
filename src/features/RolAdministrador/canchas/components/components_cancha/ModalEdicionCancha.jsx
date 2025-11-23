@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { updateCancha, deleteCancha, agregarImagenesCancha, eliminarImagenCancha } from '../../../../../api/CanchaApi';
+import { updateCancha, deleteCancha, agregarImagenesCancha, eliminarImagenCancha, cambiarEstadoCancha } from '../../../../../api/CanchaApi';
 
 export default function ModalEdicionCancha({ isOpen, onClose, cancha, onCanchaActualizada }) {
   const [loading, setLoading] = useState(false);
   const [imagenes, setImagenes] = useState([]);
   const [nuevasImagenes, setNuevasImagenes] = useState([]);
   const [imagenesAEliminar, setImagenesAEliminar] = useState([]);
+  const [imagenesAMantener, setImagenesAMantener] = useState([]);
   
   const [formData, setFormData] = useState({
     nombre: '',
@@ -21,9 +22,24 @@ export default function ModalEdicionCancha({ isOpen, onClose, cancha, onCanchaAc
     estado: true
   });
 
+  // Función para construir URL completa de imagen
+  const getUrlImagenCompleta = (urlAcceso) => {
+    if (!urlAcceso) return "https://placehold.co/600x400?text=Sin+Imagen";
+    
+    if (urlAcceso.startsWith('http')) {
+      return urlAcceso;
+    }
+    
+    const baseUrl = 'http://localhost:8032';
+    return `${baseUrl}${urlAcceso.startsWith('/') ? urlAcceso : `/${urlAcceso}`}`;
+  };
+
   // Cargar datos de la cancha cuando se abre el modal
   useEffect(() => {
     if (isOpen && cancha) {
+      console.log("📥 Cancha recibida:", cancha);
+      console.log("🖼️ Imágenes de la cancha:", cancha.imagenes);
+      
       setFormData({
         nombre: cancha.nombre || '',
         costoHora: cancha.costoHora || '',
@@ -38,8 +54,32 @@ export default function ModalEdicionCancha({ isOpen, onClose, cancha, onCanchaAc
         estado: cancha.estado !== false
       });
       
-      // Cargar imágenes existentes (simulado)
-      setImagenes(cancha.imagenes || []);
+      // Cargar imágenes existentes con URLs completas
+      if (cancha.imagenes && cancha.imagenes.length > 0) {
+        const imagenesProcesadas = cancha.imagenes.map(imagen => {
+          // Asegurarnos de que tenemos un ID válido
+          const imagenId = imagen.idImagenRelacion || imagen.id;
+          if (!imagenId) {
+            console.warn("⚠️ Imagen sin ID válido:", imagen);
+          }
+          
+          return {
+            ...imagen,
+            urlCompleta: getUrlImagenCompleta(imagen.urlAcceso),
+            id: imagenId,
+            mantener: true
+          };
+        }).filter(imagen => imagen.id != null); // Filtrar imágenes sin ID
+          
+        console.log("🖼️ Imágenes procesadas:", imagenesProcesadas);
+        setImagenes(imagenesProcesadas);
+        setImagenesAMantener(imagenesProcesadas.map(img => img.id));
+      } else {
+        console.warn("⚠️ No hay imágenes en la cancha");
+        setImagenes([]);
+        setImagenesAMantener([]);
+      }
+      
       setNuevasImagenes([]);
       setImagenesAEliminar([]);
     }
@@ -58,10 +98,9 @@ export default function ModalEdicionCancha({ isOpen, onClose, cancha, onCanchaAc
   const handleFileSelect = (e) => {
     const files = Array.from(e.target.files);
     
-    // Validar tipos de archivo
     const validFiles = files.filter(file => 
       file.type.startsWith('image/') && 
-      file.size <= 5 * 1024 * 1024 // 5MB max
+      file.size <= 5 * 1024 * 1024
     );
     
     if (validFiles.length !== files.length) {
@@ -71,10 +110,40 @@ export default function ModalEdicionCancha({ isOpen, onClose, cancha, onCanchaAc
     setNuevasImagenes(prev => [...prev, ...validFiles]);
   };
 
+  const handleToggleMantenerImagen = (imagenId) => {
+    // Validar que el ID no sea undefined
+    if (!imagenId || imagenId === 'undefined') {
+      console.error("❌ ID de imagen inválido:", imagenId);
+      return;
+    }
+
+    setImagenes(prev => 
+      prev.map(img => 
+        img.id === imagenId ? { ...img, mantener: !img.mantener } : img
+      )
+    );
+
+    setImagenesAMantener(prev => {
+      if (prev.includes(imagenId)) {
+        return prev.filter(id => id !== imagenId);
+      } else {
+        return [...prev, imagenId];
+      }
+    });
+  };
+
   const handleRemoveExistingImage = (index) => {
     const imagen = imagenes[index];
-    setImagenes(prev => prev.filter((_, i) => i !== index));
-    setImagenesAEliminar(prev => [...prev, imagen.id]);
+    
+    // Validar que la imagen tenga ID
+    if (!imagen.id || imagen.id === 'undefined') {
+      console.error("❌ No se puede eliminar imagen sin ID válido:", imagen);
+      alert('Error: Esta imagen no tiene un ID válido y no puede ser eliminada');
+      return;
+    }
+    
+    console.log("🗑️ Marcando imagen para eliminar:", imagen);
+    handleToggleMantenerImagen(imagen.id);
   };
 
   const handleRemoveNewImage = (index) => {
@@ -102,6 +171,23 @@ export default function ModalEdicionCancha({ isOpen, onClose, cancha, onCanchaAc
     e.preventDefault();
   };
 
+  const eliminarImagenSegura = async (imagenId) => {
+    // Validar que el ID sea válido antes de eliminar
+    if (!imagenId || imagenId === 'undefined') {
+      console.error("❌ ID de imagen inválido para eliminar:", imagenId);
+      return;
+    }
+
+    try {
+      console.log("🗑️ Eliminando imagen con ID:", imagenId);
+      await eliminarImagenCancha(imagenId);
+      console.log("✅ Imagen eliminada exitosamente");
+    } catch (error) {
+      console.error("❌ Error eliminando imagen:", error);
+      throw error; // Re-lanzar el error para manejarlo en el nivel superior
+    }
+  };
+
   const handleSubmit = async () => {
     if (!formData.nombre || !formData.costoHora || !formData.capacidad) {
       alert('Por favor completa los campos obligatorios');
@@ -111,22 +197,50 @@ export default function ModalEdicionCancha({ isOpen, onClose, cancha, onCanchaAc
     setLoading(true);
     
     try {
+      // Verificar que tenemos todos los datos necesarios
+      if (!cancha.idAreadeportiva && !cancha.areaDeportiva?.idAreadeportiva) {
+        alert("Error: No se pudo obtener el ID del área deportiva. La cancha no tiene área asociada.");
+        return;
+      }
+
+      const idAreadeportiva = cancha.idAreadeportiva || cancha.areaDeportiva?.idAreadeportiva;
+
       // 1. Actualizar datos de la cancha
       const canchaData = {
-        ...formData,
+        nombre: formData.nombre,
         costoHora: parseFloat(formData.costoHora),
-        capacidad: parseInt(formData.capacidad)
+        capacidad: parseInt(formData.capacidad),
+        horaInicio: formData.horaInicio || null,
+        horaFin: formData.horaFin || null,
+        tipoSuperficie: formData.tipoSuperficie,
+        tamano: formData.tamano || null,
+        iluminacion: formData.iluminacion,
+        cubierta: formData.cubierta,
+        mantenimiento: formData.mantenimiento,
+        estado: formData.estado !== false,
+        idAreadeportiva: parseInt(idAreadeportiva)
       };
       
+      console.log("Enviando datos al servidor:", canchaData);
       await updateCancha(cancha.idCancha, canchaData);
       
-      // 2. Eliminar imágenes marcadas para eliminar
-      for (const imagenId of imagenesAEliminar) {
-        await eliminarImagenCancha(imagenId);
+      // 2. Eliminar imágenes que NO están en la lista de mantener
+      const imagenesParaEliminar = imagenes
+        .filter(imagen => !imagenesAMantener.includes(imagen.id))
+        .map(imagen => imagen.id)
+        .filter(id => id && id !== 'undefined'); // Filtrar IDs inválidos
+
+      console.log("🗑️ Imágenes a eliminar (filtradas):", imagenesParaEliminar);
+      
+      if (imagenesParaEliminar.length > 0) {
+        for (const imagenId of imagenesParaEliminar) {
+          await eliminarImagenSegura(imagenId);
+        }
       }
       
       // 3. Agregar nuevas imágenes
       if (nuevasImagenes.length > 0) {
+        console.log("🖼️ Agregando nuevas imágenes:", nuevasImagenes.length);
         await agregarImagenesCancha(cancha.idCancha, nuevasImagenes);
       }
       
@@ -135,26 +249,42 @@ export default function ModalEdicionCancha({ isOpen, onClose, cancha, onCanchaAc
       handleClose();
       
     } catch (err) {
-      alert('Error al actualizar la cancha: ' + (err.response?.data?.message || err.message));
+      console.error("Error completo:", err);
+      const errorMessage = err.response?.data?.message || 
+                          err.response?.data?.error ||
+                          err.message ||
+                          "Error desconocido al actualizar la cancha";
+      alert(`❌ Error: ${errorMessage}`);
     } finally {
       setLoading(false);
     }
   };
 
   const handleDesactivar = async () => {
-    /* eslint-disable-next-line no-restricted-globals */
-    if (!confirm('¿Estás seguro de que deseas desactivar esta cancha? Los usuarios ya no podrán reservarla.')) {
+    const accion = formData.estado ? 'desactivar' : 'activar';
+      
+    const confirmed = window.confirm(`¿Estás seguro de que deseas ${accion} esta cancha?`);
+    if (!confirmed) {
       return;
     }
-
+  
     setLoading(true);
     try {
-      await deleteCancha(cancha.idCancha);
-      alert('Cancha desactivada exitosamente');
+      const nuevoEstado = !formData.estado;
+      await cambiarEstadoCancha(cancha.idCancha, nuevoEstado);
+      
+      const mensaje = nuevoEstado ? 'activada' : 'desactivada';
+      alert(`✅ Cancha ${mensaje} exitosamente`);
       onCanchaActualizada?.();
       handleClose();
+      
     } catch (err) {
-      alert('Error al desactivar la cancha: ' + (err.response?.data?.message || err.message));
+      console.error("Error completo:", err);
+      const errorMessage = err.response?.data?.message || 
+                          err.response?.data?.error ||
+                          err.message ||
+                          "Error desconocido al cambiar el estado de la cancha";
+      alert(`❌ Error: ${errorMessage}`);
     } finally {
       setLoading(false);
     }
@@ -177,20 +307,26 @@ export default function ModalEdicionCancha({ isOpen, onClose, cancha, onCanchaAc
     setImagenes([]);
     setNuevasImagenes([]);
     setImagenesAEliminar([]);
+    setImagenesAMantener([]);
     onClose();
   };
+
+  // Contador de imágenes que se mantendrán
+  const imagenesMantenidasCount = imagenes.filter(img => img.mantener).length;
+  const imagenesEliminadasCount = imagenes.length - imagenesMantenidasCount;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-6 text-white relative">
+        <div className="bg-black p-6 text-white relative">
           <h2 className="text-2xl font-bold text-center">
             Editar Cancha: {cancha.nombre}
           </h2>
           <button
             onClick={handleClose}
-            className="absolute right-4 top-4 p-2 hover:bg-white hover:bg-opacity-20 rounded-full transition-all"
+            className="absolute right-4 top-4 p-2 hover:bg-white hover:bg-opacity-10 rounded-full transition-all"
+            aria-label="Cerrar"
           >
             ✕
           </button>
@@ -200,8 +336,8 @@ export default function ModalEdicionCancha({ isOpen, onClose, cancha, onCanchaAc
         <div className="p-6 overflow-y-auto max-h-[60vh]">
           <div className="space-y-6">
             {/* Información General */}
-            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-              <h3 className="text-lg font-semibold text-blue-800 mb-3 flex items-center">
+            <div className="bg-yellow-40 border border-green-400 rounded-xl p-4">
+              <h3 className="text-lg font-semibold text-black-800 mb-3 flex items-center">
                 <i className="fas fa-info-circle mr-2"></i>
                 Información General
               </h3>
@@ -261,8 +397,8 @@ export default function ModalEdicionCancha({ isOpen, onClose, cancha, onCanchaAc
             </div>
 
             {/* Horarios */}
-            <div className="bg-green-50 border border-green-200 rounded-xl p-4">
-              <h3 className="text-lg font-semibold text-green-800 mb-3 flex items-center">
+            <div className="bg-yellow-40 border border-green-400 rounded-xl p-4">
+              <h3 className="text-lg font-semibold text-black-800 mb-3 flex items-center">
                 <i className="fas fa-clock mr-2"></i>
                 Horarios de Operación
               </h3>
@@ -297,8 +433,8 @@ export default function ModalEdicionCancha({ isOpen, onClose, cancha, onCanchaAc
             </div>
 
             {/* Características */}
-            <div className="bg-purple-50 border border-purple-200 rounded-xl p-4">
-              <h3 className="text-lg font-semibold text-purple-800 mb-3 flex items-center">
+            <div className="bg-yellow-40 border border-green-400 rounded-xl p-4">
+              <h3 className="text-lg font-semibold  border-yellow-50 mb-3 flex items-center">
                 <i className="fas fa-cogs mr-2"></i>
                 Características
               </h3>
@@ -374,11 +510,32 @@ export default function ModalEdicionCancha({ isOpen, onClose, cancha, onCanchaAc
             </div>
 
             {/* Gestión de Imágenes */}
-            <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
+            <div className="bg-yellow-50 border border-yellow-100 rounded-xl p-4">
               <h3 className="text-lg font-semibold text-yellow-800 mb-3 flex items-center">
                 <i className="fas fa-images mr-2"></i>
                 Gestión de Imágenes
               </h3>
+
+              {/* Resumen de imágenes */}
+              <div className="bg-blue-50 p-3 rounded-lg mb-4">
+                <div className="flex justify-between text-sm">
+                  <span className="font-medium">Resumen de imágenes:</span>
+                  <div className="flex gap-4">
+                    <span className="text-green-600">
+                      <i className="fas fa-check-circle mr-1"></i>
+                      Mantener: {imagenesMantenidasCount}
+                    </span>
+                    <span className="text-red-600">
+                      <i className="fas fa-times-circle mr-1"></i>
+                      Quitar: {imagenesEliminadasCount}
+                    </span>
+                    <span className="text-blue-600">
+                      <i className="fas fa-plus-circle mr-1"></i>
+                      Nuevas: {nuevasImagenes.length}
+                    </span>
+                  </div>
+                </div>
+              </div>
 
               {/* Área de subida */}
               <div 
@@ -413,26 +570,79 @@ export default function ModalEdicionCancha({ isOpen, onClose, cancha, onCanchaAc
                 <div className="mb-4">
                   <h4 className="font-medium text-gray-700 mb-3">
                     Imágenes Actuales ({imagenes.length})
+                    <span className="text-sm font-normal text-gray-500 ml-2">
+                      (Haz clic en una imagen para quitarla)
+                    </span>
                   </h4>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     {imagenes.map((imagen, index) => (
-                      <div key={index} className="relative group border border-gray-200 rounded-lg overflow-hidden">
+                      <div 
+                        key={imagen.id || index} 
+                        className={`relative group border-2 rounded-lg overflow-hidden cursor-pointer transition-all ${
+                          imagen.mantener 
+                            ? 'border-green-400 hover:border-green-600' 
+                            : 'border-red-400 hover:border-red-600 opacity-60'
+                        }`}
+                        onClick={() => {
+                          // Validar que la imagen tenga ID antes de intentar cambiarla
+                          if (!imagen.id || imagen.id === 'undefined') {
+                            console.error("❌ Imagen sin ID válido:", imagen);
+                            alert('Esta imagen no tiene un ID válido y no puede ser modificada');
+                            return;
+                          }
+                          handleToggleMantenerImagen(imagen.id);
+                        }}
+                        title={imagen.mantener ? "Clic para quitar imagen" : "Clic para mantener imagen"}
+                      >
                         <img
-                          src={imagen.url || `https://via.placeholder.com/150?text=Imagen+${index+1}`}
+                          src={imagen.urlCompleta || imagen.url || `https://via.placeholder.com/150?text=Imagen+${index+1}`}
                           alt={`Imagen ${index + 1}`}
                           className="w-full h-24 object-cover"
+                          onError={(e) => {
+                            console.error("❌ Error cargando imagen:", imagen);
+                            e.target.src = "https://placehold.co/150x100?text=Error+Cargando";
+                          }}
                         />
+                        
+                        {/* Indicador de estado */}
+                        <div className={`absolute top-2 left-2 w-6 h-6 rounded-full flex items-center justify-center text-white text-xs ${
+                          imagen.mantener ? 'bg-green-500' : 'bg-red-500'
+                        }`}>
+                          {imagen.mantener ? '✓' : '✕'}
+                        </div>
+                        
+                        {/* Overlay con información */}
                         <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all flex items-center justify-center">
-                          <button
-                            onClick={() => handleRemoveExistingImage(index)}
-                            className="opacity-0 group-hover:opacity-100 bg-red-500 text-white p-1 rounded-full transition-all transform scale-0 group-hover:scale-100"
-                            title="Eliminar imagen"
-                          >
-                            <i className="fas fa-trash text-xs"></i>
-                          </button>
+                          <div className="text-white text-center opacity-0 group-hover:opacity-100 transition-all">
+                            <div className="text-lg font-bold">
+                              {imagen.mantener ? 'MANTENER' : 'QUITAR'}
+                            </div>
+                            <div className="text-xs mt-1">
+                              {imagen.mantener ? 'Clic para quitar' : 'Clic para mantener'}
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white text-xs p-1 text-center">
+                          Imagen {index + 1}
+                          {(!imagen.id || imagen.id === 'undefined') && (
+                            <div className="text-red-300">(Sin ID válido)</div>
+                          )}
                         </div>
                       </div>
                     ))}
+                  </div>
+                  
+                  {/* Leyenda */}
+                  <div className="flex gap-4 mt-3 text-xs text-gray-600">
+                    <div className="flex items-center gap-1">
+                      <div className="w-3 h-3 bg-green-400 rounded"></div>
+                      <span>Imagen que se mantendrá</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <div className="w-3 h-3 bg-red-400 rounded"></div>
+                      <span>Imagen que se eliminará</span>
+                    </div>
                   </div>
                 </div>
               )}
@@ -468,43 +678,13 @@ export default function ModalEdicionCancha({ isOpen, onClose, cancha, onCanchaAc
                   </div>
                 </div>
               )}
-            </div>
 
-            {/* Estado de la Cancha */}
-            <div className="bg-red-50 border border-red-200 rounded-xl p-4">
-              <h3 className="text-lg font-semibold text-red-800 mb-3 flex items-center">
-                <i className="fas fa-power-off mr-2"></i>
-                Estado de la Cancha
-              </h3>
-              
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-700">
-                    Estado actual: <span className={`font-semibold ${formData.estado ? 'text-green-600' : 'text-red-600'}`}>
-                      {formData.estado ? 'Activa' : 'Inactiva'}
-                    </span>
-                  </p>
-                  <p className="text-sm text-gray-500 mt-1">
-                    {formData.estado 
-                      ? 'La cancha está disponible para reservas' 
-                      : 'La cancha no está disponible para reservas'
-                    }
-                  </p>
+              {imagenes.length === 0 && nuevasImagenes.length === 0 && (
+                <div className="text-center text-gray-500 py-4">
+                  <i className="fas fa-image text-2xl mb-2 block"></i>
+                  No hay imágenes para esta cancha
                 </div>
-                
-                <label className="flex items-center cursor-pointer">
-                  <div className="relative">
-                    <input 
-                      type="checkbox" 
-                      className="sr-only" 
-                      checked={formData.estado}
-                      onChange={(e) => setFormData(prev => ({...prev, estado: e.target.checked}))}
-                    />
-                    <div className={`block w-14 h-8 rounded-full ${formData.estado ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                    <div className={`dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition transform ${formData.estado ? 'translate-x-6' : ''}`}></div>
-                  </div>
-                </label>
-              </div>
+              )}
             </div>
           </div>
         </div>
@@ -515,10 +695,14 @@ export default function ModalEdicionCancha({ isOpen, onClose, cancha, onCanchaAc
             <div>
               <button
                 onClick={handleDesactivar}
-                className="px-6 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all font-medium flex items-center space-x-2"
+                className={`px-6 py-3 rounded-xl transition-all font-medium flex items-center space-x-2 ${
+                  formData.estado 
+                    ? 'bg-red-600 text-white hover:bg-red-700' 
+                    : 'bg-green-600 text-white hover:bg-green-700'
+                }`}
               >
-                <i className="fas fa-ban"></i>
-                <span>Desactivar Cancha</span>
+                <i className={`fas ${formData.estado ? 'fa-ban' : 'fa-check'}`}></i>
+                <span>{formData.estado ? 'Desactivar Cancha' : 'Activar Cancha'}</span>
               </button>
             </div>
             

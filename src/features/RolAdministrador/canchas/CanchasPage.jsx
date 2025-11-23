@@ -98,7 +98,7 @@ const CanchasPage = () => {
       setEditedData({});
     } catch (error) {
       console.error("Error al actualizar cancha:", error);
-      alert("❌ Error al actualizar la cancha");
+      alert(" Error al actualizar la cancha");
     }
   };
 
@@ -114,10 +114,10 @@ const CanchasPage = () => {
       );
       setCanchas(actualizadas);
       setFilteredCanchas(actualizadas);
-      alert("✅ Cancha desactivada correctamente");
+      alert(" Cancha desactivada correctamente");
     } catch (error) {
       console.error("Error al desactivar cancha:", error);
-      alert("❌ Error al desactivar la cancha");
+      alert(" Error al desactivar la cancha");
     }
   };
 
@@ -154,7 +154,7 @@ const CanchasPage = () => {
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-green-50">
         <div className="text-center">
           <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <span className="text-2xl">⚠️</span>
+            <span className="text-2xl"></span>
           </div>
           <p className="text-red-600 text-lg font-semibold">{err}</p>
           <button 
@@ -172,13 +172,13 @@ const CanchasPage = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
       {/* Header con fondo mejorado */}
       <div 
-        className="relative bg-cover bg-center bg-no-repeat py-16"
+        className="relative bg-cover mb-8 bg-center bg-no-repeat py-16"
         style={{
           backgroundImage: `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('/Fondos/Deporte11.png')`,
         }}
       >
-        <div className="absolute inset-0 bg-black bg-opacity-30"></div>
-        <div className="relative max-w-7xl mx-auto px-6 text-center">
+        <div className="absolute inset-0  bg-black bg-opacity-30"></div>
+        <div className="relative max-w-7xl mb-6 mx-auto px-6 text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
             Gestión de Canchas
           </h1>
@@ -189,39 +189,49 @@ const CanchasPage = () => {
       </div>
 
       {/* Contenido Principal */}
-      <div className="max-w-7xl mx-auto px-6 py-8 -mt-8 relative z-10">
-        {/* Panel de Búsqueda y Acciones */}
-        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 mb-8">
-          <div className="flex flex-col lg:flex-row gap-6 items-center justify-between">
-            <div className="flex-1 w-full">
-              <BuscadorCanchas
-                zona={searchTerm}
-                disciplina=""
-                onZonaChange={(e) => setSearchTerm(e.target.value)}
-                onDisciplinaChange={() => {}}
-                onBuscar={handleSearch}
-              />
-            </div>
-            
-            <div className="flex flex-col sm:flex-row gap-3">
-              <button
-                onClick={handleClearSearch}
-                className="px-6 py-3 bg-gray-500 text-white rounded-xl hover:bg-gray-600 transition-all duration-300 font-semibold text-sm shadow-lg hover:shadow-xl flex items-center justify-center"
-              >
-                <span>🔄 Limpiar</span>
-              </button>
+    <div className="w-full mx-auto px-12 py-16 -mt-8 relative z-10">
+       { /* Panel de Búsqueda y Acciones */}
+          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 mb-8">
+            <div className="flex flex-col lg:flex-row gap-6 items-center justify-between">
+              <div className="flex-1 w-full">
+                {/* Búsqueda por nombre de cancha */}
+                <div className="relative">
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") handleSearch(); }}
+              placeholder="Buscar por nombre de cancha..."
+              className="w-full pl-4 pr-24 py-3 border border-gray-200 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
+            />
+            <button
+              onClick={handleSearch}
+              className="absolute right-2 top-1/2 -translate-y-1/2 px-4 py-2 bg-[#45bfb5] text-white rounded-md transition-colors text-sm"
+            >
+              Buscar
+            </button>
+                </div>
+              </div>
               
-              <button
-                onClick={() => setShowWizard(true)}
-                className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all duration-300 font-semibold text-sm shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center"
-              >
-                <span className="mr-2">➕</span>
-                Crear Nueva Cancha
-              </button>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button
+            onClick={handleClearSearch}
+            className="px-6 py-3 bg-gray-500 text-white rounded-xl hover:bg-gray-600 transition-all duration-300 font-semibold text-sm shadow-lg hover:shadow-xl flex items-center justify-center"
+                >
+            <span> Limpiar</span>
+                </button>
+                
+                <button
+            onClick={() => setShowWizard(true)}
+            className="px-6 py-3 bg-gradient-to-r from-black to-gray-900 text-white rounded-xl hover:from-gray-800 hover:to-gray-700 transition-all duration-300 font-semibold text-sm shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center border border-gray-700"
+                >
+            <span className="mr-2"></span>
+            Crear Nueva Cancha
+                </button>
+              </div>
             </div>
-          </div>
 
-          {/* Estadísticas rápidas */}
+            {/* Estadísticas rápidas */}
           <div className="flex flex-wrap gap-4 mt-6 pt-6 border-t border-gray-200">
             <div className="flex items-center gap-2 text-sm text-gray-600">
               <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
@@ -241,22 +251,20 @@ const CanchasPage = () => {
         {/* Grid de Canchas */}
         {filteredCanchas.length === 0 ? (
           <div className="text-center py-16 bg-white rounded-2xl shadow-lg border border-gray-100">
-            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-3xl">🏟️</span>
-            </div>
+            
             <h3 className="text-xl font-semibold text-gray-700 mb-2">
               {searchTerm ? "No se encontraron canchas" : "No hay canchas registradas"}
             </h3>
             <p className="text-gray-500 mb-6 max-w-md mx-auto">
               {searchTerm 
-                ? "No encontramos canchas que coincidan con tu búsqueda. Intenta con otros términos."
+                ? "No existen canchas que coincidan con tu búsqueda. Intenta con otros términos."
                 : "Comienza agregando la primera cancha a tu área deportiva."
               }
             </p>
             {!searchTerm && (
               <button
                 onClick={() => setShowWizard(true)}
-                className="px-8 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl hover:from-blue-600 hover:to-purple-700 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                className="px-8 py-3 bg-gradient-to-r from-black-500 to-gray-900 text-white rounded-xl hover:from-blue-600 hover:to-purple-700 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
               >
                 Crear Primera Cancha
               </button>
@@ -266,19 +274,12 @@ const CanchasPage = () => {
           <div>
             {/* Información de resultados */}
             <div className="flex justify-between items-center mb-6">
-              <p className="text-gray-600">
-                Mostrando <strong>{filteredCanchas.length}</strong> de <strong>{canchas.length}</strong> canchas
-                {searchTerm && (
-                  <span> para "<strong>{searchTerm}</strong>"</span>
-                )}
-              </p>
+              
               
               {searchTerm && (
                 <button
                   onClick={handleClearSearch}
-                  className="text-sm text-blue-600 hover:text-blue-800 font-medium"
                 >
-                  Ver todas las canchas
                 </button>
               )}
             </div>
