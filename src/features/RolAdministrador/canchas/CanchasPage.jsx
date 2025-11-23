@@ -5,6 +5,7 @@ import {
   updateCancha,
   createCancha,
   deleteCancha,
+  agregarImagenesCancha,
 } from "../../../api/CanchaApi";
 import { useAuth } from "../../../auth/hooks/useAuth";
 import BuscadorCanchas from "./components/components_cancha/BuscadorCanchas";
@@ -20,7 +21,13 @@ const CanchasPage = () => {
   const [editingId, setEditingId] = useState(null);
   const [editedData, setEditedData] = useState({});
   const [err, setErr] = useState(null);
-  const [showForm, setShowForm] = useState(false);
+
+  // Wizard states
+  const [showWizard, setShowWizard] = useState(false);
+  const [wizardStep, setWizardStep] = useState(1);
+  const [createdCanchaId, setCreatedCanchaId] = useState(null);
+  const [imagenes, setImagenes] = useState([]);
+
   const [newCancha, setNewCancha] = useState({
     nombre: "",
     costoHora: 50,
@@ -123,6 +130,7 @@ const CanchasPage = () => {
     }
   };
 
+  // Paso 1: Crear cancha
   const handleCrearCancha = async () => {
     if (!idArea) return;
     const payload = { ...newCancha, idAreadeportiva: idArea };
@@ -131,23 +139,26 @@ const CanchasPage = () => {
       const creada = await createCancha(payload);
       setCanchas((prev) => [...prev, creada]);
       setFilteredCanchas((prev) => [...prev, creada]);
-      setShowForm(false);
-      setNewCancha({
-        nombre: "",
-        costoHora: 50,
-        capacidad: 25,
-        mantenimiento: "mensual",
-        horaInicio: "07:00",
-        horaFin: "22:00",
-        tipoSuperficie: "césped natural",
-        tamano: "40x60",
-        iluminacion: "halógena",
-        cubierta: "abierta",
-        urlImagen: "",
-        estado: true,
-      });
+      setCreatedCanchaId(creada.idCancha);
+      alert("✅ Cancha creada con éxito");
+      setWizardStep(2); // avanzar al paso 2
     } catch (error) {
       console.error("Error al crear cancha:", error);
+    }
+  };
+
+  // Paso 2: Subir imágenes
+  const handleUploadImages = async () => {
+    try {
+      const res = await agregarImagenesCancha(createdCanchaId, imagenes);
+      alert("✅ Imágenes subidas correctamente");
+      console.log(res.imagenes);
+      setShowWizard(false);
+      setWizardStep(1);
+      setCreatedCanchaId(null);
+      setImagenes([]);
+    } catch (error) {
+      console.error("Error al subir imágenes:", error);
     }
   };
 
@@ -155,10 +166,12 @@ const CanchasPage = () => {
   if (err) return <p className="text-center text-red-600">{err}</p>;
 
   return (
-    <div className="w-full px-6 py-8"
-    style={{
+    <div
+      className="w-full px-6 py-8"
+      style={{
         backgroundImage: `url('/Fondos/Deporte11.png')`,
-      }}>
+      }}
+    >
       {/* Buscador centrado */}
       <div className="max-w-5xl mx-auto flex items-center gap-4">
         <BuscadorCanchas
@@ -169,7 +182,7 @@ const CanchasPage = () => {
           onBuscar={handleSearch}
         />
         <button
-          onClick={() => setShowForm(true)}
+          onClick={() => setShowWizard(true)}
           className="px-4 py-2 bg-green-600 text-white rounded-full hover:bg-green-700 transition font-semibold text-sm"
         >
           Crear cancha
@@ -182,40 +195,74 @@ const CanchasPage = () => {
         </button>
       </div>
 
-      {/* Formulario de creación */}
-      {showForm && (
+      {/* Wizard de creación */}
+      {showWizard && (
         <div className="max-w-xl mx-auto mt-10 p-6 bg-white rounded-xl shadow-lg border border-gray-200">
-          <h2 className="text-lg font-bold mb-4 text-gray-800">Nueva Cancha</h2>
-          <div className="grid grid-cols-2 gap-4">
-            {Object.entries(newCancha).map(([key, value]) =>
-              key !== "estado" ? (
-                <input
-                  key={key}
-                  type="text"
-                  value={value}
-                  onChange={(e) =>
-                    setNewCancha((prev) => ({ ...prev, [key]: e.target.value }))
-                  }
-                  placeholder={key}
-                  className="border px-3 py-2 rounded text-sm"
-                />
-              ) : null
-            )}
-          </div>
-          <div className="flex justify-end gap-4 mt-6">
-            <button
-              onClick={() => setShowForm(false)}
-              className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 text-sm"
-            >
-              Cancelar
-            </button>
-            <button
-              onClick={handleCrearCancha}
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
-            >
-              Guardar cancha
-            </button>
-          </div>
+          {wizardStep === 1 && (
+            <>
+              <h2 className="text-lg font-bold mb-4 text-gray-800">Paso 1: Datos de la cancha</h2>
+              <div className="grid grid-cols-2 gap-4">
+                {Object.entries(newCancha).map(([key, value]) =>
+                  key !== "estado" ? (
+                    <input
+                      key={key}
+                      type="text"
+                      value={value}
+                      onChange={(e) =>
+                        setNewCancha((prev) => ({ ...prev, [key]: e.target.value }))
+                      }
+                      placeholder={key}
+                      className="border px-3 py-2 rounded text-sm"
+                    />
+                  ) : null
+                )}
+              </div>
+              <div className="flex justify-end gap-4 mt-6">
+                <button
+                  onClick={() => setShowWizard(false)}
+                  className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 text-sm"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleCrearCancha}
+                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
+                >
+                  Guardar cancha
+                </button>
+              </div>
+            </>
+              )}
+                    {wizardStep === 2 && (
+            <>
+              <h2 className="text-lg font-bold mb-4 text-gray-800">Paso 2: Subir imágenes</h2>
+              <input
+                type="file"
+                multiple
+                onChange={(e) => setImagenes(Array.from(e.target.files))}
+                className="border px-3 py-2 rounded text-sm w-full"
+              />
+              <div className="flex justify-end gap-4 mt-6">
+                <button
+                  onClick={() => {
+                    setShowWizard(false);
+                    setWizardStep(1);
+                    setCreatedCanchaId(null);
+                    setImagenes([]);
+                  }}
+                  className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 text-sm"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleUploadImages}
+                  className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm"
+                >
+                  Subir imágenes
+                </button>
+              </div>
+            </>
+          )}
         </div>
       )}
 
@@ -229,7 +276,7 @@ const CanchasPage = () => {
             ? "No se encontraron canchas que coincidan con la búsqueda."
             : "No hay canchas registradas para esta área."}
         </p>
-              ) : (
+      ) : (
         <div className="max-w-[1400px] mx-auto px-4">
           <section className="grid grid-cols-3 gap-12">
             {filteredCanchas.map((cancha) => (

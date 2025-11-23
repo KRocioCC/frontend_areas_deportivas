@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 const CanchaCard = ({
@@ -12,7 +12,75 @@ const CanchaCard = ({
   onDesactivar,
 }) => {
   const navigate = useNavigate();
+  const [imagenPrincipal, setImagenPrincipal] = useState("");
+  const [cargando, setCargando] = useState(true);
   const desactivada = cancha.estado === false;
+
+  // Construir URL base para las imágenes
+  const getUrlImagenCompleta = (urlAcceso) => {
+    if (!urlAcceso) return "https://placehold.co/600x400?text=Sin+Imagen";
+    
+    // Si la URL ya es completa, usarla directamente
+    if (urlAcceso.startsWith('http')) {
+      return urlAcceso;
+    }
+    
+    // Si es una ruta relativa, construir la URL completa
+    const baseUrl = 'http://localhost:8032';
+    return `${baseUrl}${urlAcceso.startsWith('/') ? urlAcceso : `/${urlAcceso}`}`;
+  };
+
+  // Procesar imágenes cuando cambia la cancha
+  useEffect(() => {
+    const procesarImagenes = () => {
+      if (!cancha) {
+        setImagenPrincipal("https://placehold.co/600x400?text=Sin+Imagen");
+        setCargando(false);
+        return;
+      }
+
+      console.log("📸 Imágenes de la cancha:", cancha.imagenes);
+      console.log("🎯 Cancha recibida:", cancha.nombre, "ID:", cancha.idCancha);
+
+      // Verificar si hay imágenes en la respuesta de la cancha
+      if (cancha.imagenes && cancha.imagenes.length > 0) {
+        const primeraImagen = cancha.imagenes[0];
+        console.log("🖼️ Primera imagen:", primeraImagen);
+        
+        // Usar urlAcceso para construir la URL completa
+        const urlImagen = getUrlImagenCompleta(primeraImagen.urlAcceso);
+        console.log("🔗 URL de imagen construida:", urlImagen);
+        
+        setImagenPrincipal(urlImagen);
+        
+        // Pre-cargar la imagen para verificar que funciona
+        const img = new Image();
+        img.onload = () => {
+          console.log("✅ Imagen cargada correctamente");
+          setCargando(false);
+        };
+        img.onerror = () => {
+          console.error("❌ Error al cargar la imagen, usando placeholder");
+          setImagenPrincipal("https://placehold.co/600x400?text=Error+Cargando");
+          setCargando(false);
+        };
+        img.src = urlImagen;
+      } else {
+        console.warn("⚠️ No hay imágenes en la respuesta de la cancha");
+        setImagenPrincipal("https://placehold.co/600x400?text=Sin+Imágenes");
+        setCargando(false);
+      }
+    };
+
+    procesarImagenes();
+  }, [cancha]);
+
+  // Función para cambiar la imagen principal
+  const cambiarImagenPrincipal = (imagen) => {
+    const urlImagen = getUrlImagenCompleta(imagen.urlAcceso);
+    console.log("🔄 Cambiando a imagen:", urlImagen);
+    setImagenPrincipal(urlImagen);
+  };
 
   const renderField = (label, field, isCurrency = false) => (
     <div className="flex items-center justify-between py-2 border-b border-gray-100">
@@ -33,14 +101,48 @@ const CanchaCard = ({
   );
 
   return (
-    <div className={`rounded-2xl shadow-lg transition-all duration-300 overflow-hidden flex flex-col h-[620px] w-full max-w-[420px] mx-auto border ${desactivada ? "bg-red-50 border-red-300" : "bg-white border-gray-100 hover:shadow-2xl"}`}>
-      {/* Imagen */}
+    <div className={`rounded-2xl shadow-lg transition-all duration-300 overflow-hidden flex flex-col h-[680px] w-full max-w-[420px] mx-auto border ${desactivada ? "bg-red-50 border-red-300" : "bg-white border-gray-100 hover:shadow-2xl"}`}>
+      
+      {/* Debug Info - Solo en desarrollo */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="bg-blue-50 p-2 text-xs border-b">
+          <div><strong>Cancha:</strong> {cancha.nombre} (ID: {cancha.idCancha})</div>
+          <div><strong>Imágenes encontradas:</strong> {cancha.imagenes ? cancha.imagenes.length : 0}</div>
+          <div><strong>Estado:</strong> {cargando ? '🔄 Cargando...' : '✅ Listo'}</div>
+        </div>
+      )}
+
+      {/* Imagen Principal */}
       <div className="h-[340px] w-full relative overflow-hidden">
-        <img
-          src={cancha.urlImagen || "https://placehold.co/600x400?text=Cancha"}
-          alt={cancha.nombre}
-          className={`w-full h-full object-cover transition-transform duration-500 ${desactivada ? "grayscale" : "hover:scale-105"}`}
-        />
+        {cargando ? (
+          <div className="w-full h-full flex flex-col items-center justify-center bg-gray-200">
+            <div className="text-gray-500 mb-2">Cargando imagen...</div>
+            <div className="text-xs text-gray-400">Cancha: {cancha.nombre}</div>
+          </div>
+        ) : (
+          <>
+            <img
+              src={imagenPrincipal}
+              alt={cancha.nombre}
+              className={`w-full h-full object-cover transition-transform duration-500 ${desactivada ? "grayscale" : "hover:scale-105"}`}
+              onLoad={() => console.log("✅ Imagen renderizada en el DOM")}
+              onError={(e) => {
+                console.error("❌ Error en la etiqueta img, usando placeholder");
+                e.target.src = "https://placehold.co/600x400?text=Error+Mostrando+Imagen";
+              }}
+            />
+            
+            {/* Indicador de múltiples imágenes */}
+            {cancha.imagenes && cancha.imagenes.length > 1 && (
+              <div className="absolute top-4 left-4">
+                <span className="px-2 py-1 bg-black/70 text-white text-xs rounded-full backdrop-blur-sm">
+                  {cancha.imagenes.length} imágenes
+                </span>
+              </div>
+            )}
+          </>
+        )}
+
         {!desactivada && (
           <div className="absolute top-4 right-4">
             {isEditing ? (
@@ -69,6 +171,36 @@ const CanchaCard = ({
           </div>
         )}
       </div>
+
+      {/* Miniaturas de imágenes (si hay más de una) */}
+      {cancha.imagenes && cancha.imagenes.length > 1 && (
+        <div className="p-3 bg-gray-50 border-b border-gray-100">
+          <div className="flex gap-2 overflow-x-auto">
+            {cancha.imagenes.map((imagen, index) => (
+              <button
+                key={imagen.idImagenRelacion || index}
+                className={`flex-shrink-0 w-12 h-12 rounded-lg overflow-hidden border-2 ${
+                  imagenPrincipal === getUrlImagenCompleta(imagen.urlAcceso) 
+                    ? "border-blue-500" 
+                    : "border-gray-300"
+                }`}
+                onClick={() => cambiarImagenPrincipal(imagen)}
+                title={`Imagen ${index + 1}`}
+              >
+                <img
+                  src={getUrlImagenCompleta(imagen.urlAcceso)}
+                  alt={`Miniatura ${index + 1}`}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    console.error("❌ Error en miniatura:", imagen.urlAcceso);
+                    e.target.src = "https://placehold.co/100x100?text=Error";
+                  }}
+                />
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Contenido */}
       <div className="p-6 flex flex-col justify-between flex-1">
@@ -117,29 +249,12 @@ const CanchaCard = ({
         <div className="mt-auto pt-4 border-t border-gray-100 space-y-3">
           {!desactivada && (
             <>
-              {/*<button
-                onClick={() => navigate(`/admin/cancha/${cancha.idCancha}`)}
-            className="w-full py-3 bg-[#41BFB3] text-white rounded-xl hover:bg-[#3aa9a0] transition-all duration-300 font-semibold text-sm shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-            >
-            Realizar Reserva
-            </button> */}
-
-            <button
-              onClick={() => navigate(`/admin/cancha/ver_reservas/${cancha.idCancha}`)}
-              className="w-full py-3 bg-[#a6b969] text-white rounded-xl hover:bg-[#3aa9a0] transition-all duration-300 font-semibold text-sm shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-          >
-              Ver Reservas
-          </button>
-
-
-
-{/* NO HAY ELIMINACION LOGICA EN EL BACKEND :=0 
               <button
-                onClick={() => onDesactivar(cancha.idCancha)}
-                className="w-full py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl hover:from-red-600 hover:to-red-700 transition-all duration-300 font-semibold text-sm shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                onClick={() => navigate(`/admin/cancha/ver_reservas/${cancha.idCancha}`)}
+                className="w-full py-3 bg-[#a6b969] text-white rounded-xl hover:bg-[#3aa9a0] transition-all duration-300 font-semibold text-sm shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
               >
-                Desactivar
-              </button> */}
+                Ver Reservas
+              </button>
             </>
           )}
         </div>
