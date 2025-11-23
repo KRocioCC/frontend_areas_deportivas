@@ -14,8 +14,7 @@ import {
   XCircle,
   RefreshCw,
   Filter,
-  Moon,
-  Sun,
+  ArrowUpDown
 } from "lucide-react";
 import { useAuth } from "../../../auth/hooks/useAuth";
 import { useTheme } from "../../../context/ThemeContext";
@@ -44,7 +43,7 @@ const ESTADO_TEXTO = {
 //aqui es donde me falta filtro de estado por fecha  es que debe ser de un solo clienyte
 export default function HistorialReservaCli() {
   const { user } = useAuth();
-  const { isDarkMode, toggleDarkMode } = useTheme();
+  const { isDarkMode } = useTheme();
   const idCliente = user?.idPersona;
 
   const [reservas, setReservas] = useState([]);
@@ -52,7 +51,8 @@ export default function HistorialReservaCli() {
   const [fechaInicio, setFechaInicio] = useState("");
   const [fechaFin, setFechaFin] = useState("");
   const [loading, setLoading] = useState(true);
-
+  const [ordenFecha, setOrdenFecha] = useState("desc")
+  const [reservasFiltradas, setReservasFiltradas] = useState([]);
   const navigate = useNavigate();
 
 
@@ -68,6 +68,24 @@ export default function HistorialReservaCli() {
       setLoading(false);
     }
   }, [idCliente, filtroEstado, fechaInicio, fechaFin]);
+
+  useEffect(() => {
+    let lista = [...reservas];
+
+    // Aplicar filtro de estado (si no es TODOS)
+    if (filtroEstado !== "TODOS") {
+      lista = lista.filter(r => r.estadoReserva === filtroEstado);
+    }
+
+    // Ordenar por fecha
+    lista.sort((a, b) => {
+      const fechaA = new Date(a.fechaReserva);
+      const fechaB = new Date(b.fechaReserva);
+      return ordenFecha === "desc" ? fechaB - fechaA : fechaA - fechaB;
+    });
+
+    setReservasFiltradas(lista);
+  }, [reservas, filtroEstado, ordenFecha]);
 
   const cargarReservas = async () => {
     try {
@@ -98,17 +116,28 @@ export default function HistorialReservaCli() {
   const getAccionesPorEstado = (estado) => {
     switch (estado) {
       case "PENDIENTE":
-        return ["QR", "Pagar", "Detalle", "Invitados", "Reprogramar", "Cancelar"];
+        return ["QR", "Pagar", "Detalle", "Reprogramar", "Cancelar"];
       case "CONFIRMADA":
-        return ["QR", "Detalle", "Invitados", "Cancelar"];
+        return ["QR", "Detalle", "Invitados", "Pagar"];
       case "EN_CURSO":
       case "COMPLETADA":
-        return ["QR", "Detalle", "Invitados"];
+        return ["QR", "Detalle", "Invitados","Pagar"];
       case "CANCELADA":
         return ["Detalle"];
       default:
         return ["Detalle"];
     }
+  };
+
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-black">
+        <p className="text-gray-700 dark:text-gray-300">Debes iniciar sesión para ver tus reservas.</p>
+      </div>
+    );
+  }
+  const toggleOrdenFecha = () => {
+    setOrdenFecha(prev => prev === "desc" ? "asc" : "desc");
   };
 
   if (!user) {
@@ -151,16 +180,6 @@ export default function HistorialReservaCli() {
                 reprogramar o cancelar según el estado de cada una.
               </p>
             </div>
-            <button
-              onClick={toggleDarkMode}
-              className="fixed bottom-6 right-6 z-50 p-4 rounded-full transition-all hover:scale-110"
-              style={{
-                backgroundColor: isDarkMode ? "#2C7366" : "#d40000",
-                color: "#FFFFFF",
-              }}
-            >
-              {isDarkMode ? <Sun className="w-6 h-6" /> : <Moon className="w-6 h-6" />}
-            </button>
           </div>
         </div>
       </div>
@@ -257,7 +276,20 @@ export default function HistorialReservaCli() {
                   style={{ border: "1px solid transparent", outline: "none" }}
                 />
               </div>
+
+              <button
+              onClick={toggleOrdenFecha}
+              className={`flex items-center gap-2 px-5 py-2 rounded-xl font-medium transition-all
+                ${isDarkMode ? "bg-[#141717] hover:bg-[#1c2021]" : "bg-gray-100 hover:bg-gray-200"}
+              `}
+              style={{ color: isDarkMode ? "#a0d9cd" : "#2C7366" }}
+            >
+              <ArrowUpDown className="w-4 h-4" />
+              Orden: {ordenFecha === "desc" ? "Más recientes primero" : "Más antiguas primero"}
+            </button>
+
             </div>
+
           </div>
         </div>
 
