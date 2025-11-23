@@ -1,26 +1,56 @@
-import React, { useState } from 'react';
-import { createCancha, agregarImagenesCancha } from '../../../api/ReservaApi';
-import { X, Upload, CheckCircle, ArrowRight, ArrowLeft } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { createCancha, agregarImagenesCancha } from '../../../api/CanchaApi';
+import { getAreadeportivaPorAdminId } from '../../../api/AreadeportivaApi';
+import { useAuth } from '../../../auth/hooks/useAuth';
 
 export default function WizardCrearCancha({ isOpen, onClose, onCanchaCreada }) {
+  const { currentUser } = useAuth();
   const [step, setStep] = useState(1);
   const [canchaId, setCanchaId] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [idAreaDeportiva, setIdAreaDeportiva] = useState(null);
+  const [areaCargando, setAreaCargando] = useState(true);
   const [formData, setFormData] = useState({
     nombre: '',
     costoHora: '',
     capacidad: '',
-    idAreadeportiva: '',
     horaInicio: '',
     horaFin: '',
     tipoSuperficie: 'césped natural',
     tamano: '',
     iluminacion: 'halógena',
     cubierta: 'abierta',
-    mantenimiento: 'mensual'
+    mantenimiento: 'mensual',
+    estado: true
   });
   const [imagenes, setImagenes] = useState([]);
-  const [uploadProgress, setUploadProgress] = useState(0);
+
+  // Cargar el área deportiva del administrador automáticamente
+  useEffect(() => {
+    const cargarAreaDeportiva = async () => {
+      if (!currentUser?.idPersona) return;
+      
+      try {
+        setAreaCargando(true);
+        const area = await getAreadeportivaPorAdminId(currentUser.idPersona);
+        if (area?.idAreadeportiva) {
+          setIdAreaDeportiva(area.idAreadeportiva);
+          console.log("Área deportiva cargada:", area.idAreadeportiva);
+        } else {
+          console.error(" No se pudo obtener el área deportiva");
+        }
+
+      } catch (error) {
+        console.error("Error al cargar área deportiva:", error);
+      } finally {
+        setAreaCargando(false);
+      }
+    };
+
+    if (isOpen) {
+      cargarAreaDeportiva();
+    }
+  }, [currentUser, isOpen]);
 
   if (!isOpen) return null;
 
@@ -30,7 +60,12 @@ export default function WizardCrearCancha({ isOpen, onClose, onCanchaCreada }) {
 
   const handleCreateCancha = async () => {
     if (!formData.nombre || !formData.costoHora || !formData.capacidad) {
-      alert('⚠️ Por favor completa los campos obligatorios');
+      alert(' Por favor completa los campos obligatorios');
+      return;
+    }
+
+    if (!idAreaDeportiva) {
+      alert(' No se pudo identificar el área deportiva. Contacta al administrador.');
       return;
     }
 
@@ -40,14 +75,15 @@ export default function WizardCrearCancha({ isOpen, onClose, onCanchaCreada }) {
         ...formData,
         costoHora: parseFloat(formData.costoHora),
         capacidad: parseInt(formData.capacidad),
-        estado: true
+        idAreadeportiva: idAreaDeportiva // Se agrega automáticamente
       };
       
+      console.log("Creando cancha con datos:", canchaData);
       const res = await createCancha(canchaData);
       setCanchaId(res.idCancha);
       setStep(2);
     } catch (err) {
-      alert('❌ Error al crear la cancha: ' + (err.response?.data?.message || err.message));
+      alert(' Error al crear la cancha: ' + (err.response?.data?.message || err.message));
     } finally {
       setLoading(false);
     }
@@ -55,38 +91,19 @@ export default function WizardCrearCancha({ isOpen, onClose, onCanchaCreada }) {
 
   const handleUploadImages = async () => {
     if (imagenes.length === 0) {
-      alert('⚠️ Por favor selecciona al menos una imagen');
+      alert(' Por favor selecciona al menos una imagen');
       return;
     }
 
     setLoading(true);
-    setUploadProgress(0);
     
     try {
-      // Simular progreso de upload
-      const progressInterval = setInterval(() => {
-        setUploadProgress(prev => {
-          if (prev >= 90) {
-            clearInterval(progressInterval);
-            return 90;
-          }
-          return prev + 10;
-        });
-      }, 200);
-
       await agregarImagenesCancha(canchaId, imagenes);
-      
-      clearInterval(progressInterval);
-      setUploadProgress(100);
-      
-      setTimeout(() => {
-        alert('🎉 Cancha creada exitosamente con imágenes');
-        onCanchaCreada?.();
-        handleClose();
-      }, 500);
-      
+      alert('🎉 Cancha creada exitosamente con ' + imagenes.length + ' imágenes');
+      onCanchaCreada?.();
+      handleClose();
     } catch (err) {
-      alert('❌ Error al subir imágenes: ' + (err.response?.data?.message || err.message));
+      alert(' Error al subir imágenes: ' + (err.response?.data?.message || err.message));
     } finally {
       setLoading(false);
     }
@@ -99,22 +116,23 @@ export default function WizardCrearCancha({ isOpen, onClose, onCanchaCreada }) {
       nombre: '',
       costoHora: '',
       capacidad: '',
-      idAreadeportiva: '',
       horaInicio: '',
       horaFin: '',
       tipoSuperficie: 'césped natural',
       tamano: '',
       iluminacion: 'halógena',
       cubierta: 'abierta',
-      mantenimiento: 'mensual'
+      mantenimiento: 'mensual',
+      estado: true
     });
     setImagenes([]);
-    setUploadProgress(0);
     onClose();
   };
 
   const handleFileSelect = (e) => {
     const files = Array.from(e.target.files);
+    console.log("Archivos seleccionados:", files.length);
+    
     // Validar tipos de archivo
     const validFiles = files.filter(file => 
       file.type.startsWith('image/') && 
@@ -128,11 +146,38 @@ export default function WizardCrearCancha({ isOpen, onClose, onCanchaCreada }) {
     setImagenes(validFiles);
   };
 
+  // Función para eliminar una imagen específica
+  const handleRemoveImage = (indexToRemove) => {
+    setImagenes(prev => prev.filter((_, index) => index !== indexToRemove));
+  };
+
+  // Función para arrastrar y soltar
+  const handleDrop = (e) => {
+    e.preventDefault();
+    const files = Array.from(e.dataTransfer.files);
+    const validFiles = files.filter(file => 
+      file.type.startsWith('image/') && 
+      file.size <= 5 * 1024 * 1024
+    );
+    
+    if (validFiles.length > 0) {
+      setImagenes(prev => [...prev, ...validFiles]);
+    }
+    
+    if (validFiles.length !== files.length) {
+      alert('⚠️ Algunos archivos no son imágenes válidas o son muy grandes (máx 5MB)');
+    }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+  };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden">
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-6 text-white relative">
+        <div className="bg-black p-6 text-white relative">
           <h2 className="text-2xl font-bold text-center">
             Crear Nueva Cancha
           </h2>
@@ -140,7 +185,7 @@ export default function WizardCrearCancha({ isOpen, onClose, onCanchaCreada }) {
             onClick={handleClose}
             className="absolute right-4 top-4 p-2 hover:bg-white hover:bg-opacity-20 rounded-full transition-all"
           >
-            <X size={24} />
+            ✕
           </button>
           
           {/* Progress Steps */}
@@ -149,7 +194,7 @@ export default function WizardCrearCancha({ isOpen, onClose, onCanchaCreada }) {
               <div className={`flex items-center justify-center w-10 h-10 rounded-full border-2 ${
                 step >= 1 ? 'bg-white text-blue-600 border-white' : 'border-white text-white'
               } font-semibold`}>
-                {step > 1 ? <CheckCircle size={20} /> : '1'}
+                {step > 1 ? '✓' : '1'}
               </div>
               <div className={`w-16 h-1 ${
                 step >= 2 ? 'bg-white' : 'bg-white bg-opacity-30'
@@ -157,7 +202,7 @@ export default function WizardCrearCancha({ isOpen, onClose, onCanchaCreada }) {
               <div className={`flex items-center justify-center w-10 h-10 rounded-full border-2 ${
                 step >= 2 ? 'bg-white text-blue-600 border-white' : 'border-white text-white'
               } font-semibold`}>
-                {step > 2 ? <CheckCircle size={20} /> : '2'}
+                {step > 2 ? '✓' : '2'}
               </div>
             </div>
           </div>
@@ -205,20 +250,20 @@ export default function WizardCrearCancha({ isOpen, onClose, onCanchaCreada }) {
                     type="number"
                     value={formData.capacidad}
                     onChange={handleChange}
-                    placeholder="Ej: 20"
+                    placeholder="Ej: 20 personas"
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    ID Área Deportiva
+                    Tamaño
                   </label>
                   <input
-                    name="idAreadeportiva"
-                    value={formData.idAreadeportiva}
+                    name="tamano"
+                    value={formData.tamano}
                     onChange={handleChange}
-                    placeholder="Ej: 1"
+                    placeholder="Ej: 40x20 metros"
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                   />
                 </div>
@@ -269,21 +314,6 @@ export default function WizardCrearCancha({ isOpen, onClose, onCanchaCreada }) {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Tamaño
-                  </label>
-                  <input
-                    name="tamano"
-                    value={formData.tamano}
-                    onChange={handleChange}
-                    placeholder="Ej: 40x20 metros"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Tipo de Iluminación
                   </label>
                   <select
@@ -313,6 +343,30 @@ export default function WizardCrearCancha({ isOpen, onClose, onCanchaCreada }) {
                     <option value="cubierta">Cubierta</option>
                   </select>
                 </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Mantenimiento
+                  </label>
+                  <select
+                    name="mantenimiento"
+                    value={formData.mantenimiento}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  >
+                    <option value="diario">Diario</option>
+                    <option value="semanal">Semanal</option>
+                    <option value="mensual">Mensual</option>
+                    <option value="trimestral">Trimestral</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Campos obligatorios info */}
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                <p className="text-yellow-800 text-sm flex items-center">
+                  Por favor llene todos los campos <span className="text-red-500 mx-1"></span> 
+                </p>
               </div>
             </div>
           )}
@@ -321,16 +375,21 @@ export default function WizardCrearCancha({ isOpen, onClose, onCanchaCreada }) {
           {step === 2 && (
             <div className="space-y-6">
               <div className="text-center">
-                <Upload size={48} className="mx-auto text-gray-400 mb-4" />
+                <div className="text-4xl mb-4">📸</div>
                 <h3 className="text-xl font-semibold text-gray-800 mb-2">
                   Subir Imágenes de la Cancha
                 </h3>
                 <p className="text-gray-600">
-                  Selecciona las imágenes que mostrarán tu cancha (máx. 5MB por imagen)
+                  Selecciona múltiples imágenes para mostrar tu cancha (máx. 5MB por imagen)
                 </p>
               </div>
 
-              <div className="border-2 border-dashed border-gray-300 rounded-2xl p-8 text-center hover:border-blue-400 transition-all">
+              {/* Área de subida mejorada */}
+              <div 
+                className="border-2 border-dashed border-gray-300 rounded-2xl p-8 text-center hover:border-blue-400 transition-all bg-gray-50"
+                onDrop={handleDrop}
+                onDragOver={handleDragOver}
+              >
                 <input
                   type="file"
                   multiple
@@ -343,49 +402,76 @@ export default function WizardCrearCancha({ isOpen, onClose, onCanchaCreada }) {
                   htmlFor="file-upload"
                   className="cursor-pointer block"
                 >
-                  <Upload size={32} className="mx-auto text-gray-400 mb-3" />
-                  <span className="text-blue-600 font-medium">
+                  <div className="text-3xl mb-3">📁</div>
+                  <span className="text-blue-600 font-medium text-lg">
                     Haz clic para seleccionar imágenes
                   </span>
-                  <p className="text-sm text-gray-500 mt-1">
-                    o arrastra y suelta aquí
+                  <p className="text-sm text-gray-500 mt-2">
+                    Puedes seleccionar múltiples imágenes manteniendo presionada la tecla Ctrl (Windows) o Cmd (Mac)
                   </p>
+                  <p className="text-xs text-gray-400 mt-1">
+                    o arrastra y suelta las imágenes aquí
+                  </p>
+                  <div className="mt-4 flex justify-center space-x-2">
+                    <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">JPG</span>
+                    <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">PNG</span>
+                    <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">WEBP</span>
+                  </div>
                 </label>
+              </div>
+
+              {/* Instrucciones adicionales */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h4 className="font-medium text-blue-800 text-sm mb-2">💡 Cómo seleccionar múltiples imágenes:</h4>
+                <ul className="text-blue-700 text-sm space-y-1">
+                  <li>• <strong>Windows:</strong> Mantén presionada la tecla <kbd className="px-1 bg-white border rounded">Ctrl</kbd> y haz clic en cada imagen</li>
+                  <li>• <strong>Mac:</strong> Mantén presionada la tecla <kbd className="px-1 bg-white border rounded">Cmd</kbd> y haz clic en cada imagen</li>
+                  <li>• <strong>También puedes:</strong> Arrastrar y soltar múltiples imágenes al área de arriba</li>
+                </ul>
               </div>
 
               {/* Preview de imágenes seleccionadas */}
               {imagenes.length > 0 && (
-                <div>
-                  <h4 className="font-medium text-gray-700 mb-3">
-                    Imágenes seleccionadas ({imagenes.length})
-                  </h4>
-                  <div className="grid grid-cols-3 gap-3">
+                <div className="border border-gray-200 rounded-xl p-4 bg-white">
+                  <div className="flex justify-between items-center mb-3">
+                    <h4 className="font-medium text-gray-700">
+                      Imágenes seleccionadas ({imagenes.length})
+                    </h4>
+                    <button
+                      onClick={() => setImagenes([])}
+                      className="text-sm text-red-600 hover:text-red-800 font-medium"
+                    >
+                      Eliminar todas
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                     {imagenes.map((file, index) => (
-                      <div key={index} className="relative group">
+                      <div key={index} className="relative group border border-gray-200 rounded-lg overflow-hidden">
                         <img
                           src={URL.createObjectURL(file)}
                           alt={`Preview ${index + 1}`}
-                          className="w-full h-24 object-cover rounded-lg"
+                          className="w-full h-24 object-cover"
                         />
-                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all rounded-lg" />
+                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all flex items-center justify-center">
+                          <button
+                            onClick={() => handleRemoveImage(index)}
+                            className="opacity-0 group-hover:opacity-100 bg-red-500 text-white p-1 rounded-full transition-all transform scale-0 group-hover:scale-100"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                        <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white text-xs p-1 text-center">
+                          {file.name.length > 20 ? file.name.substring(0, 20) + '...' : file.name}
+                        </div>
                       </div>
                     ))}
                   </div>
-                </div>
-              )}
-
-              {/* Barra de progreso */}
-              {uploadProgress > 0 && (
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm text-gray-600">
-                    <span>Subiendo imágenes...</span>
-                    <span>{uploadProgress}%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div
-                      className="bg-green-500 h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${uploadProgress}%` }}
-                    ></div>
+                  
+                  {/* Información del upload */}
+                  <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <p className="text-green-700 text-sm text-center">
+                      ✅ Listo para subir {imagenes.length} imagen{imagenes.length !== 1 ? 'es' : ''}
+                    </p>
                   </div>
                 </div>
               )}
@@ -406,15 +492,15 @@ export default function WizardCrearCancha({ isOpen, onClose, onCanchaCreada }) {
                 </button>
                 <button
                   onClick={handleCreateCancha}
-                  disabled={loading}
-                  className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all font-medium flex items-center space-x-2 disabled:opacity-50"
+                  disabled={loading || areaCargando || !idAreaDeportiva}
+                  className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all font-medium flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? (
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                   ) : (
                     <>
                       <span>Continuar</span>
-                      <ArrowRight size={20} />
+                      <span>→</span>
                     </>
                   )}
                 </button>
@@ -425,7 +511,7 @@ export default function WizardCrearCancha({ isOpen, onClose, onCanchaCreada }) {
                   onClick={() => setStep(1)}
                   className="px-6 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-100 transition-all font-medium flex items-center space-x-2"
                 >
-                  <ArrowLeft size={20} />
+                  <span>←</span>
                   <span>Atrás</span>
                 </button>
                 <button
@@ -437,8 +523,8 @@ export default function WizardCrearCancha({ isOpen, onClose, onCanchaCreada }) {
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                   ) : (
                     <>
-                      <Upload size={20} />
-                      <span>Finalizar</span>
+                      <span>📤</span>
+                      <span>Subir {imagenes.length} imagen{imagenes.length !== 1 ? 'es' : ''}</span>
                     </>
                   )}
                 </button>

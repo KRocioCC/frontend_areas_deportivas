@@ -39,13 +39,13 @@ const CanchaCard = ({
         return;
       }
 
-      console.log("📸 Imágenes de la cancha:", cancha.imagenes);
-      console.log("🎯 Cancha recibida:", cancha.nombre, "ID:", cancha.idCancha);
+      console.log(" Imágenes de la cancha:", cancha.imagenes);
+      console.log(" Cancha recibida:", cancha.nombre, "ID:", cancha.idCancha);
 
       // Verificar si hay imágenes en la respuesta de la cancha
       if (cancha.imagenes && cancha.imagenes.length > 0) {
         const primeraImagen = cancha.imagenes[0];
-        console.log("🖼️ Primera imagen:", primeraImagen);
+        console.log(" Primera imagen:", primeraImagen);
         
         // Usar urlAcceso para construir la URL completa
         const urlImagen = getUrlImagenCompleta(primeraImagen.urlAcceso);
