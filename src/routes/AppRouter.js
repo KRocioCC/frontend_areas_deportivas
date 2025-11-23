@@ -51,12 +51,11 @@ import Inicio from "../features/RolCliente/Inicio/InicioCli.jsx";
 import Areadeportiva from "../features/RolCliente/AreaDeportiva/AreaDeportiva.jsx"
 import Cancha from "../features/RolCliente/Canchas/Cancha.jsx"
 import CanchaDetalle from "../features/RolCliente/Canchas/CanchaDetalle.jsx"
-//import HistorialReserva from "../feature/RolCliente/Areadeportiva/HistorialReserva/HistorialReserva";
+import HistorialReserva from "../features/RolCliente/HistorialReserva/HistorialReservaCli.jsx";
 //import Notificaciones from "../feature/RolCliente/Notificaciones/Notificaciones"; // si existe
 //import HistorialReserva from "../feature/RolCliente/Areadeportiva/HistorialReserva/HistorialReserva";
 //import Notificaciones from "../feature/RolCliente/Notificaciones/Notificaciones"; // si existe
 import ReservaPage from "../features/RolCliente/Reserva/ReservaPage22.jsx";
-import ConfirmacionFinalReservaHorario from "../features/RolCliente/Reserva/ConfirmacionFinal.jsx";
 import ReservaCliente from "../features/RolCliente/Reserva/ReservaCliente.jsx";
 
 import ReservaConfirmacion from "../features/RolCliente/Reserva/ReservaConfirmacion.jsx";
@@ -64,6 +63,9 @@ import ReservaConfirmacion from "../features/RolCliente/Reserva/ReservaConfirmac
 import Calendar from "../features/RolAdministrador/calendar/Calendar";
 import ComoFunciona from "../features/RolCliente/Inicio/ComoFunciona.jsx";
 import SistemaQR from "../features/RolCliente/Inicio/SistemaQR.jsx";
+//import PaymentPage from "../features/RolCliente/Pagos/PaymentPage.jsx";
+import ListPagosPage from "../features/RolCliente/Pagos/ListaPagosPage.jsx";
+import RealizarPagoPage from "../features/RolCliente/Pagos/RealizarPagoPage.jsx";
 
 function AppRouter() {
 
@@ -101,11 +103,8 @@ function AppRouter() {
         <Routes>
           
           {/* Redirección por defecto → inicio */}
-          {/* Ruta pública: inicio */}
           <Route path="/" element={<Navigate to="/inicio" replace />} />
 
-          {/* Redirección por defecto → login */}
-          {/*<Route path="/" element={<Navigate to="/login" replace />} />*/}
 
           {/* Rutas de autenticación públicas */}
           <Route path="/login" element={<Login />} />
@@ -200,29 +199,42 @@ function AppRouter() {
                 </LayoutCliente>
               </ProtectedRoute>
             }
-          />
+          />        
 
-          <Route
-            path="/cliente/reservas/confirmacion/:id"
-            element={
-              <ProtectedRoute requireCliente>
-                <LayoutCliente>
-                  <ConfirmacionFinalReservaHorario />
-                </LayoutCliente>
-              </ProtectedRoute>
-            }
-          />
-
-            
-
-            {/*  <Route
-              path="/reservas/historial"
+             <Route
+              path="/reservas/mihistorial"
               element={
-                <ProtectedRoute>
-                  <HistorialReserva />
+                <ProtectedRoute requireCliente>
+                  <LayoutCliente>
+                    <HistorialReserva />
+                  </LayoutCliente>
                 </ProtectedRoute>
               }
             />
+
+            <Route
+              path="/reservas/pagos/:idReserva/listar"
+              element={
+                <ProtectedRoute requireCliente>
+                  <LayoutCliente>
+                    <ListPagosPage />
+                  </LayoutCliente>
+                </ProtectedRoute>
+              }
+            />
+
+             <Route
+              path="/reservas/pagos/:idReserva/pagar"
+              element={
+                <ProtectedRoute requireCliente>
+                  <LayoutCliente>
+                    <RealizarPagoPage />
+                  </LayoutCliente>
+                </ProtectedRoute>
+              }
+            />
+
+            {/*
             <Route
               path="/notificaciones"
               element={
@@ -230,7 +242,7 @@ function AppRouter() {
                   <Notificaciones />
                 </ProtectedRoute>
               }
-            />
+            />*/}
 
           {/* Ruta accesible para cualquier usuario autenticado */}
           <Route

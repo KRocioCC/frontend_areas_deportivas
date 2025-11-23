@@ -95,3 +95,7 @@
 .hover\:shadow-3xl:hover {
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
 }
+/*esto es para poner modo oscuro*/
+html.dark {
+  color-scheme: dark;
+}

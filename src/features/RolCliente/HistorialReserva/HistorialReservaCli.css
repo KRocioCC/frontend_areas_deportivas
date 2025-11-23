@@ -1,0 +1,63 @@
+.historial-reservas {
+  max-width: 900px;
+  margin: auto;
+  padding: 50px;
+}
+
+.filtros {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.filtros button {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: none;
+  background: var(--color-p-4);
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.filtros button.activo {
+  background: var(--color-p-5);
+  color: white;
+}
+
+.reserva-card {
+  background: #fff;
+  border: 1px solid #ccc;
+  padding: 18px;
+  border-radius: 12px;
+  margin-bottom: 18px;
+  position: relative;
+}
+
+.estado-punto {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  position: absolute;
+  top: 15px;
+  right: 15px;
+}
+
+.botones {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.botones button {
+  padding: 6px 12px;
+  border: none;
+  background: var(--color-p-3);
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.botones .cancelar {
+  background: var(--color-p-1);
+}
