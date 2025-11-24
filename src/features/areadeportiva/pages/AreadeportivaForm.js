@@ -1,11 +1,12 @@
 import React, { useEffect, useState, useMemo } from "react";
 import Button from "../../../components/ui/Button";
 import { Plus, X, Upload } from "lucide-react";
-import api from '../../../api/api'; // Tu instancia de Axios
+import api from '../../../api/api';
 import './Areadeportiva.css';
 
 import * as ZonaService from "../../../api/ZonaApi";
 import * as AdministradorService from "../../../api/administradorApi";
+
 // Configuración de ruta base para imágenes
 const BASE_URL_IMG = "http://localhost:8032/"; 
 
@@ -43,8 +44,8 @@ export default function AreadeportivaForm({
   const [administradores, setAdministradores] = useState([]); // Lista de administradores
   const [loadingData, setLoadingData] = useState(false);
   const [errors, setErrors] = useState({});
-
   const [selectedFiles, setSelectedFiles] = useState([]);
+
   // Cargar zonas y administradores al montar el componente
   useEffect(() => {
     const loadData = async () => {
@@ -167,17 +168,35 @@ export default function AreadeportivaForm({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
           <div>
             <label className="block text-sm font-medium">Zona</label>
-            <select value={idZona ?? ''} onChange={e => setIdZona(Number(e.target.value))} disabled={readonly} className="w-full border p-2 rounded">
+            <select 
+              value={idZona ?? ''} 
+              onChange={e => setIdZona(Number(e.target.value))} 
+              disabled={readonly || loadingData}
+              className="w-full border p-2 rounded"
+            >
               <option value="">Seleccione una zona</option>
-              {zonas.map(z => <option key={z.idZona} value={z.idZona}>{z.nombre}</option>)}
+              {loadingData ? (
+                <option value="" disabled>Cargando zonas...</option>
+              ) : (
+                zonas.map(z => <option key={z.idZona} value={z.idZona}>{z.nombre}</option>)
+              )}
             </select>
             {errors.idZona && <div className="text-red-500 text-sm">{errors.idZona}</div>}
           </div>
           <div>
             <label className="block text-sm font-medium">Administrador</label>
-            <select value={id ?? ''} onChange={e => setId(Number(e.target.value))} disabled={readonly} className="w-full border p-2 rounded">
+            <select 
+              value={id ?? ''} 
+              onChange={e => setId(Number(e.target.value))} 
+              disabled={readonly || loadingData}
+              className="w-full border p-2 rounded"
+            >
               <option value="">Seleccione un administrador</option>
-              {administradores.map(a => <option key={a.id} value={a.id}>{a.nombre}</option>)}
+              {loadingData ? (
+                <option value="" disabled>Cargando administradores...</option>
+              ) : (
+                administradores.map(a => <option key={a.id} value={a.id}>{a.nombre}</option>)
+              )}
             </select>
             {errors.id && <div className="text-red-500 text-sm">{errors.id}</div>}
           </div>
@@ -241,44 +260,6 @@ export default function AreadeportivaForm({
           </div>
       </div>
 
-            <div className="form-row">
-        <label>Zona</label>
-        <select 
-          value={idZona ?? ''} 
-          onChange={e => setIdZona(Number(e.target.value))}
-          disabled={readonly || loadingData}
-          aria-readonly={readonly} 
-        >
-          <option value="">Seleccione una zona</option>
-          {loadingData ? (
-            <option value="" disabled>Cargando zonas...</option>
-          ) : (
-            zonas.map(z => (
-              <option key={z.idZona} value={z.idZona}>{z.nombre}</option>
-            ))
-          )}
-        </select>
-        {errors.idZona && <div className="form-error">{errors.idZona}</div>}
-      </div>
-
-      <div className="form-row">
-        <label>Administrador</label>
-        <select 
-          value={id ?? ''} 
-          onChange={e => setId(Number(e.target.value))}
-          disabled={readonly || loadingData}
-          aria-readonly={readonly} 
-        >
-          <option value="">Seleccione un administrador</option>
-          {loadingData ? (
-            <option value="" disabled>Cargando administradores...</option>
-          ) : (
-            administradores.map(a => (
-              <option key={a.id} value={a.id}>{a.nombre}</option>
-            ))
-          )}
-        </select>
-        {errors.id && <div className="form-error">{errors.id}</div>}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
           <div>
             <label className="block text-sm font-medium">Hora Inicio</label>
