@@ -2,16 +2,16 @@
 import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { getAreadeportivaActivos } from "../../../api/AreadeportivaApi";
-//import AreaModal from "./AreaModal";
 import AreaCard from "./AreaCard";
 import "./AreaDeportiva.css";
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
-
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { lazy, Suspense } from "react";
+import { useTheme } from "../../../context/ThemeContext";
 
 const AreaModal = lazy(() => import("./AreaModal"));
 
 export default function Areadeportiva() {
+  const { isDarkMode } = useTheme();
   const [areas, setAreas] = useState([]);
   const [selectedArea, setSelectedArea] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -21,21 +21,18 @@ export default function Areadeportiva() {
   const pausedRef = useRef(false);
   const resumeTimeoutRef = useRef(null);
   const autoIntervalRef = useRef(null);
-  //sirve para pausar y despue svover  ala animaciona utoscroll
+
   const pauseAuto = () => {
     pausedRef.current = true;
     if (resumeTimeoutRef.current) clearTimeout(resumeTimeoutRef.current);
-    // reanudar automáticamente 5s después de la última interacción
     resumeTimeoutRef.current = setTimeout(() => {
       pausedRef.current = false;
-      resumeTimeoutRef.current = null;
     }, 5000);
   };
 
   const manualNavigate = (newIndex) => {
     pauseAuto();
     setCurrentIndex(newIndex);
-    
     const g = galleryRef.current;
     if (!g) return;
     const child = g.children[newIndex];
@@ -43,20 +40,15 @@ export default function Areadeportiva() {
       const containerWidth = g.offsetWidth;
       const childLeft = child.offsetLeft;
       const childWidth = child.offsetWidth;
-      
       const scrollPosition = childLeft - (containerWidth / 2) + (childWidth / 2);
-      
-      g.scrollTo({
-        left: scrollPosition,
-        behavior: 'smooth'
-      });
+      g.scrollTo({ left: scrollPosition, behavior: 'smooth' });
     }
   };
 
   const next = () => {
     const total = areas.length;
     if (total === 0) return;
-    manualNavigate((currentIndex + 1) % total); //si llega al ultimo volver a al aprimera iamgen
+    manualNavigate((currentIndex + 1) % total);
   };
 
   const prev = () => {
@@ -79,65 +71,64 @@ export default function Areadeportiva() {
     fetchAreas();
   }, []);
 
-  // Auto-scroll cada 5 segundos (pausable tras interacción y hover)
   useEffect(() => {
     if (!areas || areas.length <= 1) return;
-
     if (autoIntervalRef.current) clearInterval(autoIntervalRef.current);
-
     autoIntervalRef.current = setInterval(() => {
       if (!pausedRef.current) {
         setCurrentIndex((prev) => (prev + 1) % areas.length);
       }
     }, 4000);
-
     return () => {
       if (autoIntervalRef.current) clearInterval(autoIntervalRef.current);
       if (resumeTimeoutRef.current) clearTimeout(resumeTimeoutRef.current);
     };
   }, [areas]);
 
-// Scroll horizontal SIN afectar scroll vertical del body
   useEffect(() => {
     const g = galleryRef.current;
     if (!g) return;
-
     const child = g.children[currentIndex];
     if (!child) return;
-
-    // coordenadas del hijo relativo al contenedor
     const containerWidth = g.clientWidth;
     const childLeft = child.offsetLeft;
     const childWidth = child.offsetWidth;
-
-    // posición centrada
     const scrollX = childLeft - (containerWidth / 2) + (childWidth / 2);
-
-    g.scrollTo({
-      left: scrollX,
-      behavior: "smooth"
-    });
-
+    g.scrollTo({ left: scrollX, behavior: "smooth" });
   }, [currentIndex]);
 
-
-
-  //sprinter animado
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-blue-500"></div>
+      <div 
+        className={`flex justify-center items-center h-64 transition-colors duration-300 ${
+          isDarkMode ? 'bg-[#0f1213]' : 'bg-[#f2efeb]'
+        }`}
+      >
+        <div 
+          className="animate-spin rounded-full h-10 w-10 border-t-2 border-r-2"
+          style={{
+            borderColor: isDarkMode ? '#f35734' : '#f28627',
+            borderLeftColor: 'transparent',
+            borderTopColor: isDarkMode ? '#f35734' : '#f28627',
+          }}
+        ></div>
       </div>
     );
   }
 
   if (!areas || areas.length === 0) {
     return (
-      <div className="py-12 px-4 md:px-8 bg-[#F2EFEB] text-center">
-        <p className="text-gray-600">No hay áreas deportivas disponibles.</p>
+      <div 
+        className={`py-16 px-4 text-center transition-colors duration-300 ${
+          isDarkMode ? 'bg-[#0f1213] text-gray-300' : 'bg-[#f2efeb] text-gray-700'
+        }`}
+        style={{ fontFamily: 'var(--font-Balo)' }}
+      >
+        <p className="text-base opacity-80">No hay áreas deportivas disponibles en este momento.</p>
       </div>
     );
   }
+
   const handleOpenModal = (area) => {
     if (area.urlImagen) {
       const img = new Image();
@@ -147,38 +138,43 @@ export default function Areadeportiva() {
   };
 
   return (
-    <div className="py-8 px-4 md:px-8 bg-[#F2EFEB]">
+    <div className={`py-10 px-4 md:px-8 transition-colors duration-300 ${isDarkMode ? 'bg-[#0f1213]' : 'bg-[#f2efeb]'}`}>
       <motion.h2
-        className="text-2xl md:text-3xl font-Alumni text-center mb-1 text-gray-800"
+        className="text-2xl md:text-3xl mb-3 text-center"
+        style={{ fontFamily: 'var(--font-Oswald)' }}
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
       >
-        Explora las Areas Deportivas Disponibles
+        <span className={isDarkMode ? 'text-white' : 'text-gray-900'}>
+          Explora las Áreas Deportivas Disponibles
+        </span>
       </motion.h2>
-      <p className="text-sm text-gray-600 font-Balo text-center mb-2">
-        Aqui encotraras las disciplinas  y canchas que ofrecen muestras Areas Deportivas
+      <p 
+        className="text-center mb-8 opacity-90"
+        style={{ 
+          fontFamily: 'var(--font-Balo)',
+          color: isDarkMode ? '#cbd5e1' : '#4b5563',
+          fontSize: '1rem'
+        }}
+      >
+        Aquí encontrarás las disciplinas y canchas que ofrecen nuestras Áreas Deportivas
       </p>
 
       <div
         className="relative"
-        // pausamos auto al hacer hover en la galería completa 
-        onMouseEnter={() => {
-          pausedRef.current = true;
-        }}
+        onMouseEnter={() => { pausedRef.current = true; }}
         onMouseLeave={() => {
           if (resumeTimeoutRef.current) clearTimeout(resumeTimeoutRef.current);
           resumeTimeoutRef.current = setTimeout(() => {
             pausedRef.current = false;
-            resumeTimeoutRef.current = null;
-          }, 1000); // Reanudar después de 1 segundo
+          }, 1000);
         }}
       >
-        {/* Contenedor del carrusel*/}
         <div
           ref={galleryRef}
           id="gallery"
-          className="gallery flex gap-6 py-5 px-4"
+          className="gallery flex gap-6 py-5 px-2 md:px-4"
           style={{ scrollSnapType: "x mandatory", overflowX: "auto"}}
         >
           {areas.map((area, index) => (
@@ -190,35 +186,38 @@ export default function Areadeportiva() {
               onClick={() => handleOpenModal(area)}
             />
           ))}
-
         </div>
 
-        {/* Flechas de navegación — fuera del contenedor gallery para no recibir pointer-events: none */}
+        {/* Flechas de navegación */}
         <div className="area-controls">
           <button 
             onClick={prev} 
             aria-label="Área anterior" 
-            className="area-btn left flex items-center justify-center"
+            className="area-btn left"
           >
-            <ChevronLeftIcon className="h-6 w-6 text-[#f38321]" />
+            <ChevronLeft className="h-5 w-5" />
           </button>
           
           <button 
             onClick={next} 
             aria-label="Siguiente área" 
-            className="area-btn right flex items-center justify-center"
+            className="area-btn right"
           >
-            <ChevronRightIcon className="h-6 w-6 text-[#f38321]" />
+            <ChevronRight className="h-5 w-5" />
           </button>
         </div>
 
-        {/* Puntos indicadores */}
-        <div className="flex justify-center mt-4 gap-2">
+        {/* Indicadores */}
+        <div className="flex justify-center mt-6 gap-2">
           {areas.map((_, index) => (
             <button
               key={index}
               onClick={() => manualNavigate(index)}
-              className={`w-3 h-3 rounded-full transition-colors ${index === currentIndex ? "bg-[#f28627]" : "bg-gray-300"}`}
+              className={`w-2.5 h-2.5 rounded-full transition-colors duration-200 ${
+                index === currentIndex 
+                  ? (isDarkMode ? 'bg-[#2C7366]' : 'bg-[#41bfb2]') 
+                  : (isDarkMode ? 'bg-gray-600' : 'bg-gray-300')
+              }`}
               aria-label={`Ir a área ${index + 1}`}
             />
           ))}

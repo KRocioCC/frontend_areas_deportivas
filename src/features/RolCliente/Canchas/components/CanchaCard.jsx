@@ -1,71 +1,98 @@
+// src/features/RolCliente/Cancha/components/CanchaCard.jsx
 import React from "react";
-import { FaUsers } from "react-icons/fa";
+import { Users, CalendarCheck } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import FancyButton from "../../../../components/ui/FancyButton";
+import { useTheme } from "../../../../context/ThemeContext";
+import { motion } from "framer-motion";
 
-function CanchaCard({ cancha }) {
+const CanchaCard = ({ cancha }) => {
+  const { isDarkMode } = useTheme();
   const navigate = useNavigate();
 
+  // Colores según modo
+  const cardBg = isDarkMode ? 'bg-[#0b0d0e]' : 'bg-white';
+  const borderColor = isDarkMode ? 'border-[#2C7366]' : 'border-gray-200';
+  const textColor = isDarkMode ? 'text-gray-100' : 'text-gray-900';
+  const secondaryText = isDarkMode ? 'text-gray-300' : 'text-gray-600';
+  const iconColor = isDarkMode ? '#cbd5e1' : '#41bfb2';
+
+  // Botón: Reservar → color naranja (pago/continuar)
+ // const reservarBg = isDarkMode ? '#f35734' : '#f28627';
+  // Botón: Comentarios → color secundario verde (alternativo, suave)
+  const reservarBg = isDarkMode ? '#2C7366' : '#41bfb2';
+
   return (
-    <div className="rounded-xl overflow-hidden bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all hover:-translate-y-1">
-      
+    <motion.div
+      className={`rounded-xl overflow-hidden border ${borderColor} shadow-sm transition-all duration-300 ${cardBg}`}
+      whileHover={{ y: -6, boxShadow: isDarkMode ? '0 10px 24px rgba(0,0,0,0.4)' : '0 10px 24px rgba(0,0,0,0.12)' }}
+      whileTap={{ scale: 0.99 }}
+    >
       {/* Imagen */}
-      <img
-        src={cancha?.urlImagen || "../../../../../public/defaults/cancha-default.jpg"}
-        alt={cancha.nombre}
-        className="w-full h-40 object-cover"
-        loading="lazy"
-      />
+      <div className="relative w-full h-40 overflow-hidden">
+        <img
+          src={cancha?.urlImagen || "/defaults/cancha-default.jpg"}
+          alt={cancha.nombre || "Cancha deportiva"}
+          className="w-full h-full object-cover transition-transform duration-300"
+          loading="lazy"
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src = "/defaults/cancha-default.jpg";
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
+      </div>
 
       {/* Contenido */}
-      <div className="p-4">
-        <h3 className="text-xl font-semibold text-gray-900" style={{ fontFamily: "var(--font-Alumni)" }}>
+      <div className="p-5">
+        <h3
+          className="text-lg md:text-xl font-semibold mb-3"
+          style={{ fontFamily: 'var(--font-Alumni)', color: textColor }}
+        >
           {cancha.nombre}
         </h3>
 
-        <div className="flex items-center justify-between mt-3 text-gray-600 text-sm">
-          
+        <div className="flex flex-wrap gap-x-4 gap-y-2 mb-4 text-sm">
           {/* Costo */}
-          <span className="flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-              fill="currentColor" className="w-5 h-5 text-[--color-p-5]">
-              <path d="M2 6h20v12H2z" stroke="currentColor" strokeWidth="1.5" fill="none" />
-              <circle cx="12" cy="12" r="2.5" />
-            </svg>
-            {cancha.costoHora?.toFixed(2)} Bs / h
-          </span>
+          <div className="flex items-center gap-2">
+            <div
+              className="w-5 h-5 rounded-full flex items-center justify-center"
+              style={{ backgroundColor: isDarkMode ? '#2C7366' : '#41bfb2' }}
+            >
+              <CalendarCheck className="w-3 h-3 text-white" />
+            </div>
+            <span style={{ color: secondaryText }}>
+              {cancha.costoHora?.toFixed(2) || '0.00'} Bs / h
+            </span>
+          </div>
 
           {/* Capacidad */}
-          <span className="flex items-center gap-1">
-            <FaUsers className="text-[--color-p-1]" /> {cancha.capacidad} pers.
-          </span>
+          <div className="flex items-center gap-2">
+            <Users className="w-4 h-4" style={{ color: iconColor }} />
+            <span style={{ color: secondaryText }}>
+              {cancha.capacidad || 0} pers.
+            </span>
+          </div>
         </div>
 
         {/* Botones */}
-        <div className="mt-4 flex gap-2">
-
-          <FancyButton
+        <div className="flex flex-col sm:flex-row gap-2 mt-3">
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => navigate(`/canchacli/detalle/${cancha.idCancha}`)}
-            bgColor="var(--color-p-10)"
-            lineColor="var(--color-p-1)"
-            hoverColor="var(--color-p-1)"
+            className="flex-1 py-2 px-3 rounded-lg font-semibold text-white shadow-sm flex items-center justify-center gap-1.5 text-sm"
+            style={{
+              fontFamily: 'var(--font-josefin)',
+              backgroundColor: reservarBg,
+              boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+            }}
           >
-            Reservar
-          </FancyButton>
-
-          <FancyButton
-            onClick={() => alert("Comentarios próximamente")}
-            bgColor="var(--color-p-10)"
-            lineColor="var(--color-p-2)"
-            hoverColor="var(--color-p-2)"
-          >
-            Comentarios
-          </FancyButton>
-
+            Detalle Cancha
+          </motion.button>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
-}
+};
 
 export default React.memo(CanchaCard);
