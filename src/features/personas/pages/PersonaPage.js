@@ -5,7 +5,7 @@ import "./personaPage.css"; // Puedes crearlo luego si quieres estilos
 const PersonaPage = () => {
     return (
         <div>
-        <h2>Gestión de Personas</h2>
+        {/*<h2>Gestión de Personas</h2>*/}
         
         <Outlet /> {/* Aquí se renderiza la subpágina correspondiente */}
         </div>

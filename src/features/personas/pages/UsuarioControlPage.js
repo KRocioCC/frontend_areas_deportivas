@@ -39,7 +39,7 @@ function normalizeUsuarioControl(raw = {}) {
     fechaNacimiento,
     telefono: raw.telefono ?? raw.phone ?? "",
     email: raw.email ?? "",
-    ci: raw.ci ?? "",
+    //ci: raw.ci ?? "",
     urlImagen,
     estado,
     estadoOperativo,
@@ -127,7 +127,7 @@ export default function UsuarioControlPage() {
           nombre: payload.nombre ?? existingFromServer.nombre ?? "",
           telefono: payload.telefono ?? existingFromServer.telefono ?? "",
           email: payload.email ?? existingFromServer.email ?? "",
-          ci: payload.ci ?? existingFromServer.ci ?? "",
+          //ci: payload.ci ?? existingFromServer.ci ?? "",
           apaterno: payload.apaterno ?? payload.aPaterno ?? existingFromServer.apaterno ?? existingFromServer.aPaterno ?? existingFromServer.apellidoPaterno ?? "",
           amaterno: payload.amaterno ?? payload.aMaterno ?? existingFromServer.amaterno ?? existingFromServer.aMaterno ?? existingFromServer.apellidoMaterno ?? "",
         };
@@ -142,7 +142,7 @@ export default function UsuarioControlPage() {
           fechaNacimiento: payload.fechaNacimiento || null,
           telefono: payload.telefono ?? "",
           email: payload.email ?? "",
-          ci: payload.ci ?? "",
+          //ci: payload.ci ?? "",
           urlImagen: payload.urlImagen ?? "",
           estado: Boolean(payload.estado),
           estadoOperativo: Boolean(payload.estadoOperativo),
@@ -259,10 +259,12 @@ export default function UsuarioControlPage() {
                 <span className="detail-label">Teléfono</span>
                 <span className="detail-value">{usuarioControl.telefono || <span className="empty-text">No especificado</span>}</span>
               </div>
+              {/*
               <div className="detail-item">
                 <span className="detail-label">CI</span>
                 <span className="detail-value">{usuarioControl.ci || <span className="empty-text">No especificado</span>}</span>
               </div>
+              */}
               <div className="detail-item">
                 <span className="detail-label">Hora Inicio Turno</span>
                 <span className="detail-value">{usuarioControl.horaInicioTurno || <span className="empty-text">No especificada</span>}</span>
