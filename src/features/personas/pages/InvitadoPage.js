@@ -330,9 +330,11 @@ export default function InvitadoPage() {
             <button className="btn btn-accent" onClick={loadInvitados}>
               Limpiar
             </button>
+            {/*
             <button className="btn btn-primary" onClick={openCreate}>
               Nuevo Invitado
             </button>
+            */}
           </div>
         </div>
       </div>

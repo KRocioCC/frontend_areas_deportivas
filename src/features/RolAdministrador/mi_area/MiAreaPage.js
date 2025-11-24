@@ -1,315 +1,311 @@
-// src/features/personas/ROL-Administrador/mi_area/MiAreaPage.js
-import React, { useEffect, useMemo, useState } from 'react';
-import { getAreadeportivaPorAdminId, updateAreadeportivaPorAdminId } from "../../../api/AreadeportivaApi";
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../../auth/hooks/useAuth';
+import { 
+    getAreadeportivaPorAdminId, 
+    createAreadeportiva, 
+    updateAreadeportiva, 
+    agregarImagenesArea 
+} from "../../../api/AreadeportivaApi";
+import api from "../../../api/api"; 
+import { MapPin, Phone, Mail, Clock, Edit3, Upload, X, Save, Image as ImageIcon, Info } from "lucide-react";
 import './MiAreaPage.css';
 
-const MiAreaPage = () => {
+const BASE_URL_IMG = "http://localhost:8032/"; 
+
+const formatTime = (timeString) => timeString ? timeString.substring(0, 5) : '';
+
+// Función auxiliar para obtener URL limpia
+const getImgUrl = (img) => {
+    if (!img) return null;
+    // Si es un objeto (del backend) o una url directa
+    const ruta = img.rutaAlmacenamiento || img.url;
+    if (!ruta) return null;
+    return ruta.startsWith('http') ? ruta : `${BASE_URL_IMG}${ruta}`;
+};
+
+export default function MiAreaPage() {
   const { currentUser } = useAuth();
 
   const [area, setArea] = useState(null);
-  const [editMode, setEditMode] = useState(false);
-  const [formData, setFormData] = useState({});
   const [loading, setLoading] = useState(true);
-  const [showDebugInfo, setShowDebugInfo] = useState(false); // ← Nuevo estado para debug
+  const [isEditing, setIsEditing] = useState(false);
+  const [zonas, setZonas] = useState([]);
+  
+  const [formData, setFormData] = useState({
+    nombreArea: '', descripcionArea: '', telefonoArea: '', emailArea: '',
+    horaInicioArea: '08:00', horaFinArea: '22:00', 
+    idZona: '', 
+    latitud: '', longitud: ''
+  });
 
-  // --- CARGA INICIAL ---------------------------------------------------------
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [previews, setPreviews] = useState([]);
+
+  // --- CARGA INICIAL ---
   useEffect(() => {
-    if (!currentUser?.idPersona) return;
+    const initData = async () => {
+        if (!currentUser?.idPersona) return;
+        setLoading(true);
+        try {
+            const zonasRes = await api.get('/zona');
+            setZonas(Array.isArray(zonasRes.data) ? zonasRes.data : []);
 
-    const fetchArea = async () => {
-      try {
-        console.log('Iniciando carga del área para admin ID:', currentUser.idPersona);
-        const data = await getAreadeportivaPorAdminId(currentUser.idPersona);
-        console.log(' Área cargada:', data);
-
-        // Guarda el objeto completo para mostrarlo
-        setArea(data);
-
-        // IMPORTANTE: tomar idZona desde data.zona.idZona
-        setFormData({
-          idAreadeportiva: data.idAreadeportiva ?? null,
-          idZona: data?.zona?.idZona ?? '',          // <- zONA
-          estado: data.estado ?? true,
-
-          nombreArea: data.nombreArea || '',
-          descripcionArea: data.descripcionArea || '',
-          latitud: data.latitud ?? '',
-          longitud: data.longitud ?? '',
-          telefonoArea: data.telefonoArea || '',
-          emailArea: data.emailArea || '',
-          horaInicioArea: data.horaInicioArea || '',
-          horaFinArea: data.horaFinArea || '',
-          urlImagen: data.urlImagen || ''
-        });
-      } catch (error) {
-        console.error("Error al cargar el área:", error);
-      } finally {
-        setLoading(false);
-      }
+            const areaData = await getAreadeportivaPorAdminId(currentUser.idPersona);
+            if (areaData) {
+                setArea(areaData);
+                setFormData({
+                    nombreArea: areaData.nombreArea || '',
+                    descripcionArea: areaData.descripcionArea || '',
+                    telefonoArea: areaData.telefonoArea || '',
+                    emailArea: areaData.emailArea || '',
+                    horaInicioArea: areaData.horaInicioArea || '08:00',
+                    horaFinArea: areaData.horaFinArea || '22:00',
+                    idZona: areaData.idZona || '', 
+                    latitud: areaData.latitud || '',
+                    longitud: areaData.longitud || ''
+                });
+                setIsEditing(false);
+            } else {
+                setIsEditing(true); 
+            }
+        } catch (err) {
+            console.warn("Admin nuevo o error:", err);
+            setIsEditing(true);
+        } finally {
+            setLoading(false);
+        }
     };
+    initData();
+  }, [currentUser]);
 
-    fetchArea();
-  }, [currentUser?.idPersona]);
-
-  // --- HANDLERS --------------------------------------------------------------
+  // --- HANDLERS ---
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+      const { name, value } = e.target;
+      setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSave = async () => {
-    try {
-      console.log(' Iniciando guardado...');
-      
-      // Validación mínima de zona
-      const idZona = Number(formData.idZona || area?.zona?.idZona);
-      if (!idZona) {
-        alert("No se puede guardar: falta idZona.");
-        return;
-      }
+  const handleZonaChange = (e) => {
+      const val = e.target.value ? Number(e.target.value) : '';
+      setFormData(prev => ({ ...prev, idZona: val }));
+  };
 
-      const payload = {
-        id: currentUser.idPersona, 
-        idAreadeportiva: formData.idAreadeportiva ?? area?.idAreadeportiva ?? null,
-        idZona: idZona, 
-        
-        // Campos de ubicación (NotNull en el DTO)
-        latitud: formData.latitud === '' ? null : Number(formData.latitud),
-        longitud: formData.longitud === '' ? null : Number(formData.longitud),
-        
-        // Campos obligatorios en el DTO
-        nombreArea: formData.nombreArea?.trim() ?? area?.nombreArea ?? '',
-        horaInicioArea: formData.horaInicioArea ?? area?.horaInicioArea ?? '',
-        horaFinArea: formData.horaFinArea ?? area?.horaFinArea ?? '',
-        estado: formData.estado ?? area?.estado ?? true,
-
-        // Campos opcionales
-        descripcionArea: formData.descripcionArea?.trim() ?? area?.descripcionArea ?? '',
-        telefonoArea: formData.telefonoArea?.trim() ?? '',
-        emailArea: formData.emailArea?.trim() ?? '',
-        urlImagen: formData.urlImagen ?? ''
-      };
-
-      console.log(' Payload a enviar:', payload);
-      console.log('Campos críticos - id:', payload.id, 'idAreadeportiva:', payload.idAreadeportiva, 'idZona:', payload.idZona);
-
-      console.log('Llamando a updateAreadeportivaPorAdminId...');
-      const updated = await updateAreadeportivaPorAdminId(currentUser.idPersona, payload);
-      
-      console.log(' Área actualizada exitosamente:', updated);
-      setArea(updated);
-      setEditMode(false);
-      alert(' Cambios guardados exitosamente');
-    } catch (err) {
-      console.error(" Error al guardar:", err);
-      console.error(" Detalles del error:", err.response?.data);
-      console.error(" Status del error:", err.response?.status);
-      alert(' Error al guardar los cambios. Revisa la consola para más detalles.');
+  const handleFileChange = (e) => {
+    if (e.target.files && e.target.files.length > 0) {
+        const files = Array.from(e.target.files);
+        setSelectedFiles(prev => [...prev, ...files]);
+        const newPreviews = files.map(file => URL.createObjectURL(file));
+        setPreviews(prev => [...prev, ...newPreviews]);
     }
   };
 
-  // --- PREVIEW DE IMAGEN (segura: no dispara 401 al backend) -----------------
-  // Solo renderiza <img> si la URL es pública (http/https) y NO corresponde a tu backend protegido.
-const publicImageSrc = useMemo(() => {
-  const u = (formData.urlImagen || area?.urlImagen || '').trim();
-  if (!u) return null;
+  const removeFile = (index) => {
+      setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+      setPreviews(prev => {
+          URL.revokeObjectURL(prev[index]); 
+          return prev.filter((_, i) => i !== index);
+      });
+  };
 
-  const isHttp = /^https?:\/\//i.test(u);
-  const isBackend = /localhost:8032/i.test(u);
+  const handleSave = async (e) => {
+    e.preventDefault();
+    if (!formData.idZona) return alert("⚠️ Selecciona una Zona.");
 
-  // ✅ Si es una URL completa del backend, permitirla
-  if (isHttp && isBackend) return u;
+    try {
+        const payload = {
+            ...formData,
+            idZona: Number(formData.idZona), 
+            latitud: Number(formData.latitud),
+            longitud: Number(formData.longitud),
+            id: currentUser.idPersona,
+            estado: true,
+            ...(area?.idAreadeportiva ? { idAreadeportiva: area.idAreadeportiva } : {})
+        };
 
-  // ✅ Si es una URL pública (no backend), permitirla
-  if (isHttp && !isBackend) return u;
+        let areaActualizada;
+        if (area?.idAreadeportiva) {
+            areaActualizada = await updateAreadeportiva(area.idAreadeportiva, payload);
+        } else {
+            areaActualizada = await createAreadeportiva(payload);
+        }
 
-  // ❌ Si es una ruta relativa (ej. "img/escalada.jpg"), no mostrar
-  return null;
-}, [area?.urlImagen, formData.urlImagen]);
+        if (selectedFiles.length > 0 && areaActualizada?.idAreadeportiva) {
+            areaActualizada = await agregarImagenesArea(areaActualizada.idAreadeportiva, selectedFiles);
+        }
 
+        alert("¡Cambios guardados!");
+        setArea(areaActualizada); 
+        setSelectedFiles([]);
+        setPreviews([]);
+        setIsEditing(false);
+        
+    } catch (error) {
+        console.error("❌ Error:", error);
+        alert("Error al guardar.");
+    }
+  };
 
-  // --- RENDER ----------------------------------------------------------------
-  if (loading) return <div className="mi-area-loading">Cargando área deportiva...</div>;
-  if (!area) return <div className="mi-area-error">No se encontró un área asignada.</div>;
+  // --- LÓGICA DE PORTADA (Última imagen subida) ---
+  // Si hay imágenes, tomamos la última del array (la más reciente)
+  const portadaUrl = (area?.imagenes && area.imagenes.length > 0) 
+        ? getImgUrl(area.imagenes[area.imagenes.length - 1]) 
+        : null;
 
-  return (
-    <div className="mi-area-container">
-      <div className="mi-area-card">
-        <h1>Área deportiva: {area.nombreArea}</h1>
-        <p className="mi-area-zona">
-          ZONA: {area.zona?.nombre ?? "Sin zona asignada"}
-        </p>
-{/* QUITAR ESTO DESPUES */}
-        {/* Botón para mostrar/ocultar info de debug (opcional) */}
-        {process.env.NODE_ENV === 'development' && (
-          <button 
-            className="btn-debug" 
-            onClick={() => setShowDebugInfo(!showDebugInfo)}
-            style={{
-              padding: '2px 8px',
-              fontSize: '10px',
-              background: '#f0f0f0',
-              border: '1px solid #ccc',
-              borderRadius: '4px',
-              marginBottom: '10px',
-              cursor: 'pointer'
-            }}
-          >
-            {showDebugInfo ? '👁️ Ocultar Debug' : '👁️ Mostrar Debug'}
-          </button>
-        )}
+  if (loading) return <div className="loading-screen"><div className="spinner"></div>Cargando...</div>;
 
-
-
-
-        <div className="mi-area-layout">
-          {/* FORMULARIO */}
-          <div className="mi-area-form">
-
-            {/* Mantener idZona en el payload aunque no se edite */}
-            {editMode && (
-              <input type="hidden" name="idZona" value={formData.idZona} onChange={handleChange} />
-            )}
-
-            <div className="mi-area-row">
-              <label>Teléfono</label>
-              {editMode ? (
-                <input name="telefonoArea" value={formData.telefonoArea} onChange={handleChange} />
-              ) : <span>{area.telefonoArea || 'No especificado'}</span>}
-            </div>
-
-            <div className="mi-area-row">
-              <label>Email</label>
-              {editMode ? (
-                <input name="emailArea" value={formData.emailArea} onChange={handleChange} />
-              ) : <span>{area.emailArea || 'No especificado'}</span>}
-            </div>
-
-            <div className="mi-area-row two-cols">
-              <div>
-                <label>Latitud</label>
-                {editMode ? (
-                  <input 
-                    name="latitud" 
-                    value={formData.latitud} 
-                    onChange={handleChange}
-                    placeholder="Ej: -16.123456"
-                  />
-                ) : <span>{area.latitud}</span>}
-              </div>
-              <div>
-                <label>Longitud</label>
-                {editMode ? (
-                  <input 
-                    name="longitud" 
-                    value={formData.longitud} 
-                    onChange={handleChange}
-                    placeholder="Ej: -68.123456"
-                  />
-                ) : <span>{area.longitud}</span>}
-              </div>
-            </div>
-
-            <div className="mi-area-row">
-              <label>Descripción</label>
-              {editMode ? (
-                <textarea name="descripcionArea" value={formData.descripcionArea} onChange={handleChange} />
-              ) : <span>{area.descripcionArea}</span>}
-            </div>
-
-            <div className="mi-area-row two-cols">
-              <div>
-                <label>Hora Apertura</label>
-                {editMode ? (
-                  <input 
-                    name="horaInicioArea" 
-                    value={formData.horaInicioArea} 
-                    onChange={handleChange} 
-                    placeholder="08:00" 
-                  />
-                ) : <span>{area.horaInicioArea || '—'}</span>}
-              </div>
-              <div>
-                <label>Hora Cierre</label>
-                {editMode ? (
-                  <input 
-                    name="horaFinArea" 
-                    value={formData.horaFinArea} 
-                    onChange={handleChange} 
-                    placeholder="16:00" 
-                  />
-                ) : <span>{area.horaFinArea || '—'}</span>}
-              </div>
-            </div>
-
-            {/* Meta - SOLO SE MUESTRA EN MODO DEBUG */}
-            {showDebugInfo && (
-              <div className="mi-area-meta" style={{ 
-                background: '#f5f5f5', 
-                padding: '10px', 
-                borderRadius: '4px',
-                fontSize: '12px',
-                border: '1px dashed #ccc'
-              }}>
-                <h4>Información :</h4>
-                <span>ID Área: {area.idAreadeportiva}</span>
-                <span>Estado: {area.estado ? 'Activo' : 'Inactivo'}</span>
-                <span>ID Zona (payload): {formData.idZona || '—'}</span>
-                <span>ID Admin: {currentUser?.idPersona || '—'}</span>
-              </div>
-            )}
-
-            <div className="mi-area-actions">
-              {editMode ? (
-                <>
-                  <button className="btn-primary" onClick={handleSave}>Guardar</button>
-                  <button className="btn-secondary" onClick={() => setEditMode(false)}>Cancelar</button>
-                </>
-              ) : (
-                <>
-                  <button className="btn-primary" onClick={() => setEditMode(true)}>Editar</button>
-                  <button className="btn-secondary">Salir</button>
-                </>
-              )}
-            </div>
+  // --- MODO EDICIÓN ---
+  if (isEditing) {
+    return (
+      <div className="mi-area-container">
+        <div className="mi-area-card form-mode">
+          <div className="header-flex">
+             <h2>{area ? "Editar Mi Espacio" : "Registrar Espacio"}</h2>
+             {area && (
+                 <button type="button" onClick={() => setIsEditing(false)} className="btn-secondary">
+                    <X size={18}/> Cancelar
+                 </button>
+             )}
           </div>
 
-          {/* IMAGEN (segura) */}
-          <div className="mi-area-image">
-            {publicImageSrc ? (
-              <img
-                src={publicImageSrc}
-                alt={`Imagen de ${area.nombreArea}`}
-                loading="lazy"
-                onError={(e) => { 
-                  console.log(' Error cargando imagen:', publicImageSrc);
-                  e.currentTarget.style.display = 'none'; 
-                }}
-              />
-            ) : (
-              <span style={{ color: '#888' }}>Imagen no disponible</span>
+          <form onSubmit={handleSave}>
+            <div className="form-grid">
+                <div className="form-group">
+                    <label>Nombre del Establecimiento *</label>
+                    <input name="nombreArea" value={formData.nombreArea} onChange={handleChange} required placeholder="Ej: Club Los Pinos" autoComplete="off" />
+                </div>
+                <div className="form-group">
+                    <label>Zona *</label>
+                    <select name="idZona" value={formData.idZona} onChange={handleZonaChange} required className={!formData.idZona ? "text-gray-400" : "text-black"}>
+                        <option value="">-- Selecciona --</option>
+                        {zonas.map(z => <option key={z.idZona} value={z.idZona} className="text-black">{z.nombre}</option>)}
+                    </select>
+                </div>
+            </div>
+
+            <div className="form-group">
+                <label>Descripción / Slogan</label>
+                <textarea name="descripcionArea" rows="4" value={formData.descripcionArea} onChange={handleChange} placeholder="Describe lo mejor de tu cancha..." />
+            </div>
+
+            {/* SECCIÓN: FOTOS EXISTENTES (Lo que pediste) */}
+            {area?.imagenes && area.imagenes.length > 0 && (
+                <div className="existing-photos-section">
+                    <label className="label-title">📸 Galería Actual</label>
+                    <div className="photos-grid-mini">
+                        {area.imagenes.map((img, i) => (
+                            <div key={i} className="photo-card">
+                                <img src={getImgUrl(img)} alt="existente" />
+                            </div>
+                        ))}
+                    </div>
+                </div>
             )}
 
-            {editMode && (
-              <div className="mi-area-row" style={{ width: '100%', marginTop: '1rem' }}>
-                <label>URL Imagen (pública opcional)</label>
-                <input
-                  name="urlImagen"
-                  value={formData.urlImagen}
-                  onChange={handleChange}
-                  placeholder="https://misitio.com/imagen.jpg"
-                />
-                <small style={{ color: '#6b7280' }}>
-                  Se permiten URLs públicas y del backend si son accesibles. Las rutas relativas (ej. <code>/img/…</code>) se ignoran para evitar errores.
-                </small>
-              </div>
-            )}
-          </div>
+            {/* SECCIÓN: SUBIR NUEVAS */}
+            <div className="upload-section">
+                <label className="upload-box">
+                    <Upload size={32} className="text-blue-500"/>
+                    <span className="font-semibold">Agregar nuevas fotos</span>
+                    <input type="file" multiple accept="image/*" onChange={handleFileChange} hidden />
+                </label>
+                
+                {previews.length > 0 && (
+                    <div className="preview-grid">
+                        {previews.map((url, i) => (
+                            <div key={i} className="preview-item">
+                                <img src={url} alt="pre" />
+                                <button type="button" onClick={() => removeFile(i)} className="remove-btn"><X size={12}/></button>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+
+            <div className="form-grid">
+                <div className="form-group"><label>Teléfono</label><input name="telefonoArea" value={formData.telefonoArea} onChange={handleChange}/></div>
+                <div className="form-group"><label>Email</label><input name="emailArea" value={formData.emailArea} onChange={handleChange}/></div>
+                <div className="form-group"><label>Apertura</label><input type="time" name="horaInicioArea" value={formData.horaInicioArea} onChange={handleChange}/></div>
+                <div className="form-group"><label>Cierre</label><input type="time" name="horaFinArea" value={formData.horaFinArea} onChange={handleChange}/></div>
+                <div className="form-group"><label>Latitud</label><input type="number" step="any" name="latitud" value={formData.latitud} onChange={handleChange}/></div>
+                <div className="form-group"><label>Longitud</label><input type="number" step="any" name="longitud" value={formData.longitud} onChange={handleChange}/></div>
+            </div>
+
+            <div className="form-actions">
+                <button type="submit" className="btn-primary"><Save size={18}/> Guardar Cambios</button>
+            </div>
+          </form>
         </div>
       </div>
+    );
+  }
+
+  // --- MODO VISUALIZACIÓN ---
+  return (
+    <div className="mi-area-container">
+        <div className="area-header">
+            {/* PORTADA: Muestra la ÚLTIMA imagen subida */}
+            {portadaUrl ? (
+                <img 
+                    src={portadaUrl} 
+                    alt="Portada" 
+                    className="cover-img"
+                    onError={(e) => e.target.style.display = 'none'}
+                />
+            ) : (
+                <div className="cover-placeholder">
+                    <ImageIcon size={48} />
+                    <p>Sin foto de portada</p>
+                </div>
+            )}
+            <div className="area-title-card">
+                <h1>{area?.nombreArea}</h1>
+                <span className="badge-zona">{area?.zona?.nombre || "Zona no asignada"}</span>
+            </div>
+            <button className="edit-fab" onClick={() => setIsEditing(true)} title="Editar">
+                <Edit3 size={24} />
+            </button>
+        </div>
+
+        <div className="area-content">
+            <div className="info-grid">
+                <div className="info-card">
+                    <Clock className="icon" />
+                    <div><h4>Horario</h4><p>{formatTime(area?.horaInicioArea)} - {formatTime(area?.horaFinArea)}</p></div>
+                </div>
+                <div className="info-card">
+                    <Phone className="icon" />
+                    <div><h4>Contacto</h4><p>{area?.telefonoArea || "--"}</p></div>
+                </div>
+                <div className="info-card">
+                    <MapPin className="icon" />
+                    <div><h4>Ubicación</h4><p>Lat: {area?.latitud}, Lon: {area?.longitud}</p></div>
+                </div>
+            </div>
+
+            {/* DESCRIPCIÓN MEJORADA */}
+            <div className="description-section">
+                <div className="desc-header">
+                    <Info size={20} className="text-blue-600"/>
+                    <h3>Sobre nosotros</h3>
+                </div>
+                <div className="desc-body">
+                    <p>{area?.descripcionArea || "Añade una descripción para atraer a más clientes."}</p>
+                </div>
+            </div>
+
+            {/* GALERÍA */}
+            {area?.imagenes && area.imagenes.length > 0 && (
+                <div className="gallery-section">
+                    <h3>Galería de Fotos</h3>
+                    <div className="gallery-grid">
+                        {area.imagenes.map((img, i) => (
+                            <div key={i} className="gallery-item">
+                                <img src={getImgUrl(img)} alt={`Foto ${i}`} />
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+        </div>
     </div>
   );
-};
-
-export default MiAreaPage;
+}

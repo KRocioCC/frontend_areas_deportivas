@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import DashboardLayout from "../components/layout/DashboardLayout";
 import DashboardLayoutAdmin from "../components/layout/DashboardLayoutAdmin";
@@ -31,17 +31,19 @@ import UsuarioControlPage from "../features/personas/pages/UsuarioControlPage";
 import InvitadoPage from "../features/personas/pages/InvitadoPage";
 
 // ADMINISTRADOR
-import MiAreaPage from '../features/RolAdministrador/mi_area/MiAreaPage';
-import CanchasAdmin from "../features/RolAdministrador/canchas/CanchasAdmin";
+import MiAreaPage from '../features/RolAdministrador/mi_area/MiAreaPage.js';
+import CanchasPage from "../features/RolAdministrador/canchas/CanchasPage";
 
 import PageClientes from "../features/RolAdministrador/usuarios/clientes/PageClientes";
 import PageUsuariosControl from "../features/RolAdministrador/usuarios/usuarios_control/PageUsuariosControl";
 import Dashboard from "../features/RolAdministrador/dashboard/index.jsx";
+import CanchaReservaPage from "../features/RolAdministrador/canchas/CanchaReservasPage";
+import ReservaListAdmin from "../features/RolAdministrador/reservas/ReservaListAdmin.js";
+import CancelacionesListAdmin from "../features/RolAdministrador/cancelaciones/CancelacionesListAdmin.js";
 
 //CLIENTE
 // CLIENTE - componentes visuales
-import Preloader from "../components/ComponentsCli/Preloader.jsx";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import LayoutCliente from "../components/ComponentsCli/LayoutCliente.jsx";  
 
 
@@ -94,14 +96,12 @@ function AppRouter() {
     })
   };
 
-  const [loading, setLoading] = useState(true);
+  
 
   return (
     <AuthProvider>
       <BrowserRouter>
-        {/*{loading ? (
-            <Preloader onFinish={() => setLoading(false)} />
-          ) : (*/}
+        {/* routes */}
         <Routes>
           
           {/* Redirección por defecto → inicio */}
@@ -370,11 +370,21 @@ function AppRouter() {
 
           {/* RUTAS NUEVAS PARA ADMINISTRADOR - DashboardLayoutAdmin */}
           <Route
+            path="/admin/cancha/ver_reservas/:idCancha"
+            element={
+              <ProtectedRoute requireAdmin>
+                <DashboardLayoutAdmin>
+                  <CanchaReservaPage />
+                </DashboardLayoutAdmin>
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/admin/mi_area"
             element={
               <ProtectedRoute requireAdmin>
                 <DashboardLayoutAdmin>
-                   <MiAreaPage />
+                    <MiAreaPage />
                 </DashboardLayoutAdmin>
               </ProtectedRoute>
             }
@@ -384,12 +394,26 @@ function AppRouter() {
             element={
               <ProtectedRoute requireAdmin>
                 <DashboardLayoutAdmin>
-                  <CanchasAdmin />
+                  <CanchasPage />
 
                 </DashboardLayoutAdmin>
               </ProtectedRoute>
             }
           />
+          
+          <Route
+            path="/admin/reservaslist"
+            element={
+              <ProtectedRoute requireAdmin>
+                <DashboardLayoutAdmin>
+                    <ReservaListAdmin/> 
+                </DashboardLayoutAdmin>
+              </ProtectedRoute>
+            }
+          />
+
+        
+
           <Route
             path="/admin/dashboard"
             element={
@@ -430,6 +454,18 @@ function AppRouter() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/admin/reservas/cancelaciones"
+            element={
+              <ProtectedRoute requireAdmin>
+                <DashboardLayoutAdmin>
+                  <CancelacionesListAdmin/> 
+                </DashboardLayoutAdmin>
+              </ProtectedRoute>
+            }
+          />
+
+
           <Route
             path="/admin/notificaciones"
             element={

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate,useLocation } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import authService from '../services/authService';
 import PasswordInput from '../components/PasswordInput';
@@ -12,7 +12,6 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
-  //la ubicaion de la url
   const location = useLocation();
 
   const handleSubmit = async (e) => {
@@ -24,20 +23,19 @@ const Login = () => {
       const response = await login(username, password);
 
       localStorage.setItem('user', JSON.stringify(response));
-      localStorage.setItem('id', response.id); // guarda el ID 
+      localStorage.setItem('id', response.id);
+      localStorage.setItem("idPersona", response.idPersona);
 
-      // Configura Axios con el token JWT
       authService.setupAxiosInterceptors(response.token);
 
       const roles = response.roles || [];
       console.log('Roles recibidos:', roles);
       let redirectTo = '/inicio';
 
-      // SI VENÍA DE UNA RUTA PROTEGIDA → REDIRIGIR AHÍ
       if (location.state?.from) {
         redirectTo = location.state.from;
       } else if (roles.includes('ROLE_ADMINISTRADOR')) {
-        redirectTo = '/admin/dashboard';
+        redirectTo = '/admin/canchas';
       } else if (roles.includes('ROLE_CLIENTE')) {
         redirectTo = '/inicio';
       } else if (roles.includes('ROLE_SUPERUSUARIO')) {
@@ -55,83 +53,102 @@ const Login = () => {
   };
 
   return (
-    <div className="auth-container">
-      <div className="auth-card">
-        <div className="text-center mb-8">
-          <h1 className="text-2xl font-semibold text-[#17252A] mb-2">Iniciar Sesión</h1>
-          <p className="text-gray-600">Accede a tu cuenta</p>
-        </div>
-
-        {error && <div className="auth-error">{error}</div>}
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-4">
+      <div className="max-w-6xl w-full grid lg:grid-cols-2 gap-8 items-center">
         
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Usuario
-            </label>
-            <input
-              type="text"
-              required
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="auth-input"
-              placeholder="Ingresa tu usuario"
+        {/* Sección izquierda - Logo grande y lema */}
+        <div className="text-center lg:text-left flex flex-col justify-center">
+          <div className="mb-8">
+            <img 
+              src="/contenido/logos.png" 
+              alt="Logo" 
+              className="h-48 lg:h-64 xl:h-80 mx-auto lg:mx-0 mb-6 object-contain transition-all duration-300"
             />
+            <h1 className="text-2xl lg:text-3xl xl:text-4xl font-bold text-white mb-3">
+              Escanea tu pasion
+            </h1>
+            <p className="text-lg lg:text-xl text-gray-300">
+              Juega sin limites
+            </p>
+          </div>
+        </div>
+
+        {/* Sección derecha - Formulario de login */}
+        <div className="bg-white/10 backdrop-blur-sm rounded-2xl shadow-2xl p-6 lg:p-8 border border-white/20">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl lg:text-3xl font-bold text-white mb-2">Iniciar Sesión</h2>
+            <p className="text-gray-300">Accede a tu cuenta para continuar</p>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Contraseña
-            </label>
-            <PasswordInput
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              placeholder="Ingresa tu contraseña"
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={isLoading}
-            className={`auth-button ${isLoading ? 'auth-button-disabled' : ''}`}
-          >
-            {isLoading ? (
-              <div className="flex items-center justify-center">
-                <div className="loading-spinner"></div>
-                Iniciando sesión...
+          {error && (
+            <div className="bg-red-500/20 border border-red-500/30 text-red-200 px-4 py-3 rounded-lg mb-6">
+              <div className="flex items-center">
+                <span className="text-red-400 mr-2">⚠</span>
+                {error}
               </div>
-            ) : (
-              'Iniciar Sesión'
-            )}
-          </button>
-        </form>
-
-        <div className="mt-6 text-center">
-          <Link to="/register" className="auth-link">
-            ¿No tienes cuenta? Regístrate
-          </Link>
-        </div>
-
-        <div className="mt-6 text-center">
-          <button
-            type="button"
-            onClick={() => navigate("/inicio")}
-            className="text-[var(--accent1)] hover:underline text-sm"
-          >
-            ← Volver al inicio
-          </button>
-        </div>
-
-        <div className="auth-debug">
-          <details>
-            <summary className="debug-summary">Información de roles</summary>
-            <div className="debug-content">
-              <p><strong>Superusuario:</strong> /solicitudes</p>
-              <p><strong>Administrador:</strong> /admin/dashboard</p>
-              <p><strong>Cliente:</strong> /inicio</p>
             </div>
-          </details>
+          )}
+          
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Usuario
+              </label>
+              <input
+                type="text"
+                required
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="w-full px-4 py-3 bg-white/5 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3AAFA9] focus:border-transparent transition-all text-white placeholder-gray-400"
+                placeholder="Ingresa tu usuario"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Contraseña
+              </label>
+              <PasswordInput
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                placeholder="Ingresa tu contraseña"
+                className="bg-white/5 border border-gray-600 focus:ring-2 focus:ring-[#3AAFA9] focus:border-transparent text-white placeholder-gray-400"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={isLoading}
+              className={`w-full py-3 px-4 text-white font-semibold rounded-xl bg-gradient-to-r from-[#2B7A78] to-[#3AAFA9] hover:from-[#3AAFA9] hover:to-[#2B7A78] transition-all duration-300 ${
+                isLoading ? 'opacity-70 cursor-not-allowed' : 'hover:shadow-lg'
+              }`}
+            >
+              {isLoading ? (
+                <div className="flex items-center justify-center">
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-3"></div>
+                  Iniciando sesión...
+                </div>
+              ) : (
+                'Iniciar Sesión'
+              )}
+            </button>
+          </form>
+
+          <div className="mt-8 text-center space-y-4">
+            <Link to="/register" className="block text-[#3AAFA9] hover:text-[#2B7A78] transition-colors font-medium text-lg">
+              ¿No tienes cuenta? <span className="font-semibold underline">Regístrate</span>
+            </Link>
+            
+            <button
+              type="button"
+              onClick={() => navigate("/inicio")}
+              className="text-gray-400 hover:text-gray-300 transition-colors text-sm flex items-center justify-center mx-auto"
+            >
+              <span className="mr-2">←</span>
+              Volver al inicio
+            </button>
+          </div>
         </div>
       </div>
     </div>

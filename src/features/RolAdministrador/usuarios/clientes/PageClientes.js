@@ -102,7 +102,7 @@ const totalPaginas = Math.ceil(clientes.length / clientesPorPagina);
           <table className="styled-table">
             <thead>
               <tr>
-                <th>ID</th>
+                <th>#</th>
                 <th>Nombre</th>
                 <th>Apellido Paterno</th>
                 <th>Apellido Materno</th>
@@ -119,9 +119,9 @@ const totalPaginas = Math.ceil(clientes.length / clientesPorPagina);
                   </td>
                 </tr>
               ) : (
-                clientesPaginados.map(cliente => (
+                clientesPaginados.map((cliente, index) => (
                 <tr key={cliente.id}>
-                  <td>{cliente.id}</td>
+                  <td>{indiceInicio + index + 1}</td> {/* número de lista */}
                   <td>{cliente.nombre}</td>
                   <td>{cliente.apellidoPaterno || "-"}</td>
                   <td>{cliente.apellidoMaterno || "-"}</td>

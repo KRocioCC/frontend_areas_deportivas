@@ -1,72 +1,150 @@
+/* ===== Variables de colores para navbar ===== */
+:root {
+  --navbar-bg: #1a2f38;           /* Mismo azul verdoso oscuro que el sidebar */
+  --navbar-hover: #2a4a58;        /* Azul verdoso medio para hover */
+  --navbar-active: #3aafa9;       /* Azul verdoso claro para elementos activos */
+  --navbar-text: #e0f2f1;         /* Texto claro */
+  --navbar-border: #2d4a54;       /* Bordes sutiles */
+  --navbar-shadow: rgba(0, 0, 0, 0.3); /* Sombras */
+}
+
 .navbar {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   height: 60px;
-  background: var(--color-p-6);
+  background: var(--navbar-bg);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 10px;
-  z-index: 5;
+  padding: 0 20px;
+  z-index: 30;
+  border-bottom: 1px solid var(--navbar-border);
+  box-shadow: 0 2px 12px var(--navbar-shadow);
 }
+
 .navbar-left {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 20px;
 }
+
 .navbar-right {
   display: flex;
   align-items: center;
   gap: 15px;
 }
+
 .navbar-logo {
-  height: 40px;       
-  width: auto;        
-  margin-left: 30px;   
-  transition: transform 0.2s ease;
+  height: 35px;
+  width: auto;
+  transition: all 0.3s ease;
+  filter: brightness(0) invert(1); /* Hace el logo blanco */
 }
+
 .navbar-logo:hover {
   transform: scale(1.05);
+  filter: brightness(0) invert(0.9); /* Efecto hover sutil */
 }
+
 .user-menu {
   display: flex;
   align-items: center;
-  gap: 10px;
-  background: var(--color-p-6);
-  padding: 8px 15px;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 8px 16px;
   border-radius: 50px;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+  color: var(--navbar-text);
 }
 
 .user-menu:hover {
-  background: var(--color-p-4);
+  background: var(--navbar-hover);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px var(--navbar-shadow);
 }
 
 .user-icon {
-  width: 30px;
-  height: 30px;
-  background: var(--color-p-4);
-  color: var(--color-p-1);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
+  font-size: 1.8rem;
+  color: var(--navbar-active);
+  transition: all 0.3s ease;
+}
+
+.user-menu:hover .user-icon {
+  color: #ffffff;
+  transform: scale(1.1);
+}
+
+.user-menu span {
+  font-weight: 500;
+  font-size: 0.95rem;
+  white-space: nowrap;
 }
 
 .toggle-btn {
-  background: var(--color-p-1);
-  color: var(--color-p-4);
-  border: none;
-  padding: 10px 10px;
-  font-size: 1.2rem;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--navbar-text);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 10px 12px;
+  font-size: 1.3rem;
   cursor: pointer;
-  border-radius: 50px;
-  transition: all 0.2s ease;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
 }
+
 .toggle-btn:hover {
-  background: var(--color-p-3);
+  background: var(--navbar-active);
+  color: #ffffff;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(58, 175, 169, 0.3);
+}
+
+/* Efecto cuando el sidebar está abierto */
+.toggle-btn.sidebar-open {
+  background: var(--navbar-active);
+  color: #ffffff;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .navbar {
+    padding: 0 15px;
+  }
+  
+  .navbar-left {
+    gap: 15px;
+  }
+  
+  .navbar-logo {
+    height: 30px;
+  }
+  
+  .user-menu span {
+    display: none; /* Ocultar nombre en móviles */
+  }
+  
+  .user-menu {
+    padding: 8px 12px;
+    gap: 8px;
+  }
+  
+  .toggle-btn {
+    width: 40px;
+    height: 40px;
+    padding: 8px 10px;
+  }
+}
+
+/* Animación suave para todo el navbar */
+.navbar * {
+  transition: all 0.3s ease;
 }

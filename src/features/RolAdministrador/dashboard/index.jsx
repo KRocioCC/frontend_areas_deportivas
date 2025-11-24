@@ -10,7 +10,10 @@ export default function DashboardAdministrador() {
   console.log('Usuario en DashboardAdministrador:', currentUser);
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6 space-y-8">
+    <div className="min-h-screen bg-gray-100 p-6 space-y-8"
+     style={{
+        backgroundImage: `url('/Fondos/Deporte6.png')`,
+      }}>
       <h1 className="text-4xl font-bold text-gray-800 mb-4">
         Panel Administrador
       </h1>

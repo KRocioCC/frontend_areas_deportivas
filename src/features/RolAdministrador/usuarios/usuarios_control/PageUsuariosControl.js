@@ -62,7 +62,7 @@ export default function PageUsuariosControl() {
 
       setUsuarios(enriched);
     } catch (err) {
-      console.error("❌ Error al cargar usuarios control:", err);
+      console.error(" Error al cargar usuarios control:", err);
       setError("No se pudieron cargar los usuarios de control.");
     } finally {
       setLoading(false);
@@ -71,7 +71,7 @@ export default function PageUsuariosControl() {
 
   async function handleSearch(e) {
     e.preventDefault();
-    console.log("🔍 Buscando:", search);
+    console.log(" Buscando:", search);
     if (!search.trim()) {
       loadUsuarios();
       return;
@@ -84,7 +84,7 @@ export default function PageUsuariosControl() {
   }
 
   function handleCreate() {
-    console.log("🆕 Crear nuevo usuario");
+    console.log(" Crear nuevo usuario");
     setSelectedUsuario(null);
     setShowForm(true);
   }
@@ -92,6 +92,7 @@ export default function PageUsuariosControl() {
   async function handleSave(payload) {
     try {
       let usuarioGuardado;
+      const payloadConEstado = { ...payload, estado: true }; 
       if (selectedUsuario) {
         console.log("✏️ Editando usuario:", selectedUsuario.id);
         await updateUsuarioControl(selectedUsuario.id, payload);
@@ -217,8 +218,10 @@ export default function PageUsuariosControl() {
             <table className="styled-table">
               <thead>
                 <tr>
-                  <th>ID</th>
+                  <th>#</th>
                   <th>Nombre</th>
+                  <th>Ap. Materno</th>
+                  <th>Ap. Paterno</th>
                   <th>Email</th>
                   <th>Teléfono</th>
                   <th>Estado</th>
@@ -234,13 +237,15 @@ export default function PageUsuariosControl() {
                     </td>
                   </tr>
                 ) : (
-                  usuariosPaginados.map(usuario => (
+                  usuariosPaginados.map((usuario, index) => (
                     <tr
                       key={usuario.id}
                       className={!usuario.estado ? "row-inactive" : ""}
                     >
-                      <td>{usuario.id}</td>
+                      <td>{indiceInicio + index + 1}</td> {/* número de lista */}
                       <td>{usuario.nombre}</td>
+                      <td>{usuario.apaterno || "—"}</td>
+                      <td>{usuario.amaterno || "—"}</td>
                       <td>{usuario.email}</td>
                       <td>{usuario.telefono}</td>
                       <td>{usuario.estado ? "Activo" : "Inactivo"}</td>
