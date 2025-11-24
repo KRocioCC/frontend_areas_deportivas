@@ -40,6 +40,7 @@ import Dashboard from "../features/RolAdministrador/dashboard/index.jsx";
 import CanchaReservaPage from "../features/RolAdministrador/canchas/CanchaReservasPage";
 import ReservaListAdmin from "../features/RolAdministrador/reservas/ReservaListAdmin.js";
 import CancelacionesListAdmin from "../features/RolAdministrador/cancelaciones/CancelacionesListAdmin.js";
+import DisciplinaListAdmin from "../features/RolAdministrador/Disciplina/DisciplinaListAdmin.js";
 
 //CLIENTE
 // CLIENTE - componentes visuales
@@ -464,7 +465,16 @@ function AppRouter() {
               </ProtectedRoute>
             }
           />
-
+          <Route
+            path="/admin/disciplinas"
+            element={
+              <ProtectedRoute requireAdmin>
+                <DashboardLayoutAdmin>
+            <DisciplinaListAdmin />
+                </DashboardLayoutAdmin>
+              </ProtectedRoute>
+            }
+          />
 
           <Route
             path="/admin/notificaciones"
