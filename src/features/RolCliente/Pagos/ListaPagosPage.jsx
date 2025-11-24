@@ -72,7 +72,7 @@ export default function ListPagosPage() {
   const pagadaCompleta = Boolean(reserva?.pagadaCompleta === true || saldoPendiente <= 0);
 
   // Botón "Realizar pago" habilitado solo si falta saldo y usuario es dueño
-  const puedeRealizarPago = !pagadaCompleta && reserva && reserva.clienteId === user?.idPersona;
+  const puedeRealizarPago = !pagadaCompleta && reserva && user?.idPersona;
 
   // Nota: lo pasamos a la pantalla de pago para que ese flujo lo respete
   const tipoPagoCongelado = pagos.length > 0 ? pagos[0].tipoPago : null;

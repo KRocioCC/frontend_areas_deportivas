@@ -119,6 +119,7 @@ export default function RealizarPagoPage() {
         clienteId: reserva.clienteId,
         cuotas: cuotasElegidas ?? 1
       };
+      console.log("ENVIANDO AL BACKEND:", payload);
 
       const pago = await createPago(payload);
       setPagoCreado(pago);

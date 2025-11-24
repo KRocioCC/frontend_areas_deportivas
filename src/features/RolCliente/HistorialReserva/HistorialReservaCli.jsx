@@ -52,7 +52,7 @@ export default function HistorialReservaCli() {
 
   const ESTADO_COLORES = {
     PENDIENTE: 
-      isDarkMode 
+      isDarkMode  
         ? "border-[#f35734]" 
         : "border-[#f38321]",
 
