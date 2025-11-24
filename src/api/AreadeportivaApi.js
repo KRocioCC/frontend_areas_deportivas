@@ -115,3 +115,17 @@ export const agregarImagenesArea = async (id, archivos) => {
   });
   return response.data;
 };
+
+// Variante que acepta un callback de progreso (onUploadProgress)
+export const agregarImagenesAreaConProgreso = async (id, archivos, onUploadProgress) => {
+  const formData = new FormData();
+  if (archivos && archivos.length > 0) {
+    archivos.forEach((file) => formData.append('archivosImagenes', file));
+  }
+
+  const response = await api.post(`${BASE_URL}/${id}/imagenes`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+    onUploadProgress,
+  });
+  return response.data;
+};

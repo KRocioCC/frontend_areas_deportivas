@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import * as reservaService from '../../../api/ReservaApi';
+import * as canchaService from '../../../api/CanchaApi';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
@@ -12,6 +13,7 @@ const CanchaReservasPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [modal, setModal] = useState({ abierto: false, tipo: '', reserva: null });
+    const [cancha, setCancha] = useState(null);
 
     // Buscador: por nombre de cliente y por fecha
     const [searchTerm, setSearchTerm] = useState('');
@@ -80,9 +82,16 @@ const CanchaReservasPage = () => {
             
             setLoading(true);
             try {
-                const reservasData = await reservaService.getReservasPorCancha(idCancha);
-                console.log('Reservas obtenidas:', reservasData);
-                setReservas(reservasData);
+                const [reservasData, canchaData] = await Promise.all([
+                    reservaService.getReservasPorCancha(idCancha),
+                    canchaService.getCancha(idCancha).catch(err => {
+                        console.warn('No se pudo obtener datos de la cancha:', err);
+                        return null;
+                    })
+                ]);
+                console.log('Reservas obtenidas:', reservasData, 'Cancha:', canchaData);
+                setReservas(reservasData || []);
+                setCancha(canchaData || null);
             } catch (err) {
                 console.error('Error al obtener reservas:', err);
                 setError('Ocurrió un error al cargar las reservas. Por favor, intenta de nuevo.');
@@ -339,7 +348,7 @@ const CanchaReservasPage = () => {
             )}
 
             {/* Contenido principal */}
-            <div className="min-h-screen bg-gray-100 p-6 max-w-screen-2xl mx-auto w-full">
+            <div className="min-h-screen bg-gray-100 p-6 max-w-screen-2xl mt-28 mx-auto w-full">
                 <div className="bg-white p-8 rounded-xl shadow-lg w-full mx-auto max-w-screen-2xl">
                     {/* Header */}
                     <div className="flex justify-between items-center mb-8">
@@ -356,7 +365,7 @@ const CanchaReservasPage = () => {
                         <div className="text-center">
                             <h1 className="text-4xl font-bold text-black mb-2" style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}>
                                 Reservas de la cancha 
-                                <p className="text-2xl mt-2">{reservas?.[0]?.cancha?.nombre ?? 'Nombre no disponible'}</p>
+                                <p className="text-2xl mt-2">{cancha?.nombre ?? 'Nombre no disponible'}</p>
                             </h1>
                         </div>
                         
