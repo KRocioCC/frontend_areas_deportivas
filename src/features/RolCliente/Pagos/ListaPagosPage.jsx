@@ -6,7 +6,7 @@ import { useTheme } from "../../../context/ThemeContext";
 import { getPagosByReserva, createPago, confirmarPago } from "../../../api/PagosApi";
 import { getReservaPorId } from "../../../api/ReservaApi";
 import { obtenerMontoTotal } from "../../../api/IncluyeApi";
-import { FaQrcode, FaCreditCard, FaMoneyBillWave } from "react-icons/fa";
+import {FaArrowLeft } from "react-icons/fa";
 
 function generarCodigoTransaccion(idReserva, clienteId) {
   const timestamp = Date.now().toString(36).toUpperCase();
@@ -220,18 +220,20 @@ export default function ListPagosPage() {
         </div>
 
         {/* ——— BOTONES (acciones) ——— */}
-        <div className="flex justify-end gap-3">
-          <button
-            onClick={() => navigate(-1)}
-            className="px-5 py-3 rounded-lg font-medium flex items-center justify-center transition-all duration-200 hover:opacity-90 active:scale-[0.98]"
+        <div className="flex flex items-center justify-between mt-10-end gap-3">
+          <button 
+            onClick={() => navigate(-1)} 
+            className="flex items-center gap-2 mb-6 px-4 py-2.5 rounded-lg font-medium transition-all duration-200 hover:opacity-90 active:scale-[0.98] shadow-sm"
             style={{
               fontFamily: 'var(--font-josefin)',
-              background: isDarkMode ? '#1e2224' : '#f2efeb',
-              color: isDarkMode ? '#a0a0a0' : '#4b5563',
-              border: isDarkMode ? '1px solid #2a2e30' : '1px solid #ddd',
+              background: isDarkMode ? '#8a2628' : '#d61727',
+              color: '#FFFFFF',
+              boxShadow: isDarkMode 
+                ? '0 2px 6px rgba(180, 91, 93, 0.3)' 
+                : '0 2px 6px rgba(214, 23, 39, 0.25)',
             }}
           >
-            ← Salir
+            <FaArrowLeft /> Salir
           </button>
 
           {puedeRealizarPago ? (

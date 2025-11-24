@@ -1,4 +1,4 @@
-// src/components/QRCodeComponent.jsx
+
 import React, { useEffect, useRef } from "react";
 
 export default function QRCode({ value, size = 150, isDarkMode = false }) {
