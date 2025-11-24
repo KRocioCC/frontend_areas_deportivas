@@ -163,13 +163,17 @@ export default function ClienteForm({ initialData, onSave, onCancel }) {
       </div>
 
       <div className="form-row">
-        <label>Estado del Cliente *</label>
-        <input 
+        <label>Categoria *</label>
+        <select 
           name="categoria" 
           value={form.categoria} 
           onChange={handleChange}
           className={errors.categoria ? 'error-field' : ''}
-        />
+        >
+          <option value="NUEVO">NUEVO</option>
+          <option value="POTENCIA">POTENCIA</option>
+          <option value="ANTIGUO">ANTIGUO</option>
+        </select>
         {errors.categoria && <div className="form-error">{errors.categoria}</div>}
       </div>
 

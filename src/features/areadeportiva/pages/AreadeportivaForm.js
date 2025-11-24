@@ -4,6 +4,9 @@ import Button from "../../../components/ui/Button";
 import { Plus, X } from "lucide-react";
 import './Areadeportiva.css';
 
+import * as ZonaService from "../../../api/ZonaApi";
+import * as AdministradorService from "../../../api/administradorApi";
+
 export default function AreadeportivaForm({ 
   initialData, 
   onSave, 
@@ -36,24 +39,28 @@ export default function AreadeportivaForm({
 
   const [zonas, setZonas] = useState([]); // Lista de zonas para select
   const [administradores, setAdministradores] = useState([]); // Lista de administradores
+  const [loadingData, setLoadingData] = useState(false);
   const [errors, setErrors] = useState({});
 
   // Cargar zonas y administradores al montar el componente
   useEffect(() => {
-
     const loadData = async () => {
       try {
-        const zonasRes = await fetch('http://localhost:8032/api/zona');
-        const zonasData = await zonasRes.json();
+        setLoadingData(true);
+        // Usa los servicios de API en lugar de fetch directo
+        const [zonasData, adminsData] = await Promise.all([
+          ZonaService.getZonas(),
+          AdministradorService.getAdministradores()
+        ]);
+        
         setZonas(Array.isArray(zonasData) ? zonasData : []);
-
-        const adminsRes = await fetch('http://localhost:8032/api/administradores');
-        const adminsData = await adminsRes.json();
         setAdministradores(Array.isArray(adminsData) ? adminsData : []);
       } catch (err) {
         console.error("Error cargando zonas o administradores:", err);
         setZonas([]);
         setAdministradores([]);
+      } finally {
+        setLoadingData(false);
       }
     };
     loadData();
@@ -252,33 +259,42 @@ export default function AreadeportivaForm({
         {errors.urlImagen && <div className="form-error">{errors.urlImagen}</div>}
       </div>
 
-      <div className="form-row">
+            <div className="form-row">
         <label>Zona</label>
-        <select value={idZona ?? ''} 
+        <select 
+          value={idZona ?? ''} 
           onChange={e => setIdZona(Number(e.target.value))}
-          disabled={readonly}
+          disabled={readonly || loadingData}
           aria-readonly={readonly} 
         >
           <option value="">Seleccione una zona</option>
-          {zonas.map(z => (
-            <option key={z.idZona} value={z.idZona}>{z.nombre}</option>
-          ))}
+          {loadingData ? (
+            <option value="" disabled>Cargando zonas...</option>
+          ) : (
+            zonas.map(z => (
+              <option key={z.idZona} value={z.idZona}>{z.nombre}</option>
+            ))
+          )}
         </select>
         {errors.idZona && <div className="form-error">{errors.idZona}</div>}
       </div>
 
       <div className="form-row">
         <label>Administrador</label>
-        <select value={id ?? ''} 
+        <select 
+          value={id ?? ''} 
           onChange={e => setId(Number(e.target.value))}
-          disabled={readonly}
+          disabled={readonly || loadingData}
           aria-readonly={readonly} 
         >
           <option value="">Seleccione un administrador</option>
-          {administradores.map(a => (
-            <option key={a.id} 
-            value={a.id}>{a.nombre}</option>
-          ))}
+          {loadingData ? (
+            <option value="" disabled>Cargando administradores...</option>
+          ) : (
+            administradores.map(a => (
+              <option key={a.id} value={a.id}>{a.nombre}</option>
+            ))
+          )}
         </select>
         {errors.id && <div className="form-error">{errors.id}</div>}
       </div>

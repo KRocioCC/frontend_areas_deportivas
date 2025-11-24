@@ -9,7 +9,7 @@ const AdministradorForm = ({ initialData, onSave, onCancel }) => {
     fechaNacimiento: "",
     telefono: "",
     email: "",
-    ci: "",
+    //ci: "",
     urlImagen: "",
     estado: true,
     cargo: "",
@@ -27,7 +27,7 @@ const AdministradorForm = ({ initialData, onSave, onCancel }) => {
         fechaNacimiento: initialData.fechaNacimiento ?? initialData.fecha_nacimiento ?? "",
         telefono: initialData.telefono ?? "",
         email: initialData.email ?? "",
-        ci: initialData.ci ?? "",
+        //ci: initialData.ci ?? "",
         urlImagen: initialData.urlImagen ?? initialData.url_imagen ?? "",
         estado: initialData.estado ?? true,
         cargo: initialData.cargo ?? "",
@@ -42,7 +42,7 @@ const AdministradorForm = ({ initialData, onSave, onCancel }) => {
     if (!form.apaterno.trim()) e.apaterno = "El apellido paterno es obligatorio";
     if (!form.telefono.trim()) e.telefono = "El teléfono es obligatorio";
     if (!form.email.trim()) e.email = "El correo electrónico es obligatorio";
-    if (!form.ci.trim()) e.ci = "El carnet de identidad es obligatorio";
+    //if (!form.ci.trim()) e.ci = "El carnet de identidad es obligatorio";
     if (!form.cargo.trim()) e.cargo = "El cargo es obligatorio";
     if (!form.direccion.trim()) e.direccion = "La dirección es obligatoria";
     
@@ -79,7 +79,7 @@ const AdministradorForm = ({ initialData, onSave, onCancel }) => {
       nombre: form.nombre ?? "",
       telefono: form.telefono ?? "",
       email: form.email ?? "",
-      ci: form.ci ?? "",
+      //ci: form.ci ?? "",
       urlImagen: form.urlImagen ?? "",
       fechaNacimiento: form.fechaNacimiento || null,
       estado: Boolean(form.estado),
@@ -155,6 +155,7 @@ const AdministradorForm = ({ initialData, onSave, onCancel }) => {
         {errors.email && <div className="form-error">{errors.email}</div>}
       </div>
 
+      {/*
       <div className="form-row">
         <label>Carnet de Identidad *</label>
         <input 
@@ -165,6 +166,7 @@ const AdministradorForm = ({ initialData, onSave, onCancel }) => {
         />
         {errors.ci && <div className="form-error">{errors.ci}</div>}
       </div>
+      */}
 
       <div className="form-row">
         <label>URL de Imagen</label>

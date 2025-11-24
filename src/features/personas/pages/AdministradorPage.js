@@ -37,7 +37,7 @@ function normalizeAdministrador(raw = {}) {
     fechaNacimiento,
     telefono: raw.telefono ?? raw.phone ?? "",
     email: raw.email ?? "",
-    ci: raw.ci ?? "",
+    //ci: raw.ci ?? "",
     urlImagen,
     estado,
     cargo: raw.cargo ?? "",
@@ -123,7 +123,7 @@ export default function AdministradorPage() {
           nombre: payload.nombre ?? existingFromServer.nombre ?? "",
           telefono: payload.telefono ?? existingFromServer.telefono ?? "",
           email: payload.email ?? existingFromServer.email ?? "",
-          ci: payload.ci ?? existingFromServer.ci ?? "",
+          //ci: payload.ci ?? existingFromServer.ci ?? "",
           apaterno: payload.apaterno ?? payload.aPaterno ?? existingFromServer.apaterno ?? existingFromServer.aPaterno ?? existingFromServer.apellidoPaterno ?? "",
           amaterno: payload.amaterno ?? payload.aMaterno ?? existingFromServer.amaterno ?? existingFromServer.aMaterno ?? existingFromServer.apellidoMaterno ?? "",
         };
@@ -138,7 +138,7 @@ export default function AdministradorPage() {
           fechaNacimiento: payload.fechaNacimiento || null,
           telefono: payload.telefono ?? "",
           email: payload.email ?? "",
-          ci: payload.ci ?? "",
+          //ci: payload.ci ?? "",
           urlImagen: payload.urlImagen ?? "",
           estado: Boolean(payload.estado),
           cargo: payload.cargo ?? "",
@@ -248,10 +248,12 @@ export default function AdministradorPage() {
                 <span className="detail-label">Teléfono</span>
                 <span className="detail-value">{administrador.telefono || <span className="empty-text">No especificado</span>}</span>
               </div>
+              {/*
               <div className="detail-item">
                 <span className="detail-label">CI</span>
                 <span className="detail-value">{administrador.ci || <span className="empty-text">No especificado</span>}</span>
               </div>
+              */}
               <div className="detail-item">
                 <span className="detail-label">Cargo</span>
                 <span className="detail-value">{administrador.cargo || <span className="empty-text">No especificado</span>}</span>
