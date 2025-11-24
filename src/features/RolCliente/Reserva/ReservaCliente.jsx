@@ -114,11 +114,10 @@ export default function ReservaCliente() {
 
             {/* DATOS */}
             <div className="space-y-2 text-[18px]">
-              <p><strong>Nombre:</strong> {clienteCompleto.nombre +" "+ clienteCompleto.aPaterno + " "+ clienteCompleto.aMaterno || clienteCompleto.fullName}</p>
+              <p><strong>Nombre:</strong> {clienteCompleto.nombre +" "+ clienteCompleto.apellidoPaterno + " "+ clienteCompleto.apellidoMaterno || clienteCompleto.fullName}</p>
               <p><strong>Correo:</strong> {clienteCompleto.email}</p>
               <p><strong>Fecha nacimiento:</strong> {clienteCompleto.fechaNacimiento }</p>
               <p><strong>Teléfono:</strong> {clienteCompleto.telefono || "No registrado"}</p>
-              <p><strong>Imagen:</strong> {clienteCompleto.urlImagen}</p>
             </div>
           </div>
         ) : (

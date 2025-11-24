@@ -1,17 +1,20 @@
-// src/features/areadeportivas/pages/AreadeportivaForm.jsx
 import React, { useEffect, useState, useMemo } from "react";
 import Button from "../../../components/ui/Button";
-import { Plus, X } from "lucide-react";
+import { Plus, X, Upload } from "lucide-react";
+import api from '../../../api/api'; // Tu instancia de Axios
 import './Areadeportiva.css';
 
 import * as ZonaService from "../../../api/ZonaApi";
 import * as AdministradorService from "../../../api/administradorApi";
+// Configuración de ruta base para imágenes
+const BASE_URL_IMG = "http://localhost:8032/"; 
 
 export default function AreadeportivaForm({ 
   initialData, 
   onSave, 
   onCancel,
-  mode,}) {
+  mode,
+}) {
   
   const computedMode = useMemo(() => {
       if (mode) return mode;
@@ -28,7 +31,6 @@ export default function AreadeportivaForm({
   const [telefonoArea, setTelefonoArea] = useState('');
   const [horaInicioArea, setHoraInicioArea] = useState('');
   const [horaFinArea, setHoraFinArea] = useState('');
-  const [urlImagen, setUrlImagen] = useState('');
   const [latitud, setLatitud] = useState('');
   const [longitud, setLongitud] = useState('');
   const [estado, setEstado] = useState(true);
@@ -42,6 +44,7 @@ export default function AreadeportivaForm({
   const [loadingData, setLoadingData] = useState(false);
   const [errors, setErrors] = useState({});
 
+  const [selectedFiles, setSelectedFiles] = useState([]);
   // Cargar zonas y administradores al montar el componente
   useEffect(() => {
     const loadData = async () => {
@@ -66,7 +69,7 @@ export default function AreadeportivaForm({
     loadData();
   }, []);
 
-  // Cargar datos iniciales (editar)
+  // Cargar datos iniciales
   useEffect(() => {
     if (initialData) {
       setNombreArea(initialData.nombreArea || '');
@@ -76,12 +79,12 @@ export default function AreadeportivaForm({
       setHoraInicioArea(initialData.horaInicioArea || '');
       setHoraFinArea(initialData.horaFinArea || '');
       setEstado(initialData.estado ?? true);
-      setUrlImagen(initialData.urlImagen || '');
       setLatitud(initialData.latitud ?? '');
       setLongitud(initialData.longitud ?? '');
       setIdZona(initialData.idZona ?? null);
       setId(initialData.id ?? null);
     } else {
+      // Limpiar para crear
       setNombreArea('');
       setDescripcionArea('');
       setEmailArea('');
@@ -89,29 +92,34 @@ export default function AreadeportivaForm({
       setHoraInicioArea('');
       setHoraFinArea('');
       setEstado(true);
-      setUrlImagen('');
       setLatitud('');
       setLongitud('');
       setIdZona(null);
       setId(null);
     }
     setErrors({});
+    setSelectedFiles([]); 
   }, [initialData]);
 
-  // Validación del formulario
+  const handleFileChange = (e) => {
+    if (e.target.files) {
+        const files = Array.from(e.target.files);
+        setSelectedFiles(files);
+    }
+  };
+
   function validate() {
     const e = {};
-    if (!nombreArea.trim()) e.nombreArea = "El nombre del área es obligatorio";
-    if (!idZona) e.idZona = "Debe seleccionar una zona";
-    if (!id) e.id = "Debe seleccionar un administrador";
-    if (!latitud) e.latitud = "Latitud es obligatoria";
-    if (!longitud) e.longitud = "Longitud es obligatoria";
-    if (!horaInicioArea) e.horaInicioArea = "Hora de inicio obligatoria";
-    if (!horaFinArea) e.horaFinArea = "Hora de fin obligatoria";
+    if (!nombreArea.trim()) e.nombreArea = "Nombre obligatorio";
+    if (!idZona) e.idZona = "Seleccione una zona";
+    if (!id) e.id = "Seleccione un administrador";
+    if (!latitud) e.latitud = "Latitud obligatoria";
+    if (!longitud) e.longitud = "Longitud obligatoria";
+    if (!horaInicioArea) e.horaInicioArea = "Hora inicio obligatoria";
+    if (!horaFinArea) e.horaFinArea = "Hora fin obligatoria";
     return e;
   };
   
-//ENVIO FORMULARIO
   const handleSubmit = (ev) => {
     ev.preventDefault();
     const e = validate();
@@ -120,7 +128,6 @@ export default function AreadeportivaForm({
       return;
     }
     
-//REVISO
     const payload = {
       ...(initialData?.idAreadeportiva ? { idAreadeportiva: initialData.idAreadeportiva } : {}),
       nombreArea: nombreArea.trim(),
@@ -130,133 +137,108 @@ export default function AreadeportivaForm({
       horaInicioArea: horaInicioArea,
       horaFinArea: horaFinArea,
       estado: estado,
-      urlImagen: urlImagen.trim(),
       latitud: Number(latitud),
       longitud: Number(longitud),
       idZona: Number(idZona),
       id: Number(id)
     };
 
-    onSave(payload);
+    // Enviamos payload y archivos al padre
+    onSave(payload, selectedFiles);
   };
 
-  const title =
-    computedMode === "view"
-      ? "Ver Area Deportiva"
-      : computedMode === "edit"
-      ? "Editar Area Deportiva"
-      : "Nuevo Area Deportiva";
+  const title = computedMode === "view" ? "Ver Área" : computedMode === "edit" ? "Editar Área" : "Nueva Área Deportiva";
 
   return (
-    <form className="Areadeportiva-form" onSubmit={handleSubmit}>
-      <h3>{title}</h3>
+    <form className="Areadeportiva-form p-4" onSubmit={handleSubmit}>
+      <h3 className="text-xl font-bold mb-4">{title}</h3>
 
-      <div className="form-row">
-        <label>Nombre del Área</label>
+      <div className="form-row mb-3">
+        <label className="block text-sm font-medium">Nombre del Área</label>
         <input 
           value={nombreArea} 
           onChange={e => setNombreArea(e.target.value)} 
           disabled={readonly}
-          aria-readonly={readonly}
-          className={readonly ? "field-readonly" : ""}
+          className={`w-full border p-2 rounded ${readonly ? "bg-gray-100" : ""}`}
         />
-        {errors.nombreArea && <div className="form-error">{errors.nombreArea}</div>}
+        {errors.nombreArea && <div className="text-red-500 text-sm">{errors.nombreArea}</div>}
       </div>
 
-      <div className="form-row">
-        <label>Descripción</label>
-        <textarea 
-          value={descripcionArea} 
-          onChange={e => setDescripcionArea(e.target.value)}
-          disabled={readonly}
-          aria-readonly={readonly}
-          className={readonly ? "field-readonly" : ""}
-          rows={4} 
-        />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+          <div>
+            <label className="block text-sm font-medium">Zona</label>
+            <select value={idZona ?? ''} onChange={e => setIdZona(Number(e.target.value))} disabled={readonly} className="w-full border p-2 rounded">
+              <option value="">Seleccione una zona</option>
+              {zonas.map(z => <option key={z.idZona} value={z.idZona}>{z.nombre}</option>)}
+            </select>
+            {errors.idZona && <div className="text-red-500 text-sm">{errors.idZona}</div>}
+          </div>
+          <div>
+            <label className="block text-sm font-medium">Administrador</label>
+            <select value={id ?? ''} onChange={e => setId(Number(e.target.value))} disabled={readonly} className="w-full border p-2 rounded">
+              <option value="">Seleccione un administrador</option>
+              {administradores.map(a => <option key={a.id} value={a.id}>{a.nombre}</option>)}
+            </select>
+            {errors.id && <div className="text-red-500 text-sm">{errors.id}</div>}
+          </div>
       </div>
 
-      <div className="form-row">
-        <label>Email</label>
+      {/* SUBIDA DE ARCHIVOS */}
+      <div className="mb-4 p-4 border-2 border-dashed border-blue-300 bg-blue-50 rounded">
+        <label className="flex items-center gap-2 font-bold text-blue-700 mb-2">
+            <Upload size={18}/> Subir Nuevas Fotos
+        </label>
         <input 
-          type="email" 
-          value={emailArea} 
-          onChange={e => setEmailArea(e.target.value)} 
-          disabled={readonly}
-          aria-readonly={readonly}
+            type="file" 
+            multiple 
+            accept="image/*"
+            onChange={handleFileChange}
+            disabled={readonly}
+            className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700"
         />
+        {selectedFiles.length > 0 && (
+            <p className="text-sm text-green-600 mt-1 font-semibold">{selectedFiles.length} imágenes seleccionadas</p>
+        )}
       </div>
 
-      <div className="form-row">
-        <label>Teléfono</label>
-        <input 
-          value={telefonoArea} 
-          onChange={e => setTelefonoArea(e.target.value)} 
-          placeholder="8 dígitos" 
-          disabled={readonly}
-          aria-readonly={readonly}
-        />
+      {/* GALERÍA DE IMÁGENES EXISTENTES */}
+      {initialData?.imagenes && initialData.imagenes.length > 0 && (
+        <div className="mb-4 p-4 bg-gray-50 border rounded-lg">
+            <label className="block text-sm font-bold text-gray-700 mb-2">
+                Galería ({initialData.imagenes.length} fotos)
+            </label>
+            <div className="flex flex-wrap gap-4">
+                {initialData.imagenes.map((img, index) => (
+                    <div key={img.idImagen || index} className="relative group">
+                        <img 
+                            // Lógica de URL: si viene completa se usa, si no se pega la base
+                            src={img.rutaAlmacenamiento?.startsWith('http') ? img.rutaAlmacenamiento : `${BASE_URL_IMG}${img.rutaAlmacenamiento}`}
+                            alt={`Foto ${index}`} 
+                            className="w-24 h-24 object-cover rounded shadow border bg-white" 
+                            onError={(e) => {
+                                e.target.src = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgdmlld0JveD0iMCAwIDUwIDUwIj48cmVjdCB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIGZpbGw9IiNlZWVlZWUiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIiBmaWxsPSIjOTk5OTk5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+TUE8L3RleHQ+PC9zdmc+";
+                            }}
+                        />
+                    </div>
+                ))}
+            </div>
+        </div>
+      )}
+
+      <div className="form-row mb-3">
+        <label className="block text-sm font-medium">Descripción</label>
+        <textarea value={descripcionArea} onChange={e => setDescripcionArea(e.target.value)} disabled={readonly} rows={3} className="w-full border p-2 rounded"/>
       </div>
 
-      <div className="form-row">
-        <label>Hora Inicio</label>
-        <input type="time" 
-          value={horaInicioArea} 
-          onChange={e => setHoraInicioArea(e.target.value)}
-          disabled={readonly}
-          aria-readonly={readonly}
-        />
-        {errors.horaInicioArea && <div className="form-error">{errors.horaInicioArea}</div>}
-      </div>
-
-      <div className="form-row">
-        <label>Hora Fin</label>
-        <input 
-          type="time" 
-          value={horaFinArea} 
-          onChange={e => setHoraFinArea(e.target.value)}
-          disabled={readonly}
-          aria-readonly={readonly}
-        />
-        {errors.horaFinArea && <div className="form-error">{errors.horaFinArea}</div>}
-      </div>
-
-      <div className="form-row">
-        <label>Latitud</label>
-        <input 
-          type="number" 
-          step="any" 
-          value={latitud} 
-          onChange={e => setLatitud(e.target.value)} 
-          disabled={readonly}
-          aria-readonly={readonly}
-        />
-        {errors.latitud && <div className="form-error">{errors.latitud}</div>}
-      </div>
-
-      <div className="form-row">
-        <label>Longitud</label>
-        <input 
-          type="number" 
-          step="any" 
-          value={longitud} 
-          onChange={e => setLongitud(e.target.value)}
-          disabled={readonly}
-          aria-readonly={readonly}
-        />
-        {errors.longitud && <div className="form-error">{errors.longitud}</div>}
-      </div>
-
-      <div className="form-row">
-        <label>Url</label>
-        <input 
-          type="string" 
-          step="any" 
-          value={urlImagen} 
-          onChange={e => setUrlImagen(e.target.value)}
-          disabled={readonly}
-          aria-readonly={readonly} 
-        />
-        {errors.urlImagen && <div className="form-error">{errors.urlImagen}</div>}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+          <div>
+            <label className="block text-sm font-medium">Email</label>
+            <input type="email" value={emailArea} onChange={e => setEmailArea(e.target.value)} disabled={readonly} className="w-full border p-2 rounded"/>
+          </div>
+          <div>
+            <label className="block text-sm font-medium">Teléfono</label>
+            <input value={telefonoArea} onChange={e => setTelefonoArea(e.target.value)} placeholder="8 dígitos" disabled={readonly} className="w-full border p-2 rounded"/>
+          </div>
       </div>
 
             <div className="form-row">
@@ -297,35 +279,43 @@ export default function AreadeportivaForm({
           )}
         </select>
         {errors.id && <div className="form-error">{errors.id}</div>}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+          <div>
+            <label className="block text-sm font-medium">Hora Inicio</label>
+            <input type="time" value={horaInicioArea} onChange={e => setHoraInicioArea(e.target.value)} disabled={readonly} className="w-full border p-2 rounded"/>
+            {errors.horaInicioArea && <div className="text-red-500 text-sm">{errors.horaInicioArea}</div>}
+          </div>
+          <div>
+            <label className="block text-sm font-medium">Hora Fin</label>
+            <input type="time" value={horaFinArea} onChange={e => setHoraFinArea(e.target.value)} disabled={readonly} className="w-full border p-2 rounded"/>
+            {errors.horaFinArea && <div className="text-red-500 text-sm">{errors.horaFinArea}</div>}
+          </div>
       </div>
 
-      <div className="form-row">
-        <label className="checkbox-label">
-          <input 
-            type="checkbox" 
-            checked={estado} 
-            onChange={e => setEstado(e.target.checked)}
-            disabled={readonly}
-            aria-readonly={readonly} 
-          /> Activo
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+          <div>
+            <label className="block text-sm font-medium">Latitud</label>
+            <input type="number" step="any" value={latitud} onChange={e => setLatitud(e.target.value)} disabled={readonly} className="w-full border p-2 rounded"/>
+            {errors.latitud && <div className="text-red-500 text-sm">{errors.latitud}</div>}
+          </div>
+          <div>
+             <label className="block text-sm font-medium">Longitud</label>
+             <input type="number" step="any" value={longitud} onChange={e => setLongitud(e.target.value)} disabled={readonly} className="w-full border p-2 rounded"/>
+             {errors.longitud && <div className="text-red-500 text-sm">{errors.longitud}</div>}
+          </div>
+      </div>
+
+      <div className="form-row mb-4">
+        <label className="inline-flex items-center">
+          <input type="checkbox" checked={estado} onChange={e => setEstado(e.target.checked)} disabled={readonly} className="form-checkbox"/>
+          <span className="ml-2">Activo</span>
         </label>
-        
       </div>
 
-      <div className="form-actions">
-        {readonly ? (
-          <Button variant="primary" size="sm" icon={X} onClick={onCancel}>
-            Cerrar
-          </Button>
-        ) : (
-          <>
-            <Button type="submit" variant="accent1" size="sm" icon={Plus}>
-              Guardar
-            </Button>
-            <Button variant="primary" size="sm" icon={X} onClick={onCancel}>
-              Cancelar
-            </Button>
-          </>
+      <div className="flex justify-end gap-2">
+        <Button variant="primary" size="sm" icon={X} onClick={onCancel}>Cancelar</Button>
+        {!readonly && (
+             <Button type="submit" variant="accent1" size="sm" icon={Plus}>Guardar</Button>
         )}
       </div>
     </form>

@@ -1,8 +1,8 @@
 import axios from 'axios';
 
+// URL base de tu backend
 const API_URL = 'http://localhost:8032/api';
 
-// Crear instancia de axios con configuración base
 const api = axios.create({
     baseURL: API_URL,
     headers: {
@@ -10,32 +10,34 @@ const api = axios.create({
     },
 });
 
-// Interceptor para agregar token de autenticación si existe
-
+// Interceptor para inyectar el Token
 api.interceptors.request.use(
     (config) => {
-        const token = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).token : null;
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;  // Agregar el token al encabezado
+        // Intentamos leer el usuario del localStorage
+        const userStr = localStorage.getItem('user');
+        let token = null;
+
+        if (userStr) {
+            try {
+                const user = JSON.parse(userStr);
+                // A veces el token viene como 'token' o 'accessToken'
+                token = user.token || user.accessToken;
+            } catch (e) {
+                console.error("Error parseando usuario del localStorage", e);
+            }
         }
+
+        // Si encontramos token, lo inyectamos
+        if (token) {
+            config.headers['Authorization'] = `Bearer ${token}`;
+            // console.log("🔑 Token inyectado en petición a:", config.url); // Descomenta para depurar
+        } else {
+            console.warn("⚠️ Petición saliendo SIN TOKEN a:", config.url);
+        }
+
         return config;
     },
-    (error) => Promise.reject(error)
-);  
-
-// Interceptor para manejar errores comunes
-api.interceptors.response.use(
-    (response) => response,
     (error) => {
-        const { response } = error;
-
-        if (response && response.status === 401) {
-            // Si el token expiró, redirigir al login
-            localStorage.removeItem('user');
-            
-            //window.location.href = '/login';
-        } 
-
         return Promise.reject(error);
     }
 );

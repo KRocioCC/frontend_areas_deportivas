@@ -5,10 +5,13 @@ import {
   updateCancha,
   createCancha,
   deleteCancha,
+  agregarImagenesCancha,
 } from "../../../api/CanchaApi";
 import { useAuth } from "../../../auth/hooks/useAuth";
 import BuscadorCanchas from "./components/components_cancha/BuscadorCanchas";
 import CanchaCard from "./components/components_cancha/CanchaCard";
+import WizardCrearCancha from "./WizardCrearCancha";
+import ModalEdicionCancha from "./components/components_cancha/ModalEdicionCancha";
 
 const CanchasPage = () => {
   const { currentUser } = useAuth();
@@ -20,21 +23,9 @@ const CanchasPage = () => {
   const [editingId, setEditingId] = useState(null);
   const [editedData, setEditedData] = useState({});
   const [err, setErr] = useState(null);
-  const [showForm, setShowForm] = useState(false);
-  const [newCancha, setNewCancha] = useState({
-    nombre: "",
-    costoHora: 50,
-    capacidad: 25,
-    mantenimiento: "mensual",
-    horaInicio: "07:00",
-    horaFin: "22:00",
-    tipoSuperficie: "césped natural",
-    tamano: "40x60",
-    iluminacion: "halógena",
-    cubierta: "abierta",
-    urlImagen: "",
-    estado: true,
-  });
+
+  // Wizard states
+  const [showWizard, setShowWizard] = useState(false);
 
   useEffect(() => {
     const fetchAreaYcanchas = async () => {
@@ -99,7 +90,7 @@ const CanchasPage = () => {
     try {
       await updateCancha(editingId, editedData);
       const updatedList = canchas.map((c) =>
-        c.idCancha === editingId ? editedData : c
+        c.idCancha === editingId ? { ...c, ...editedData } : c
       );
       setCanchas(updatedList);
       setFilteredCanchas(updatedList);
@@ -107,10 +98,15 @@ const CanchasPage = () => {
       setEditedData({});
     } catch (error) {
       console.error("Error al actualizar cancha:", error);
+      alert(" Error al actualizar la cancha");
     }
   };
 
   const handleDesactivarCancha = async (idCancha) => {
+    if (!window.confirm("¿Estás seguro de que deseas desactivar esta cancha?")) {
+      return;
+    }
+    
     try {
       await deleteCancha(idCancha);
       const actualizadas = canchas.map((c) =>
@@ -118,136 +114,218 @@ const CanchasPage = () => {
       );
       setCanchas(actualizadas);
       setFilteredCanchas(actualizadas);
+      alert(" Cancha desactivada correctamente");
     } catch (error) {
       console.error("Error al desactivar cancha:", error);
+      alert(" Error al desactivar la cancha");
     }
   };
 
-  const handleCrearCancha = async () => {
-    if (!idArea) return;
-    const payload = { ...newCancha, idAreadeportiva: idArea };
-
-    try {
-      const creada = await createCancha(payload);
-      setCanchas((prev) => [...prev, creada]);
-      setFilteredCanchas((prev) => [...prev, creada]);
-      setShowForm(false);
-      setNewCancha({
-        nombre: "",
-        costoHora: 50,
-        capacidad: 25,
-        mantenimiento: "mensual",
-        horaInicio: "07:00",
-        horaFin: "22:00",
-        tipoSuperficie: "césped natural",
-        tamano: "40x60",
-        iluminacion: "halógena",
-        cubierta: "abierta",
-        urlImagen: "",
-        estado: true,
-      });
-    } catch (error) {
-      console.error("Error al crear cancha:", error);
+  const handleCanchaCreada = () => {
+    // Recargar las canchas después de crear una nueva
+    const fetchCanchas = async () => {
+      try {
+        const canchasData = await getCanchasPorArea(idArea);
+        setCanchas(canchasData);
+        setFilteredCanchas(canchasData);
+      } catch (error) {
+        console.error("Error al recargar canchas:", error);
+      }
+    };
+    
+    if (idArea) {
+      fetchCanchas();
     }
   };
 
-  if (loading) return <p className="text-center text-gray-600">Cargando canchas…</p>;
-  if (err) return <p className="text-center text-red-600">{err}</p>;
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-green-50">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600 text-lg">Cargando canchas...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (err) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-green-50">
+        <div className="text-center">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span className="text-2xl"></span>
+          </div>
+          <p className="text-red-600 text-lg font-semibold">{err}</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all"
+          >
+            Reintentar
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="w-full px-6 py-8"
-    style={{
-        backgroundImage: `url('/Fondos/Deporte11.png')`,
-      }}>
-      {/* Buscador centrado */}
-      <div className="max-w-5xl mx-auto flex items-center gap-4">
-        <BuscadorCanchas
-          zona={searchTerm}
-          disciplina=""
-          onZonaChange={(e) => setSearchTerm(e.target.value)}
-          onDisciplinaChange={() => {}}
-          onBuscar={handleSearch}
-        />
-        <button
-          onClick={() => setShowForm(true)}
-          className="px-4 py-2 bg-green-600 text-white rounded-full hover:bg-green-700 transition font-semibold text-sm"
-        >
-          Crear cancha
-        </button>
-        <button
-          onClick={handleClearSearch}
-          className="px-4 py-2 bg-gray-400 text-white rounded-full hover:bg-gray-500 transition font-semibold text-sm"
-        >
-          Limpiar
-        </button>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
+      {/* Header con fondo mejorado */}
+      <div 
+        className="relative bg-cover mb-8 bg-center bg-no-repeat py-16"
+        style={{
+          backgroundImage: `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('/Fondos/Deporte11.png')`,
+        }}
+      >
+        <div className="absolute inset-0  bg-black bg-opacity-30"></div>
+        <div className="relative max-w-7xl mb-6 mx-auto px-6 text-center">
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+            Gestión de Canchas
+          </h1>
+          <p className="text-xl text-blue-100 max-w-2xl mx-auto">
+            Administra y organiza todas las canchas de tu área deportiva
+          </p>
+        </div>
       </div>
 
-      {/* Formulario de creación */}
-      {showForm && (
-        <div className="max-w-xl mx-auto mt-10 p-6 bg-white rounded-xl shadow-lg border border-gray-200">
-          <h2 className="text-lg font-bold mb-4 text-gray-800">Nueva Cancha</h2>
-          <div className="grid grid-cols-2 gap-4">
-            {Object.entries(newCancha).map(([key, value]) =>
-              key !== "estado" ? (
-                <input
-                  key={key}
-                  type="text"
-                  value={value}
-                  onChange={(e) =>
-                    setNewCancha((prev) => ({ ...prev, [key]: e.target.value }))
-                  }
-                  placeholder={key}
-                  className="border px-3 py-2 rounded text-sm"
-                />
-              ) : null
+      {/* Contenido Principal */}
+    <div className="w-full mx-auto px-12 py-16 -mt-8 relative z-10">
+       { /* Panel de Búsqueda y Acciones */}
+          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 mb-8">
+            <div className="flex flex-col lg:flex-row gap-6 items-center justify-between">
+              <div className="flex-1 w-full">
+                {/* Búsqueda por nombre de cancha */}
+                <div className="relative">
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") handleSearch(); }}
+              placeholder="Buscar por nombre de cancha..."
+              className="w-full pl-4 pr-24 py-3 border border-gray-200 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
+            />
+            <button
+              onClick={handleSearch}
+              className="absolute right-2 top-1/2 -translate-y-1/2 px-4 py-2 bg-[#45bfb5] text-white rounded-md transition-colors text-sm"
+            >
+              Buscar
+            </button>
+                </div>
+              </div>
+              
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button
+            onClick={handleClearSearch}
+            className="px-6 py-3 bg-gray-500 text-white rounded-xl hover:bg-gray-600 transition-all duration-300 font-semibold text-sm shadow-lg hover:shadow-xl flex items-center justify-center"
+                >
+            <span> Limpiar</span>
+                </button>
+                
+                <button
+            onClick={() => setShowWizard(true)}
+            className="px-6 py-3 bg-gradient-to-r from-black to-gray-900 text-white rounded-xl hover:from-gray-800 hover:to-gray-700 transition-all duration-300 font-semibold text-sm shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center border border-gray-700"
+                >
+            <span className="mr-2"></span>
+            Crear Nueva Cancha
+                </button>
+              </div>
+            </div>
+
+            {/* Estadísticas rápidas */}
+          <div className="flex flex-wrap gap-4 mt-6 pt-6 border-t border-gray-200">
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+              <span>Total: <strong>{canchas.length}</strong> canchas</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+              <span>Activas: <strong>{canchas.filter(c => c.estado).length}</strong></span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+              <span>Inactivas: <strong>{canchas.filter(c => !c.estado).length}</strong></span>
+            </div>
+          </div>
+        </div>
+
+        {/* Grid de Canchas */}
+        {filteredCanchas.length === 0 ? (
+          <div className="text-center py-16 bg-white rounded-2xl shadow-lg border border-gray-100">
+            
+            <h3 className="text-xl font-semibold text-gray-700 mb-2">
+              {searchTerm ? "No se encontraron canchas" : "No hay canchas registradas"}
+            </h3>
+            <p className="text-gray-500 mb-6 max-w-md mx-auto">
+              {searchTerm 
+                ? "No existen canchas que coincidan con tu búsqueda. Intenta con otros términos."
+                : "Comienza agregando la primera cancha a tu área deportiva."
+              }
+            </p>
+            {!searchTerm && (
+              <button
+                onClick={() => setShowWizard(true)}
+                className="px-8 py-3 bg-gradient-to-r from-black-500 to-gray-900 text-white rounded-xl hover:from-blue-600 hover:to-purple-700 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+              >
+                Crear Primera Cancha
+              </button>
             )}
           </div>
-          <div className="flex justify-end gap-4 mt-6">
-            <button
-              onClick={() => setShowForm(false)}
-              className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 text-sm"
-            >
-              Cancelar
-            </button>
-            <button
-              onClick={handleCrearCancha}
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
-            >
-              Guardar cancha
-            </button>
+        ) : (
+          <div>
+            {/* Información de resultados */}
+            <div className="flex justify-between items-center mb-6">
+              
+              
+              {searchTerm && (
+                <button
+                  onClick={handleClearSearch}
+                >
+                </button>
+              )}
+            </div>
+
+            {/* Grid de Canchas */}
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+              {filteredCanchas.map((cancha) => (
+                <CanchaCard
+                  key={cancha.idCancha}
+                  cancha={cancha}
+                  onEdit={handleEditCancha}
+                  isEditing={editingId === cancha.idCancha}
+                  editedData={editedData}
+                  onChangeField={handleChangeField}
+                  onSave={handleSaveCancha}
+                  onCancel={() => {
+                    setEditingId(null);
+                    setEditedData({});
+                  }}
+                  onDesactivar={handleDesactivarCancha}
+                />
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
-      {/* Separador visual */}
-      <hr className="my-10 border-gray-300" />
+      {/* Wizard Modal */}
+      <WizardCrearCancha
+        isOpen={showWizard}
+        onClose={() => setShowWizard(false)}
+        onCanchaCreada={handleCanchaCreada}
+      />
 
-      {/* Grid fijo en 3 columnas */}
-      {filteredCanchas.length === 0 ? (
-        <p className="text-center text-gray-600">
-          {searchTerm
-            ? "No se encontraron canchas que coincidan con la búsqueda."
-            : "No hay canchas registradas para esta área."}
-        </p>
-              ) : (
-        <div className="max-w-[1400px] mx-auto px-4">
-          <section className="grid grid-cols-3 gap-12">
-            {filteredCanchas.map((cancha) => (
-              <CanchaCard
-                key={cancha.idCancha}
-                cancha={cancha}
-                onEdit={handleEditCancha}
-                isEditing={editingId === cancha.idCancha}
-                editedData={editedData}
-                onChangeField={handleChangeField}
-                onSave={handleSaveCancha}
-                onCancel={() => setEditingId(null)}
-                onDesactivar={handleDesactivarCancha}
-              />
-            ))}
-          </section>
-        </div>
-      )}
+      {/* Modal de edición: se muestra cuando editingId está definido */}
+      <ModalEdicionCancha
+        isOpen={!!editingId}
+        onClose={() => { setEditingId(null); setEditedData({}); }}
+        cancha={canchas.find(c => c.idCancha === editingId)}
+        onCanchaActualizada={() => {
+          // recargar canchas y limpiar estado de edición
+          setEditingId(null);
+          setEditedData({});
+          handleCanchaCreada();
+        }}
+      />
     </div>
   );
 };

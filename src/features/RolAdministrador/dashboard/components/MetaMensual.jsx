@@ -3,16 +3,12 @@ import Chart from 'react-apexcharts';
 import { Dropdown } from './ui/dropdown/Dropdown';
 import { DropdownItem } from './ui/dropdown/DropdownItem';
 import { MoreDotIcon } from '../icons';
-import { getReservasPorRangoFechas } from '../../../../api/ReservaApi';
-// import { calcularIngresos } from '../../../api/ReservaApi'; // ← Descomenta cuando actives el endpoint
+import { getReservasPorAdministradorEnRango } from '../../../../api/ReservaApi';
 
-const MetaMensual = () => {
+const MetaMensual = ({ idAdministrador }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [reservasMes, setReservasMes] = useState(0);
   const metaReservas = 20;
-
-  // const [ingresosMes, setIngresosMes] = useState(0);
-  // const metaIngresos = 20000;
 
   useEffect(() => {
     async function fetchReservasDelMes() {
@@ -22,38 +18,22 @@ const MetaMensual = () => {
         const finMes = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0);
 
         const formato = (fecha) => fecha.toISOString().split('T')[0];
-        const reservas = await getReservasPorRangoFechas(
+        const reservas = await getReservasPorAdministradorEnRango(
+          idAdministrador,
           formato(inicioMes),
           formato(finMes)
         );
+
         setReservasMes(reservas.length);
       } catch (error) {
         console.error('Error al cargar reservas del mes:', error);
       }
     }
 
-    fetchReservasDelMes();
-  }, []);
-
-  /*
-  useEffect(() => {
-    async function fetchIngresosDelMes() {
-      try {
-        const hoy = new Date();
-        const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
-        const finMes = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0);
-
-        const formato = (fecha) => fecha.toISOString().split('T')[0];
-        const data = await calcularIngresos(formato(inicioMes), formato(finMes));
-        setIngresosMes(data.ingresos || 0);
-      } catch (error) {
-        console.error('Error al calcular ingresos del mes:', error);
-      }
+    if (idAdministrador) {
+      fetchReservasDelMes();
     }
-
-    fetchIngresosDelMes();
-  }, []);
-  */
+  }, [idAdministrador]);
 
   const progreso = Math.min((reservasMes / metaReservas) * 100, 100).toFixed(2);
   const series = [parseFloat(progreso)];
@@ -105,7 +85,7 @@ const MetaMensual = () => {
               Meta Mensual
             </h3>
             <p className="mt-1 text-gray-500 text-theme-sm dark:text-gray-400">
-              Reservas acumuladas este mes
+              Reservas acumuladas este mes (Administrador {idAdministrador})
             </p>
           </div>
           <div className="relative inline-block">

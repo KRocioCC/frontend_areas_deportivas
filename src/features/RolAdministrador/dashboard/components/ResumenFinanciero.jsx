@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { getClientes } from '../../../../api/clienteApi';
-import { getReservas, getReservasPorRangoFechas } from '../../../../api/ReservaApi';
+import { getReservasPorAdministradorEnRango } from '../../../../api/ReservaApi';
 import { ArrowDownIcon, ArrowUpIcon, BoxIconLine, GroupIcon } from '../icons';
 import Badge from './ui/badge/Badge';
 
-const ResumenFinanciero = () => {
+const ResumenFinanciero = ({ idAdministrador }) => {
   const [clientes, setClientes] = useState([]);
   const [reservas, setReservas] = useState([]);
   const [reservasPrevias, setReservasPrevias] = useState([]);
@@ -12,18 +12,30 @@ const ResumenFinanciero = () => {
   useEffect(() => {
     async function fetchData() {
       try {
+        // Clientes globales (puedes filtrar por admin si tu API lo soporta)
         const clientesData = await getClientes();
-        const reservasData = await getReservas();
         setClientes(clientesData);
-        setReservas(reservasData);
 
-        // Calcular fechas del mes anterior
         const hoy = new Date();
+        const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+        const finMes = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0);
+
         const inicioMesAnterior = new Date(hoy.getFullYear(), hoy.getMonth() - 1, 1);
         const finMesAnterior = new Date(hoy.getFullYear(), hoy.getMonth(), 0);
 
         const formato = (fecha) => fecha.toISOString().split('T')[0];
-        const reservasPreviasData = await getReservasPorRangoFechas(
+
+        // Reservas del mes actual para este administrador
+        const reservasData = await getReservasPorAdministradorEnRango(
+          idAdministrador,
+          formato(inicioMes),
+          formato(finMes)
+        );
+        setReservas(reservasData);
+
+        // Reservas del mes anterior para este administrador
+        const reservasPreviasData = await getReservasPorAdministradorEnRango(
+          idAdministrador,
           formato(inicioMesAnterior),
           formato(finMesAnterior)
         );
@@ -33,8 +45,10 @@ const ResumenFinanciero = () => {
       }
     }
 
-    fetchData();
-  }, []);
+    if (idAdministrador) {
+      fetchData();
+    }
+  }, [idAdministrador]);
 
   const totalClientes = clientes.length;
   const totalReservas = reservas.length;
@@ -75,12 +89,15 @@ const ResumenFinanciero = () => {
         </div>
         <div className="flex items-end justify-between mt-5">
           <div>
-            <span className="text-sm text-gray-500 dark:text-gray-400">Reservas</span>
+            <span className="text-sm text-gray-500 dark:text-gray-400">Reservas (Administrador {idAdministrador})</span>
             <h4 className="mt-2 font-bold text-gray-800 text-lg dark:text-white/90">
               {totalReservas}
             </h4>
           </div>
-          <Badge color={esPositivo ? 'success' : 'error'} startIcon={esPositivo ? <ArrowUpIcon /> : <ArrowDownIcon />}>
+          <Badge
+            color={esPositivo ? 'success' : 'error'}
+            startIcon={esPositivo ? <ArrowUpIcon /> : <ArrowDownIcon />}
+          >
             {esPositivo ? '+' : ''}
             {Math.abs(porcentajeReservas).toFixed(2)}%
           </Badge>
