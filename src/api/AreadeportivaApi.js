@@ -3,6 +3,10 @@ import api from './api';
 // Definir la URL base
 const BASE_URL = '/areasdeportivas';
 
+// =====================
+// ÁREA DEPORTIVA
+// =====================
+
 // Obtener todas las áreas deportivas (activos)
 export async function getAreadeportivaActivos() {
   const res = await api.get(`${BASE_URL}/activos`);
@@ -23,20 +27,13 @@ export async function getAreadeportivaById(id) {
 
 // Crear nueva área deportiva
 export const createAreadeportiva = async (data) => {
-    // Usamos api.post, que ya tiene el interceptor del token
-    const response = await api.post('/areasdeportivas', data);
-    return response.data;
+  const response = await api.post(BASE_URL, data);
+  return response.data;
 };
 
 // Actualizar área deportiva por ID
 export async function updateAreadeportiva(id, payload) {
   const res = await api.put(`${BASE_URL}/${id}`, payload);
-  return res.data;
-}
-
-// Eliminar lógica (cambiar estado)
-export async function deleteAreadeportiva(id) {
-  const res = await api.put(`${BASE_URL}/${id}/eliminar`);
   return res.data;
 }
 
@@ -76,6 +73,39 @@ export async function updateAreadeportivaPorAdminId(adminId, payload) {
   return res.data;
 }
 
+// =====================
+// DISCIPLINAS (por administrador)
+// =====================
+
+// Crear disciplina (idsCanchas opcional)
+export async function createDisciplinaPorAdmin(adminId, disciplina, idsCanchas = []) {
+  const res = await api.post(`${BASE_URL}/admin/${adminId}/disciplinas`, disciplina, {
+    params: { idsCanchas }
+  });
+  return res.data;
+}
+
+// Listar disciplinas de un administrador
+export async function getDisciplinasPorAdmin(adminId) {
+  const res = await api.get(`${BASE_URL}/admin/${adminId}/disciplinas`);
+  return res.data;
+}
+
+// Actualizar disciplina por administrador
+export async function updateDisciplinaPorAdmin(adminId, idDisciplina, payload) {
+  const res = await api.put(`${BASE_URL}/admin/${adminId}/disciplinas/${idDisciplina}`, payload);
+  return res.data;
+}
+
+// Eliminar disciplina por administrador
+export async function deleteDisciplinaPorAdmin(adminId, idDisciplina) {
+  await api.delete(`${BASE_URL}/admin/${adminId}/disciplinas/${idDisciplina}`);
+}
+
+// =====================
+// IMÁGENES DE ÁREA DEPORTIVA
+// =====================
+
 // Subir imágenes
 export async function agregarImagenesAreadeportiva(id, archivosImagenes) {
   const formData = new FormData();
@@ -102,27 +132,21 @@ export async function reordenarImagenesAreadeportiva(id, idsImagenesOrden) {
 // --- Función agregada para subir imágenes (versión consolidada) ---
 export const agregarImagenesArea = async (id, archivos) => {
   const formData = new FormData();
-
   if (archivos && archivos.length > 0) {
-    archivos.forEach((file) => {
-      // "archivosImagenes" coincide con tu @RequestParam en Java
-      formData.append('archivosImagenes', file);
-    });
+    archivos.forEach((file) => formData.append('archivosImagenes', file));
   }
-
   const response = await api.post(`${BASE_URL}/${id}/imagenes`, formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   });
   return response.data;
 };
 
-// Variante que acepta un callback de progreso (onUploadProgress)
+// Variante con progreso
 export const agregarImagenesAreaConProgreso = async (id, archivos, onUploadProgress) => {
   const formData = new FormData();
   if (archivos && archivos.length > 0) {
     archivos.forEach((file) => formData.append('archivosImagenes', file));
   }
-
   const response = await api.post(`${BASE_URL}/${id}/imagenes`, formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
     onUploadProgress,
