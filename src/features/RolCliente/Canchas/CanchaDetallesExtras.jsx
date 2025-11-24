@@ -19,7 +19,7 @@ export default function CanchaDetallesExtras({ cancha }) {
   ];
 
   return (
-    <div className="bg-[var(--color-p-6)] rounded-2xl shadow-sm border border-[var(--color-pb-4)] p-6 transition-all hover:shadow-md">
+    <div className=" rounded-2xl  p-0 transition-all hover:shadow-md">
       <h3 className="font-[var(--font-Oswald)] text-xl text-[var(--primary)] mb-5 tracking-wide">
         Detalles de la Cancha
       </h3>

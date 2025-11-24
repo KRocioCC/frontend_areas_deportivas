@@ -2,8 +2,9 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Bell, LogOut, User } from "lucide-react";
+import { Menu, X, Bell, LogOut, User, Moon, Sun } from "lucide-react";
 import { useAuth } from "../../auth/hooks/useAuth";
+import { useTheme } from "../../context/ThemeContext";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -13,6 +14,7 @@ export default function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { currentUser, logout, isClient } = useAuth();
+  const { isDarkMode, toggleDarkMode } = useTheme(); // ← ¡YA FUNCIONA!
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10);
@@ -53,7 +55,7 @@ export default function Navbar() {
           path: "/cliente/reservas",
           children: [
             { name: "Nueva reserva", path: "/cliente/reservas/nueva" },
-            { name: "Mis reservas", path: "/cliente/reservas/historial" },
+            { name: "Mis reservas", path: "/reservas/mihistorial" },
           ],
         },
       ]
@@ -110,8 +112,8 @@ export default function Navbar() {
       <motion.nav
         className={`fixed top-0 left-0 right-0 z-50 px-4 md:px-6 py-3 transition-all duration-400 flex justify-center ${
           scrolled
-            ? "bg-[rgba(8,10,12,0.88)] backdrop-blur-sm shadow-sm"
-            : "bg-transparent"
+            ? "bg-[rgba(8,10,12,0.88)] dark:bg-[rgba(10,10,10,0.75)] backdrop-blur-sm shadow-sm"
+            : "bg-transparent dark:bg-transparent"
         }`}
         initial={{ y: -18 }}
         animate={{ y: 0 }}
@@ -138,7 +140,7 @@ export default function Navbar() {
               onClick={() => setMenuOpen(!menuOpen)}
               aria-label="menu"
               className={`p-2 rounded-md transition-colors ${
-                scrolled ? "text-[var(--color-p-5)]" : "text-white"
+                scrolled ? "text-[var(--color-p-5)]" : "text-text-white dark:text-gray-200"
               }`}
             >
               {menuOpen ? <X size={26} /> : <Menu size={24} />}
@@ -159,7 +161,7 @@ export default function Navbar() {
                         ? "text-[var(--color-p-2)]"
                         : scrolled
                         ? "text-[var(--color-p-4)]"
-                        : "text-white"
+                        : "text-white dark:text-gray-200"
                     }`}
                   >
                     {item.name}
@@ -202,17 +204,27 @@ export default function Navbar() {
 
             {/* Notificaciones + Usuario */}
             <div className="flex items-center gap-3">
+              {/*agregue un boton de luna sol */}
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                onClick={toggleDarkMode}
+                className="p-2 rounded-md transition-colors 
+                  text-white dark:text-yellow-300"
+              >
+                {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+              </motion.button>
+              {/*agregue un boton notificaiones */}
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.98 }}
                 className={`p-2 rounded-md transition-colors ${
-                  scrolled ? "text-[var(--color-p-5)]" : "text-white"
+                  scrolled ? "text-[var(--color-p-5)]" : "text-white dark:text-gray-200"
                 }`}
                 aria-label="notificaciones"
               >
                 <div className="relative">
                   <Bell className="w-5 h-5" />
-                  <span className="absolute -top-1 -right-1 bg-[var(--color-p-2)] text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-medium">
+                  <span className="absolute -top-1 -right-1 bg-[var(--color-p-2)] text-white dark:text-gray-200 text-xs rounded-full w-4 h-4 flex items-center justify-center font-medium">
                     3
                   </span>
                 </div>
@@ -224,7 +236,7 @@ export default function Navbar() {
                   <button
                     className={`
                       flex items-center gap-2 px-3 py-1.5 rounded-lg transition-colors 
-                      ${scrolled ? "bg-[rgba(255,255,255,0.08)] text-[var(--color-p-5)]" : "bg-white/10 text-white"}
+                      ${scrolled ? "bg-[rgba(255,255,255,0.08)] text-[var(--color-p-5)]" : "bg-white/10 text-white dark:text-gray-200"}
                     `}
                   >
                     <User className="w-4 h-4" />
@@ -261,7 +273,7 @@ export default function Navbar() {
                           text-[0.85rem] text-red-400 text-left 
                           px-4 py-2 rounded-md transition-all duration-150 
                           hover:bg-red-500/20 
-                          hover:text-white
+                          hover:text-white dark:text-gray-200
                         "
                       >
                         Cerrar sesión
@@ -274,7 +286,7 @@ export default function Navbar() {
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => handleNavigate("/login")}
-                  className="px-4 py-2 rounded-md font-[var(--font-josefin)] text-sm bg-[var(--color-p-2)] text-white shadow-sm"
+                  className="px-4 py-2 rounded-md font-[var(--font-josefin)] text-sm bg-[var(--color-p-2)] text-white dark:text-gray-200 shadow-sm"
                 >
                   Iniciar
                 </motion.button>
@@ -328,7 +340,7 @@ export default function Navbar() {
               <motion.button
                 whileTap={{ scale: 0.9 }}
                 onClick={() => setMenuOpen(false)}
-                className="p-2 rounded-xl bg-[rgba(255,255,255,0.05)] text-[var(--color-p-4)] hover:text-white transition"
+                className="p-2 rounded-xl bg-[rgba(255,255,255,0.05)] text-[var(--color-p-4)] hover:text-white dark:text-gray-200 transition"
               >
                 <X size={20} />
               </motion.button>
@@ -351,7 +363,7 @@ export default function Navbar() {
                         ${
                           accordionOpen === i || activePath.startsWith(item.path)
                             ? "text-[var(--color-p-2)] bg-[rgba(255,255,255,0.05)]"
-                            : "text-[var(--color-p-4)] hover:text-white hover:bg-[rgba(255,255,255,0.03)]"
+                            : "text-[var(--color-p-4)] hover:text-white dark:text-gray-200 hover:bg-[rgba(255,255,255,0.03)]"
                         }`}
                     >
                       <span>{item.name}</span>
@@ -382,8 +394,8 @@ export default function Navbar() {
                             className={`w-full text-left py-2 px-3 text-sm rounded-md transition 
                               ${
                                 activePath === child.path
-                                  ? "text-white bg-[var(--color-p-5)]"
-                                  : "text-[var(--color-p-4)] hover:text-white hover:bg-[rgba(255,255,255,0.05)]"
+                                  ? "text-white dark:text-gray-200 bg-[var(--color-p-5)]"
+                                  : "text-[var(--color-p-4)] hover:text-white dark:text-gray-200 hover:bg-[rgba(255,255,255,0.05)]"
                               }`}
                           >
                             {child.name}
@@ -396,11 +408,27 @@ export default function Navbar() {
               </div>
 
               {/* NOTIFICATIONS */}
+
+              <button
+                onClick={toggleDarkMode}
+                className="flex items-center gap-3 p-3 rounded-lg bg-[rgba(255,255,255,0.03)] 
+                  hover:bg-[rgba(255,255,255,0.06)] transition text-[var(--color-p-4)]"
+              >
+                {isDarkMode ? (
+                  <Sun className="w-5 h-5 text-yellow-300" />
+                ) : (
+                  <Moon className="w-5 h-5" />
+                )}
+                <span className="text-sm font-[var(--font-Balo)]">
+                  {isDarkMode ? "Modo Claro" : "Modo Oscuro"}
+                </span>
+              </button>
+              {/*notificaiones */}
               <div className="mb-6">
                 <div className="flex items-center gap-3 p-3 rounded-lg bg-[rgba(255,255,255,0.03)] hover:bg-[rgba(255,255,255,0.05)] transition">
                   <div className="relative">
                     <Bell className="w-5 h-5 text-[var(--color-p-5)]" />
-                    <span className="absolute -top-2 -right-2 bg-[var(--color-p-2)] text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-bold">
+                    <span className="absolute -top-2 -right-2 bg-[var(--color-p-2)] text-white dark:text-gray-200 text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-bold">
                       3
                     </span>
                   </div>
@@ -426,7 +454,7 @@ export default function Navbar() {
                       </div>
 
                       <div>
-                        <span className="text-white font-[var(--font-Balo)] font-semibold text-sm block">
+                        <span className="text-white dark:text-gray-200 font-[var(--font-Balo)] font-semibold text-sm block">
                           {currentUser.nombre || currentUser.username}
                         </span>
                         <span className="text-[var(--color-p-5)] text-xs">Mi cuenta</span>
@@ -438,7 +466,7 @@ export default function Navbar() {
                       <motion.button
                         whileTap={{ scale: 0.95 }}
                         onClick={() => handleNavigate("/perfil")}
-                        className="py-2 px-3 rounded-lg bg-[var(--color-p-5)] text-white text-sm font-[var(--font-Balo)] hover:bg-[var(--color-p-5)]/90 transition"
+                        className="py-2 px-3 rounded-lg bg-[var(--color-p-5)] text-white dark:text-gray-200 text-sm font-[var(--font-Balo)] hover:bg-[var(--color-p-5)]/90 transition"
                       >
                         Perfil
                       </motion.button>
@@ -446,7 +474,7 @@ export default function Navbar() {
                       <motion.button
                         whileTap={{ scale: 0.95 }}
                         onClick={handleLogout}
-                        className="py-2 px-3 rounded-lg bg-[rgba(255,255,255,0.05)] text-[var(--color-p-2)] text-sm font-[var(--font-Balo)] border border-[var(--color-p-2)]/30 hover:bg-[var(--color-p-2)] hover:text-white transition"
+                        className="py-2 px-3 rounded-lg bg-[rgba(255,255,255,0.05)] text-[var(--color-p-2)] text-sm font-[var(--font-Balo)] border border-[var(--color-p-2)]/30 hover:bg-[var(--color-p-2)] hover:text-white dark:text-gray-200 transition"
                       >
                         Salir
                       </motion.button>
@@ -457,7 +485,7 @@ export default function Navbar() {
                   <motion.button
                     whileTap={{ scale: 0.95 }}
                     onClick={() => handleNavigate("/login")}
-                    className="w-full py-3 px-3 text-sm font-[var(--font-josefin)] font-bold text-white bg-gradient-to-r from-[var(--color-p-2)] to-[var(--color-p-1)] rounded-lg shadow hover:shadow-md transition"
+                    className="w-full py-3 px-3 text-sm font-[var(--font-josefin)] font-bold text-white dark:text-gray-200 bg-gradient-to-r from-[var(--color-p-2)] to-[var(--color-p-1)] rounded-lg shadow hover:shadow-md transition"
                   >
                     Iniciar Sesión
                   </motion.button>

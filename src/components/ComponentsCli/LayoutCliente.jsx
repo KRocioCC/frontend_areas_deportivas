@@ -10,7 +10,7 @@ export default function LayoutCliente({ children }) {
       <Navbar />
       {/* pt-20 = ~5rem → suficiente para navbar alto (80px) */}
       {/*<main className="pt-[5rem] pb-8">{children}</main>*/}
-      <main className="pb-8">{children}</main>
+      <main className="pt-0 pb-0">{children}</main>
 
       <Footer/>
     </div>

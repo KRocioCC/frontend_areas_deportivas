@@ -39,7 +39,8 @@ export const listarPorDisciplina = async (idDisciplina) => {
 
 // Obtener monto total de una asociación específica
 export const obtenerMontoTotal = async (idReserva, idCancha, idDisciplina) => {
-  const res = await api.get(`/incluye/monto-total/${idReserva}/${idCancha}/${idDisciplina}`);
+  // Usar query params para este endpoint (coincide con backend: /api/incluye/monto-total?idReserva=..&idCancha=..&idDisciplina=..)
+  const res = await api.get(`/incluye/monto-total`, { params: { idReserva, idCancha, idDisciplina } });
   return res.data;
 };
 

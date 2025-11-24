@@ -2,8 +2,14 @@
 import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { getAreadeportivaActivos } from "../../../api/AreadeportivaApi";
-import AreaModal from "./AreaModal";
+//import AreaModal from "./AreaModal";
+import AreaCard from "./AreaCard";
 import "./AreaDeportiva.css";
+import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
+
+import { lazy, Suspense } from "react";
+
+const AreaModal = lazy(() => import("./AreaModal"));
 
 export default function Areadeportiva() {
   const [areas, setAreas] = useState([]);
@@ -91,7 +97,6 @@ export default function Areadeportiva() {
     };
   }, [areas]);
 
-  // Scroll hacia el elemento activo cuando cambia currentIndex
 // Scroll horizontal SIN afectar scroll vertical del body
   useEffect(() => {
     const g = galleryRef.current;
@@ -113,8 +118,6 @@ export default function Areadeportiva() {
       behavior: "smooth"
     });
 
-    // ❌ NO USAR scrollIntoView
-    // ❌ NO USAR window.scrollTo
   }, [currentIndex]);
 
 
@@ -135,6 +138,13 @@ export default function Areadeportiva() {
       </div>
     );
   }
+  const handleOpenModal = (area) => {
+    if (area.urlImagen) {
+      const img = new Image();
+      img.src = area.urlImagen;
+    }
+    setSelectedArea(area);
+  };
 
   return (
     <div className="py-8 px-4 md:px-8 bg-[#F2EFEB]">
@@ -169,67 +179,36 @@ export default function Areadeportiva() {
           ref={galleryRef}
           id="gallery"
           className="gallery flex gap-6 py-5 px-4"
-          style={{ scrollSnapType: "x mandatory", overflowX: "auto" }}
+          style={{ scrollSnapType: "x mandatory", overflowX: "auto"}}
         >
           {areas.map((area, index) => (
-            <motion.div
+            <AreaCard
               key={area.id}
-              className={`flex-shrink-0 w-[340px] h-[440px] overflow-hidden bg-white cursor-pointer relative group rounded-none ${index === currentIndex ? "opacity-100" : "opacity-70"}`}
-              whileHover={{
-                scale: 1.02,
-                boxShadow: "0 10px 30px rgba(0, 0, 0, 0.41)",
-              }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => setSelectedArea(area)}
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ type: "spring", stiffness: 300 }}
-            >
-              {/* Imagen ocupa todo el card */}
-              <div className="w-full h-full relative">
-                <img
-                  src={area.urlImagen || "/images/default-area.jpg"}
-                  alt={area.nombreArea}
-                  className="object-cover w-full h-full"
-                />
-
-                {/* overlay que aparece al hover: sombreado de arriba hacia abajo */}
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-
-                {/* icono ojito arriba derecha */}
-                <div className="absolute top-3 right-3 bg-[#f28627] text-white p-2 rounded-full shadow-sm">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                  </svg>
-                </div>
-
-                {/* info abajo - texto más largo y con fuente Alumni */}
-                <div className="absolute bottom-0 left-0 right-0 p-5">
-                  <h3 className="text-2xl text-white font-Alumni mb-1 leading-tight">{area.nombreArea}</h3>
-                  <div className="flex items-center gap-2 text-white text-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" 
-                        className="h-4 w-4 text-white" 
-                        fill="currentColor" 
-                        viewBox="0 0 24 24">
-                      <path d="M3 5a2 2 0 012-2h3a1 1 0 011 .76l1 4a1 1 0 01-.27.95l-2 2a16 16 0 006.36 6.36l2-2a1 1 0 01.95-.27l4 1a1 1 0 01.76 1v3a2 2 0 01-2 2h-2C9.82 21 3 14.18 3 6V5z"/>
-                    </svg>
-
-                    <span>{area.telefonoArea || "No disponible"}</span>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
+              area={area}
+              index={index}
+              currentIndex={currentIndex}
+              onClick={() => handleOpenModal(area)}
+            />
           ))}
+
         </div>
 
         {/* Flechas de navegación — fuera del contenedor gallery para no recibir pointer-events: none */}
         <div className="area-controls">
-          <button onClick={prev} aria-label="Anterior área" className="area-btn left">
-            ❮
+          <button 
+            onClick={prev} 
+            aria-label="Área anterior" 
+            className="area-btn left flex items-center justify-center"
+          >
+            <ChevronLeftIcon className="h-6 w-6 text-[#f38321]" />
           </button>
-          <button onClick={next} aria-label="Siguiente área" className="area-btn right">
-            ❯
+          
+          <button 
+            onClick={next} 
+            aria-label="Siguiente área" 
+            className="area-btn right flex items-center justify-center"
+          >
+            <ChevronRightIcon className="h-6 w-6 text-[#f38321]" />
           </button>
         </div>
 
@@ -247,7 +226,11 @@ export default function Areadeportiva() {
       </div>
 
       <AnimatePresence>
-        {selectedArea && <AreaModal area={selectedArea} onClose={() => setSelectedArea(null)} />}
+        {selectedArea && (
+          <Suspense fallback={null}>
+            <AreaModal area={selectedArea} onClose={() => setSelectedArea(null)} />
+          </Suspense>
+        )}
       </AnimatePresence>
     </div>
   );
