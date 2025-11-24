@@ -24,14 +24,7 @@ import {
   getReservasPorEstado
 } from "../../../api/ReservaApi";
 import { useNavigate } from "react-router-dom";
-
-const ESTADO_COLORES = {
-  PENDIENTE: "border-orange-500 bg-orange-50 dark:bg-gray-900",
-  CONFIRMADA: "border-blue-500 bg-blue-50 dark:bg-gray-900",
-  EN_CURSO: "border-purple-500 bg-purple-50 dark:bg-gray-900",
-  COMPLETADA: "border-green-500 bg-green-50 dark:bg-gray-900",
-  CANCELADA: "border-red-500 bg-red-50 dark:bg-gray-900",
-};
+import QrModal from "../QR/QrModal";
 
 const ESTADO_TEXTO = {
   PENDIENTE: "Pendiente",
@@ -54,16 +47,35 @@ export default function HistorialReservaCli() {
   const [ordenFecha, setOrdenFecha] = useState("desc")
   const [reservasFiltradas, setReservasFiltradas] = useState([]);
   const navigate = useNavigate();
+  const [openQrModal, setOpenQrModal] = useState(false);
+  const [selectedReservaId, setSelectedReservaId] = useState(null);
 
+  const ESTADO_COLORES = {
+    PENDIENTE: 
+      isDarkMode 
+        ? "border-[#f35734]" 
+        : "border-[#f38321]",
+
+    CONFIRMADA:
+      isDarkMode
+        ? "border-[#2C7366]"
+        : "border-[#46c4b7]",
+
+    CANCELADA:
+      isDarkMode
+        ? "border-[#8a2628]"
+        : "border-[#d40000]",
+  };
+
+  const toggleOrdenFecha = () => {
+    //aqui deberia ordenenar por fecha de creacion
+    setOrdenFecha(prev => prev === "desc" ? "asc" : "desc");
+  };
 
   useEffect(() => {
-    //console.log("➡️ useEffect ejecutado");
-    //console.log({ user, idCliente, filtroEstado, fechaInicio, fechaFin });
-
     if (idCliente) {
       cargarReservas();
     } else {
-      //console.warn("⚠️ Usuario no logueado");
       setReservas([]);
       setLoading(false);
     }
@@ -72,24 +84,49 @@ export default function HistorialReservaCli() {
   useEffect(() => {
     let lista = [...reservas];
 
-    // Aplicar filtro de estado (si no es TODOS)
+    // Filtrar por estado si no es TODOS
     if (filtroEstado !== "TODOS") {
       lista = lista.filter(r => r.estadoReserva === filtroEstado);
     }
 
-    // Ordenar por fecha
+    // Función segura para parsear fechaReserva en objeto Date
+    const parseDate = (str) => {
+      if (!str) return NaN;
+      // si ya contiene 'T' (fecha ISO completa), usar Date
+      if (str.includes('T')) return new Date(str);
+      // si es 'YYYY-MM-DD' -> crear Date en modo local añadiendo T00:00:00
+      const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(str);
+      if (match) {
+        const [_, y, m, d] = match;
+        return new Date(Number(y), Number(m) - 1, Number(d));
+      }
+      // fallback
+      const d = new Date(str);
+      return isNaN(d) ? NaN : d;
+    };
+
     lista.sort((a, b) => {
-      const fechaA = new Date(a.fechaReserva);
-      const fechaB = new Date(b.fechaReserva);
+      const fechaA = parseDate(a.fechaReserva);
+      const fechaB = parseDate(b.fechaReserva);
+
+      // fechas inválidas van al final
+      const aInvalid = isNaN(fechaA);
+      const bInvalid = isNaN(fechaB);
+      if (aInvalid && bInvalid) return 0;
+      if (aInvalid) return 1;
+      if (bInvalid) return -1;
+
       return ordenFecha === "desc" ? fechaB - fechaA : fechaA - fechaB;
     });
 
     setReservasFiltradas(lista);
   }, [reservas, filtroEstado, ordenFecha]);
 
+  
+
   const cargarReservas = async () => {
     try {
-      //console.log("🔄 Cargando reservas...");
+      //console.log(" Cargando reservas...");
       setLoading(true);
       let data = [];
 
@@ -116,12 +153,12 @@ export default function HistorialReservaCli() {
   const getAccionesPorEstado = (estado) => {
     switch (estado) {
       case "PENDIENTE":
-        return ["QR", "Pagar", "Detalle", "Reprogramar", "Cancelar"];
+        return ["Ver Pagos", "Detalle", "Reprogramar", "Cancelar"];
       case "CONFIRMADA":
-        return ["QR", "Detalle", "Invitados", "Pagar"];
+        return ["QR", "Detalle", "Invitados", "Ver Pagos"];
       case "EN_CURSO":
       case "COMPLETADA":
-        return ["QR", "Detalle", "Invitados","Pagar"];
+        return ["QR", "Detalle", "Invitados","Ver Pagos"];
       case "CANCELADA":
         return ["Detalle"];
       default:
@@ -136,9 +173,7 @@ export default function HistorialReservaCli() {
       </div>
     );
   }
-  const toggleOrdenFecha = () => {
-    setOrdenFecha(prev => prev === "desc" ? "asc" : "desc");
-  };
+
 
   if (!user) {
     return (
@@ -156,7 +191,7 @@ export default function HistorialReservaCli() {
           ${isDarkMode ? "bg-pb-10 border-p-3 text-p-6" : "bg-p-6 border-p-1 text-pb-10"}`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-1">
+          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-0.5">
 
             {/* Título principal */}
             <h1
@@ -176,7 +211,7 @@ export default function HistorialReservaCli() {
                 }}
               >
                 Aquí encontrarás <span className="font-semibold text-p-1">todas tus reservas</span> pasadas,
-                presentes y futuras. Podrás ver detalles, pagar, generar QR, invitar amigos,
+                presentes y futuras. Podrás ver detalles, Ver Pagos, generar QR, invitar amigos,
                 reprogramar o cancelar según el estado de cada una.
               </p>
             </div>
@@ -197,48 +232,32 @@ export default function HistorialReservaCli() {
               : "0 4px 20px rgba(0, 0, 0, 0.08)",
           }}
         >
-          <div className="flex flex-col lg:flex-row gap-6">
+          <div className="flex flex-col lg:flex-row lg:items-end gap-6">
 
-            {/* Filtro estado */}
+            {/* Filtro por estado */}
             <div className="flex-1">
-              <label
-                className="block text-sm font-medium mb-2"
-                style={{ color: isDarkMode ? "#7fd8c7" : "#2C7366" }}
-              >
+              <label className="block text-sm font-medium mb-2" style={{ color: isDarkMode ? "#2C7366" : "#46c4b7" }}>
                 <Filter className="inline w-4 h-4 mr-1" /> Filtrar por estado
               </label>
-
               <select
                 value={filtroEstado}
                 onChange={(e) => setFiltroEstado(e.target.value)}
                 className={`w-full px-4 py-2 rounded-xl text-sm transition-all
-                  ${isDarkMode
-                    ? "bg-[#141717] text-gray-200"
-                    : "bg-white text-gray-900"
-                  }
+                  ${isDarkMode ? "bg-[#141717] text-gray-200" : "bg-white text-gray-900"}
                 `}
-                style={{
-                  border: "1px solid transparent",
-                  outline: "none",
-                }}
+                style={{ border: "1px solid transparent", outline: "none" }}
               >
                 <option value="TODOS">Todas las reservas</option>
                 <option value="PENDIENTE">Pendientes</option>
                 <option value="CONFIRMADA">Confirmadas</option>
-                <option value="EN_CURSO">En curso</option>
-                <option value="COMPLETADA">Completadas</option>
                 <option value="CANCELADA">Canceladas</option>
               </select>
             </div>
 
-            {/* Filtro fechas */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1">
-              {/* Desde */}
-              <div>
-                <label
-                  className="block text-sm font-medium mb-2"
-                  style={{ color: isDarkMode ? "#7fd8c7" : "#2C7366" }}
-                >
+            {/* Filtro por fechas */}
+            <div className="flex flex-1 gap-4 flex-col sm:flex-row">
+              <div className="flex-1">
+                <label className="block text-sm font-medium mb-2" style={{ color: isDarkMode ? "#2C7366" : "#46c4b7" }}>
                   Desde
                 </label>
                 <input
@@ -246,21 +265,14 @@ export default function HistorialReservaCli() {
                   value={fechaInicio}
                   onChange={(e) => setFechaInicio(e.target.value)}
                   className={`w-full px-4 py-2 rounded-xl text-sm transition-all
-                    ${isDarkMode
-                      ? "bg-[#141717] text-gray-200"
-                      : "bg-white text-gray-900"
-                    }
+                    ${isDarkMode ? "bg-[#141717] text-gray-200" : "bg-white text-gray-900"}
                   `}
                   style={{ border: "1px solid transparent", outline: "none" }}
                 />
               </div>
 
-              {/* Hasta */}
-              <div>
-                <label
-                  className="block text-sm font-medium mb-2"
-                  style={{ color: isDarkMode ? "#7fd8c7" : "#2C7366" }}
-                >
+              <div className="flex-1">
+                <label className="block text-sm font-medium mb-2" style={{ color: isDarkMode ? "#2C7366" : "#46c4b7" }}>
                   Hasta
                 </label>
                 <input
@@ -268,26 +280,26 @@ export default function HistorialReservaCli() {
                   value={fechaFin}
                   onChange={(e) => setFechaFin(e.target.value)}
                   className={`w-full px-4 py-2 rounded-xl text-sm transition-all
-                    ${isDarkMode
-                      ? "bg-[#141717] text-gray-200"
-                      : "bg-white text-gray-900"
-                    }
+                    ${isDarkMode ? "bg-[#141717] text-gray-200" : "bg-white text-gray-900"}
                   `}
                   style={{ border: "1px solid transparent", outline: "none" }}
                 />
               </div>
+            </div>
 
+            {/* Botón de orden */}
+            <div className="flex-none">
+              <label className="block text-sm font-medium mb-2 invisible">Orden</label>
               <button
-              onClick={toggleOrdenFecha}
-              className={`flex items-center gap-2 px-5 py-2 rounded-xl font-medium transition-all
-                ${isDarkMode ? "bg-[#141717] hover:bg-[#1c2021]" : "bg-gray-100 hover:bg-gray-200"}
-              `}
-              style={{ color: isDarkMode ? "#a0d9cd" : "#2C7366" }}
-            >
-              <ArrowUpDown className="w-4 h-4" />
-              Orden: {ordenFecha === "desc" ? "Más recientes primero" : "Más antiguas primero"}
-            </button>
-
+                onClick={toggleOrdenFecha}
+                className={`flex items-center gap-2 px-5 py-2 rounded-xl font-medium transition-all
+                  ${isDarkMode ? "bg-[#141717] hover:bg-[#1c2021]" : "bg-gray-100 hover:bg-gray-200"}
+                `}
+                style={{ color: isDarkMode ? "#2C7366" : "#46c4b7" }}
+              >
+                <ArrowUpDown className="w-4 h-4" />
+                {ordenFecha === "desc" ? "Más recientes" : "Más antiguas"}
+              </button>
             </div>
 
           </div>
@@ -295,14 +307,42 @@ export default function HistorialReservaCli() {
 
 
 
+
         {/* Loading */}
         {loading && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className={`${isDarkMode ? "bg-gray-800" : "bg-white"} rounded-2xl shadow-sm p-6 animate-pulse`}></div>
-            ))}
-          </div>
-        )}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className={`rounded-2xl p-6 animate-pulse transition-all
+                ${isDarkMode ? "bg-[#141717]" : "bg-white"}
+                ${isDarkMode ? "shadow-md" : "shadow-sm"}
+              `}
+            >
+              <div className={`h-6 w-1/3 rounded bg-gray-400/30 mb-4 ${isDarkMode ? "bg-gray-600/30" : ""}`}></div>
+
+              <div className="flex gap-4 mb-4">
+                <div className={`h-4 w-1/4 rounded bg-gray-400/30 ${isDarkMode ? "bg-gray-600/30" : ""}`}></div>
+                <div className={`h-4 w-1/3 rounded bg-gray-400/30 ${isDarkMode ? "bg-gray-600/30" : ""}`}></div>
+              </div>
+
+              <div className="flex gap-4 mb-4">
+                <div className={`h-4 w-1/2 rounded bg-gray-400/30 ${isDarkMode ? "bg-gray-600/30" : ""}`}></div>
+              </div>
+              <div className={`h-4 w-1/4 rounded bg-gray-400/30 mb-6 ${isDarkMode ? "bg-gray-600/30" : ""}`}></div>
+              <div className="flex gap-3">
+                {[1, 2, 3, 4].map((b) => (
+                  <div
+                    key={b}
+                    className={`h-8 w-20 rounded-xl bg-gray-400/30 ${isDarkMode ? "bg-gray-600/30" : ""}`}
+                  ></div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
 
         {/* No hay reservas */}
         {!loading && reservas.length === 0 && (
@@ -316,7 +356,7 @@ export default function HistorialReservaCli() {
 
         {/* Lista de reservas */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {!loading && reservas.map((r) => (
+          {!loading && reservasFiltradas.map((r) => (
             <div
               key={r.idReserva}
               className={`
@@ -326,7 +366,17 @@ export default function HistorialReservaCli() {
               `}
               style={{
                 backgroundColor: isDarkMode ? "#0f1213" : "#ffffff",
+                borderLeftWidth: "8px",
+                borderLeftColor:
+                  r.estadoReserva === "CONFIRMADA"
+                    ? (isDarkMode ? "#2C7366" : "#46c4b7")
+                    : r.estadoReserva === "PENDIENTE"
+                    ? (isDarkMode ? "#f35734" : "#f38321")
+                    : r.estadoReserva === "CANCELADA"
+                    ? (isDarkMode ? "#8a2628" : "#d40000")
+                    : "#ccc",
               }}
+              
             >
               <div className="p-6">
                 {/* HEADER */}
@@ -343,17 +393,16 @@ export default function HistorialReservaCli() {
 
                   {/* BADGE DE ESTADO */}
                   <span
-                    className="px-3 py-1 rounded-md text-xs font-semibold text-white"
+                    className="px-3 py-1 rounded-md text-xs font-semibold"
                     style={{
+                      color: "#fff",
                       backgroundColor:
-                        r.estadoReserva === "COMPLETADA"
-                          ? "#2C7366"
+                        r.estadoReserva === "CONFIRMADA"
+                          ? (isDarkMode ? "#2C7366" : "#46c4b7")
                           : r.estadoReserva === "PENDIENTE"
-                          ? "#d18500"
+                          ? (isDarkMode ? "#f35734" : "#f38321")
                           : r.estadoReserva === "CANCELADA"
-                          ? "#b60000"
-                          : r.estadoReserva === "EN_CURSO"
-                          ? "#4e3ac9"
+                          ? (isDarkMode ? "#8a2628" : "#d40000")
                           : "#2C7366",
                     }}
                   >
@@ -367,22 +416,22 @@ export default function HistorialReservaCli() {
                   style={{ color: isDarkMode ? "#c2c2c2" : "#444" }}
                 >
                   <p className="flex items-center gap-2">
-                    <MapPin className="w-4 h-4" style={{ color: "#2C7366" }} />
+                    <MapPin className="w-4 h-4" style={{ color: isDarkMode ? "#2C7366" : "#46c4b7" }} />
                     {r.cancha?.zona || "Zona Central"}
                   </p>
 
                   <p className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4" style={{ color: "#2C7366" }} />
+                    <Calendar className="w-4 h-4" style={{ color: isDarkMode ? "#2C7366" : "#46c4b7" }} />
                     {format(new Date(r.fechaReserva), "dd 'de' MMMM, yyyy")}
                   </p>
 
                   <p className="flex items-center gap-2">
-                    <Clock className="w-4 h-4" style={{ color: "#2C7366" }} />
+                    <Clock className="w-4 h-4" style={{ color: isDarkMode ? "#2C7366" : "#46c4b7" }} />
                     {r.horaInicio?.slice(0, 5)} - {r.horaFin?.slice(0, 5)}
                   </p>
 
                   <p className="flex items-center gap-2">
-                    <Users className="w-4 h-4" style={{ color: "#2C7366" }} />
+                    <Users className="w-4 h-4" style={{ color: isDarkMode ? "#2C7366" : "#46c4b7" }} />
                     Capacidad: {r.cancha?.capacidad || 10}
                   </p>
                 </div>
@@ -393,12 +442,14 @@ export default function HistorialReservaCli() {
                     <button
                       key={accion}
                        onClick={() => {
-                        if (accion === "Pagar") {
+                        if (accion === "Ver Pagos") {
                           navigate(`/reservas/pagos/${r.idReserva}/listar`);
                         }
-                        /*if (accion === "QR") {
-                          navigate(`/reserva/${r.idReserva}/qr`);
-                        }
+                        if (accion === "QR") {
+                          console.log("ABRIENDO QR PARA:", r.idReserva);
+                          setSelectedReservaId(r.idReserva);
+                          setOpenQrModal(true);
+                        }/*
                         if (accion === "Detalle") {
                           navigate(`/reserva/${r.idReserva}`);
                         }*/
@@ -408,24 +459,22 @@ export default function HistorialReservaCli() {
                       style={{
                         background:
                           accion === "Cancelar"
-                            ? "#b60000"
-                            : accion === "Pagar"
-                            ? "#46c4b7"
+                            ? (isDarkMode ? "#8a2628" : "#d40000")
+                            : accion === "Ver Pagos"
+                            ? (isDarkMode ? "#2C7366" : "#46c4b7")
                             : accion === "QR"
-                            ? "#f38321"
+                            ? (isDarkMode ? "#f35734" : "#f38321")
                             : isDarkMode
                             ? "#171a1b"
                             : "#f2f2f2",
                         color:
-                          accion === "Cancelar" || accion === "Pagar"
+                          accion === "Cancelar" || accion === "Ver Pagos" || accion === "QR"
                             ? "#fff"
-                            : isDarkMode
-                            ? "#e5e5e5"
-                            : "#333",
+                            : (isDarkMode ? "#e5e5e5" : "#333"),
                       }}
                     >
                       {accion === "QR" && <QrCode className="w-4 h-4" />}
-                      {accion === "Pagar" && <CreditCard className="w-4 h-4" />}
+                      {accion === "Ver Pagos" && <CreditCard className="w-4 h-4" />}
                       {accion === "Detalle" && <Eye className="w-4 h-4" />}
                       {accion === "Invitados" && <UserPlus className="w-4 h-4" />}
                       {accion === "Reprogramar" && <RefreshCw className="w-4 h-4" />}
@@ -442,6 +491,11 @@ export default function HistorialReservaCli() {
       
       
       </div>
+      <QrModal
+        open={openQrModal}
+        onClose={() => setOpenQrModal(false)}
+        idReserva={selectedReservaId}
+      />
     </div>
   );
 }

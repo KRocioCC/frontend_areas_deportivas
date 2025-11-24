@@ -66,6 +66,8 @@ import SistemaQR from "../features/RolCliente/Inicio/SistemaQR.jsx";
 //import PaymentPage from "../features/RolCliente/Pagos/PaymentPage.jsx";
 import ListPagosPage from "../features/RolCliente/Pagos/ListaPagosPage.jsx";
 import RealizarPagoPage from "../features/RolCliente/Pagos/RealizarPagoPage.jsx";
+import IngresarTarjetaPage from "../features/RolCliente/Pagos/IngresarTarjetaPage.jsx";
+import ConfirmarPagoQRPage from "../features/RolCliente/Pagos/ConfirmarPagoQRPage.jsx";
 
 function AppRouter() {
 
@@ -223,12 +225,33 @@ function AppRouter() {
               }
             />
 
-             <Route
+            <Route
               path="/reservas/pagos/:idReserva/pagar"
               element={
                 <ProtectedRoute requireCliente>
                   <LayoutCliente>
                     <RealizarPagoPage />
+                  </LayoutCliente>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/reservas/pagos/tarjeta"
+              element={
+                <ProtectedRoute requireCliente>
+                  <LayoutCliente>
+                    <IngresarTarjetaPage />
+                  </LayoutCliente>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/reservas/pagos/qr"
+              element={
+                <ProtectedRoute requireCliente>
+                  <LayoutCliente>
+                    <ConfirmarPagoQRPage />
                   </LayoutCliente>
                 </ProtectedRoute>
               }

@@ -74,7 +74,6 @@ export default function ListPagosPage() {
   // Botón "Realizar pago" habilitado solo si falta saldo y usuario es dueño
   const puedeRealizarPago = !pagadaCompleta && reserva && reserva.clienteId === user?.idPersona;
 
-  // Tipo elegido congelado (si hay pagos, tomar el tipo del primer pago)
   // Nota: lo pasamos a la pantalla de pago para que ese flujo lo respete
   const tipoPagoCongelado = pagos.length > 0 ? pagos[0].tipoPago : null;
   const primeraVez = pagos.length === 0;
@@ -83,57 +82,156 @@ export default function ListPagosPage() {
   if (!reserva) return <div className="p-6">Reserva no encontrada o no autorizada.</div>;
 
   return (
-    <div className={`min-h-screen p-6 ${isDarkMode ? 'bg-[#0f1213] text-white' : 'bg-white text-[#0b0d0e]'}`}>
+    <div 
+      className={`min-h-screen pt-16 p-6 font-sans transition-colors duration-300 ${
+        isDarkMode 
+          ? 'bg-[#0f1213] text-[#e6e6e6]' 
+          : 'bg-[#ffffff] text-[#0b0d0e]'
+      }`}
+    >
       <div className="max-w-3xl mx-auto">
-        <header className="mb-6">
-          <h2 className="text-2xl font-bold">Pagos - Reserva #{reserva.idReserva}</h2>
-          <p className="text-sm opacity-80">Cancha: {reserva.cancha?.nombre} · Fecha: {reserva.fechaReserva}</p>
+        {/* ——— ENCABEZADO ——— */}
+        <header className="mb-8">
+          <h2 
+            className="text-2xl font-bold tracking-tight mb-1"
+            style={{ fontFamily: 'var(--font-Oswald)' }}
+          >
+            Pagos Realizados
+          </h2>
+          <p 
+            className="text-sm opacity-90"
+            style={{ fontFamily: 'var(--font-Balo)' }}
+          >
+            Reserva <span className="font-medium">{reserva.idReserva}</span> · Cancha: {reserva.cancha?.nombre} · Fecha: {reserva.fechaReserva}
+          </p>
         </header>
 
-        {/* Totales */}
-        <div className="flex gap-4 mb-6">
-          <div className="flex-1 rounded-xl p-4 shadow" style={{ background: isDarkMode ? '#111' : '#fff' }}>
-            <div className="text-xs">Total</div>
-            <div className="text-xl font-semibold">{(totalIncluye).toFixed(2)}</div>
-          </div>
-          <div className="flex-1 rounded-xl p-4 shadow" style={{ background: isDarkMode ? '#111' : '#fff' }}>
-            <div className="text-xs">Pagado</div>
-            <div className="text-xl font-semibold">{totalPagado.toFixed(2)}</div>
-          </div>
-          <div className="flex-1 rounded-xl p-4 shadow" style={{ background: isDarkMode ? '#111' : '#fff' }}>
-            <div className="text-xs">Saldo</div>
-            <div className="text-xl font-semibold">{saldoPendiente.toFixed(2)}</div>
-          </div>
-        </div>
-
-        {/* Lista de pagos */}
-        <div className="space-y-3 mb-6">
-          {pagos.length === 0 && <div className="text-center py-6">No se encontraron pagos para esta reserva.</div>}
-          {pagos.map((p) => (
-            <div key={p.idPago} className="flex items-center gap-4 rounded-xl p-4 shadow transition" style={{ background: isDarkMode ? '#080a0b' : '#fff' }}>
-              <img src={p.cliente?.urlImagen || '/img/avatar-placeholder.png'} alt="cliente" className="w-12 h-12 rounded-full object-cover" />
-              <div className="flex-1">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <div className="font-semibold">{p.cliente?.nombre} {p.cliente?.apellidoPaterno}</div>
-                    <div className="text-xs opacity-80">{p.tipoPago} · {p.metodoPago} · {p.fecha}</div>
-                  </div>
-                  <div className="text-lg font-bold">{Number(p.monto).toFixed(2)}</div>
-                </div>
-                {p.descripcion && <div className="text-sm opacity-80 mt-2">{p.descripcion}</div>}
+        {/* ——— TOTALES (3 cards en fila) ——— */}
+        <div className="grid grid-cols-3 gap-4 mb-8">
+          {[
+            { label: 'Total', value: totalIncluye.toFixed(2), color: isDarkMode ? '#2C7366' : '#46c4b7', bold: true },
+            { label: 'Pagado', value: totalPagado.toFixed(2), color: isDarkMode ? '#8a262866' : '#d40000', bold: false },
+            { label: 'Saldo', value: saldoPendiente.toFixed(2), color: saldoPendiente > 0 ? (isDarkMode ? '#f35734' : '#f38321') : (isDarkMode ? '#2C7366' : '#46c4b7'), bold: saldoPendiente > 0 }
+          ].map(({ label, value, color, bold }, i) => (
+            <div 
+              key={label}
+              className={`rounded-xl p-5 shadow-sm border transition-all duration-200 hover:shadow-md ${
+                isDarkMode ? 'border-[#1e2224]' : 'border-[#e0e0e0]'
+              }`}
+              style={{
+                background: isDarkMode ? '#080a0b' : '#FFFFFF',
+                boxShadow: `0 2px 6px rgba(0,0,0,${isDarkMode ? '0.2' : '0.05'})`,
+              }}
+            >
+              <div 
+                className="text-xs font-medium uppercase tracking-wide opacity-90 mb-1"
+                style={{ fontFamily: 'var(--font-Alumni)' }}
+              >
+                {label}
+              </div>
+              <div 
+                className={`${bold ? 'font-bold' : 'font-semibold'} text-xl tracking-tight`}
+                style={{ 
+                  fontFamily: 'var(--font-Oswald)',
+                  color: color
+                }}
+              >
+                {value}
               </div>
             </div>
           ))}
         </div>
 
-        {/* Acciones: Ver historial SIEMPRE; Realizar pago solo si falta saldo */}
+        {/* ——— LISTA DE PAGOS ——— */}
+        <div className="space-y-4 mb-10">
+          {pagos.length === 0 ? (
+            <div 
+              className="py-10 text-center rounded-xl"
+              style={{ 
+                background: isDarkMode ? '#080a0b' : '#FFFFFF',
+                border: isDarkMode ? '1px solid #1e2224' : '1px solid #e0e0e0',
+                fontFamily: 'var(--font-Balo)'
+              }}
+            >
+              <p className="text-sm opacity-70">No se registran pagos para esta reserva.</p>
+            </div>
+          ) : (
+            pagos.map((p) => (
+              <div
+                key={p.idPago}
+                className={`flex items-start gap-4 p-5 rounded-xl transition-all duration-200 hover:shadow-md border ${
+                  isDarkMode ? 'border-[#1e2224] hover:border-[#2C7366]' : 'border-[#e0e0e0] hover:border-[#41bfb29f]'
+                }`}
+                style={{
+                  background: isDarkMode ? '#080a0b' : '#FFFFFF',
+                  boxShadow: `0 2px 5px rgba(0,0,0,${isDarkMode ? '0.15' : '0.03'})`,
+                }}
+              >
+                <img 
+                  src={p.cliente?.urlImagen || '/img/avatar-placeholder.png'} 
+                  alt="cliente" 
+                  className="w-12 h-12 rounded-full object-cover mt-1 flex-shrink-0 ring-2 ring-opacity-20"
+                  style={{ 
+                    borderColor: isDarkMode ? '#2C736644' : '#41bfb29f44' 
+                  }}
+                />
+                <div className="flex-1 min-w-0">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <div 
+                        className="font-semibold tracking-tight mb-0.5"
+                        style={{ fontFamily: 'var(--font-Alumni)', fontSize: '1.05rem' }}
+                      >
+                        {p.cliente?.nombre} {p.cliente?.apellidoPaterno}
+                      </div>
+                      <div 
+                        className="text-xs opacity-80 flex flex-wrap gap-2"
+                        style={{ fontFamily: 'var(--font-Balo)' }}
+                      >
+                        <span>{p.tipoPago}</span>
+                        <span>•</span>
+                        <span>{p.metodoPago}</span>
+                        <span>•</span>
+                        <span>{p.fecha}</span>
+                      </div>
+                    </div>
+                    <div 
+                      className="font-bold text-lg tracking-tight whitespace-nowrap"
+                      style={{ 
+                        fontFamily: 'var(--font-Oswald)',
+                        color: isDarkMode ? '#f35734' : '#f38321'
+                      }}
+                    >
+                      {Number(p.monto).toFixed(2)}
+                    </div>
+                  </div>
+                  {p.descripcion && (
+                    <div 
+                      className="text-sm opacity-85 mt-2 leading-relaxed"
+                      style={{ fontFamily: 'var(--font-Balo)' }}
+                    >
+                      {p.descripcion}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
+        {/* ——— BOTONES (acciones) ——— */}
         <div className="flex justify-end gap-3">
           <button
             onClick={() => navigate(-1)}
-            className="px-4 py-2 rounded-md font-medium"
-            style={{ background: '#f2f2f2', color: '#0b0d0e' }}
+            className="px-5 py-3 rounded-lg font-medium flex items-center justify-center transition-all duration-200 hover:opacity-90 active:scale-[0.98]"
+            style={{
+              fontFamily: 'var(--font-josefin)',
+              background: isDarkMode ? '#1e2224' : '#f2efeb',
+              color: isDarkMode ? '#a0a0a0' : '#4b5563',
+              border: isDarkMode ? '1px solid #2a2e30' : '1px solid #ddd',
+            }}
           >
-            Salir
+            ← Salir
           </button>
 
           {puedeRealizarPago ? (
@@ -149,29 +247,31 @@ export default function ListPagosPage() {
                   }
                 });
               }}
-              className="px-4 py-2 rounded-md font-medium"
-              style={{ background: '#46c4b7', color: '#fff' }}
+              className="px-6 py-3 rounded-lg font-medium flex items-center justify-center transition-all duration-200 hover:shadow-lg active:scale-[0.98]"
+              style={{
+                fontFamily: 'var(--font-josefin)',
+                background: isDarkMode ? '#f35734' : '#46c4b7',
+                color: '#FFFFFF',
+                boxShadow: isDarkMode 
+                  ? '0 4px 12px rgba(243, 87, 52, 0.3)' 
+                  : '0 4px 12px rgba(65, 191, 178, 0.25)',
+              }}
             >
               Realizar pago
             </button>
           ) : (
-            <button disabled className="px-4 py-2 rounded-md font-medium opacity-40 cursor-not-allowed" style={{ background: '#46c4b7', color: '#fff' }}>
+            <button 
+              disabled 
+              className="px-6 py-3 rounded-lg font-medium opacity-60 cursor-not-allowed"
+              style={{
+                fontFamily: 'var(--font-josefin)',
+                background: isDarkMode ? '#1e2224' : '#f0f0f0',
+                color: isDarkMode ? '#555' : '#888',
+              }}
+            >
               Realizar pago
             </button>
           )}
-        </div>
-
-        {/* Mensajes de ayuda / debug */}
-        <div className="mt-6 text-sm">
-          {mensaje && <div className={`p-3 rounded ${mensaje.type === 'error' ? 'bg-red-600 text-white' : mensaje.type === 'success' ? 'bg-green-600 text-white' : 'bg-yellow-500 text-black'}`}>{mensaje.text}</div>}
-
-          <div className="mt-3 p-3 bg-gray-50 text-xs rounded text-gray-600">
-            <strong>Debug console:</strong>
-            <ul className="list-disc pl-5">
-              <li>Revisa la consola (console.log) para ver los objetos completos de reserva, pagos y respuestas del backend.</li>
-              <li>Si realizas un pago en tarjeta/QR, el backend suele devolver el pago creado; después confirmamos con confirmarPago(idPago, codigo).</li>
-            </ul>
-          </div>
         </div>
       </div>
     </div>
