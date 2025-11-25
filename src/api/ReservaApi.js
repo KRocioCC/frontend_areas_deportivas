@@ -16,6 +16,13 @@ export const getReservaPorId = async (id) => {
   return res.data;
 };
 
+export const getReservasByAdmin = async (id) => {
+  // ANTES (Incorrecto): api.get(`${URL_BASE}/${id}`);
+  // AHORA (Correcto): Agregamos "/admin/"
+  const res = await api.get(`${URL_BASE}/admin/${id}`); 
+  return res.data;
+};
+
 export const createReserva = async (payload) => {
   const res = await api.post(`${URL_BASE}`, payload);
   return res.data;
