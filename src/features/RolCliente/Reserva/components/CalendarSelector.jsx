@@ -1,6 +1,6 @@
 // src/Reserva/components/CalendarSelector.jsx
 import Calendar from "react-calendar";
-import { FaCalendarAlt } from "react-icons/fa";
+//import { FaCalendarAlt } from "react-icons/fa";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import "./CalendarSelector.css";
@@ -11,7 +11,7 @@ export default function CalendarSelector({ fecha, onChange }) {
 
   return (
     <div
-      className="bg-p-5 p-4 rounded-2xl shadow-lg border border-p-6"
+      className="bg-p-6 p-4 rounded-2xl shadow-lg border border-p-6"
       style={{
         fontFamily: "var(--font-Balo)",
         maxWidth: "560px", 

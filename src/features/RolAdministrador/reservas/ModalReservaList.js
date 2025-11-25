@@ -35,10 +35,13 @@ export default function ModalReservaList({ initialData, onCancel }) {
 
             <div className="modal-reserva-info">
               <h3>{cancha.nombre || "Cancha sin nombre"}</h3>
-              <div className="modal-reserva-box primary">
-                <div className="label">Estado</div>
-                <div className="value">{initialData.estadoReserva}</div>
-              </div>
+              <div
+              className={`modal-reserva-box estado-${initialData.estadoReserva?.toLowerCase()}`}
+            >
+              <div className="label">Estado</div>
+              <div className="value">{initialData.estadoReserva}</div>
+            </div>
+
 
               <div className="modal-reserva-box">
                 <Users className="icon" />

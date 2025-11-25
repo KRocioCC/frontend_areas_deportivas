@@ -4,7 +4,7 @@ import CalendarSelector from "../Reserva/components/CalendarSelector"
 import HorariosDisponibles from "../Reserva/components/HorariosDisponibles";
 import useReservaFlow from "../Reserva/hooks/useReservaFlow";
 import { FaArrowLeft, FaTimes } from "react-icons/fa";
-// ReservaPage.jsx
+
 
 
 export default function ReservaPage() {

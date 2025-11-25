@@ -60,13 +60,13 @@ function Sidebar({ open }) {
           { label: "Cliente", path: "/personas/clientes" },
           { label: "Administrador", path: "/personas/administradores" },
           { label: "Usuario de Control", path: "/personas/usuarios-control" },
-          { label: "Invitado", path: "/personas/invitados" }
+          //{ label: "Invitado", path: "/personas/invitados" }
         ]
       },
       { label: "Áreas Deportivas", icon: <TfiLocationPin />, path: "/areadeportiva" },
       { label: "Canchas", icon: <TfiBasketball />, path: "/canchas" },
       { label: "Equipamientos", icon: <TfiLayersAlt />, path: "/equipamientos" },
-      //{ label: "Calendario", icon: <TfiCalendar />, path: "/reservas/calendario" }
+      { label: "Calendario", icon: <TfiCalendar />, path: "/reservas/calendario" }
     );
   }
 

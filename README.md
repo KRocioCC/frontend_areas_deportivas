@@ -88,3 +88,7 @@ npm install @fullcalendar/core --legacy-peer-deps
 npm install date-fns
 
 
+# INSTALAR PARA LAS CARDS
+npm install jspdf html2canvas
+
+

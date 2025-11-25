@@ -75,6 +75,11 @@ function SidebarAdmin({ open }) {
       path: "/admin/notificaciones" 
     },
     { 
+      label: "Disciplinas", 
+      icon: <TfiBasketball />, 
+      path: "/admin/disciplinas" 
+    },
+    { 
       label: "Calendario", 
       icon: <TfiCalendar />, 
       path: "/admin/calendario" 

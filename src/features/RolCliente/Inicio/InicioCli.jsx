@@ -5,7 +5,7 @@ import Servicios from "./Servicios";
 import Nosotros from "./Nosotros";
 import MisionVision from "./MisionVision"
 import Contacto from "./Contacto"
-import Footer from "./Footer"
+
 
 export default function Inicio() {
   return (
@@ -16,7 +16,6 @@ export default function Inicio() {
       <Nosotros/>
       <MisionVision/>
       <Contacto/> 
-      <Footer/> 
     </div>
   );
 }

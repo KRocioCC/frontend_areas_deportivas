@@ -137,3 +137,27 @@
 .modal-reserva-footer {
   text-align: right;
 }
+
+/* Estado PENDIENTE → amarillo */
+.modal-reserva-box.estado-pendiente {
+  background-color: #fef9c3; /* amarillo claro */
+  color: #b45309; /* marrón/amarillo oscuro */
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+/* Estado CONFIRMADA → verde */
+.modal-reserva-box.estado-confirmada {
+  background-color: #d1fae5; /* verde claro */
+  color: #065f46; /* verde oscuro */
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+/* Estado CANCELADA → rojo */
+.modal-reserva-box.estado-cancelada {
+  background-color: #fee2e2; /* rojo claro */
+  color: #b91c1c; /* rojo fuerte */
+  flex-direction: column;
+  align-items: flex-start;
+}

@@ -1,3 +1,4 @@
+// src/features/reservas/components/ReservaListAdmin.js
 import React, { useContext, useEffect, useState, useMemo, useCallback } from "react";
 import * as ReservaService from "../../../api/ReservaApi";
 import Button from "../../../components/ui/Button";
@@ -6,7 +7,6 @@ import CRUDTable from "../../../components/ui/CRUDTable";
 import { Eye } from "lucide-react";
 import { AuthContext } from "../../../auth/context/AuthContext";
 import ModalReservaList from "./ModalReservaList";
-
 
 import "./ReservaListAdmin.css";
 
@@ -46,7 +46,15 @@ export default function ReservaListAdmin() {
         inicio,
         fin
       );
-      setItems(Array.isArray(data) ? data : []);
+      // solo CONFIRMADAS y PENDIENTES
+      const filtradas = Array.isArray(data)
+        ? data.filter(
+            (reserva) =>
+              reserva.estadoReserva === "CONFIRMADA" ||
+              reserva.estadoReserva === "PENDIENTE"
+          )
+        : [];
+      setItems(filtradas);
     } catch (err) {
       setError("No se pudieron cargar las reservas");
     } finally {
@@ -65,9 +73,10 @@ export default function ReservaListAdmin() {
       return;
     }
 
-    const filtered = items.filter(item =>
-      item.observaciones?.toLowerCase().includes(search.trim().toLowerCase()) ||
-      item.cancha?.nombre?.toLowerCase().includes(search.trim().toLowerCase()) // 👈 filtro por nombre de cancha
+    const filtered = items.filter(
+      (item) =>
+        item.observaciones?.toLowerCase().includes(search.trim().toLowerCase()) ||
+        item.cancha?.nombre?.toLowerCase().includes(search.trim().toLowerCase())
     );
     setItems(filtered);
   }
@@ -77,30 +86,36 @@ export default function ReservaListAdmin() {
     setShowForm(true);
   }, []);
 
-  const columns = useMemo(() => [
-    { header: "ID", accessor: "idReserva", width: 80, sortable: true, align: "right" },
-    { header: "Fecha", accessor: "fechaReserva", sortable: true },
-    { header: "Hora", render: (_, row) => `${row.horaInicio} - ${row.horaFin}`, sortable: true },
-    { header: "Estado", accessor: "estadoReserva", sortable: true },
-    { 
-      header: "Cancha", 
-      render: (_, row) => row.cancha?.nombre || "Sin cancha", // 👈 muestra nombre de cancha
-      sortable: true 
-    },
-    { header: "Observaciones", accessor: "observaciones", truncate: 200 },
-    {
-      header: "Pago",
-      render: (_, row) => (
-        <span className="text-sm">
-          {`Pagado: Bs ${row.totalPagado} / Pendiente: Bs ${row.saldoPendiente}`}
-        </span>
-      ),
-    },
-  ], []);
+  const columns = useMemo(
+    () => [
+      { header: "ID", accessor: "idReserva", width: 80, sortable: true, align: "right" },
+      { header: "Fecha", accessor: "fechaReserva", sortable: true },
+      { header: "Hora", render: (_, row) => `${row.horaInicio} - ${row.horaFin}`, sortable: true },
+      { header: "Estado", accessor: "estadoReserva", sortable: true },
+      {
+        header: "Cancha",
+        render: (_, row) => row.cancha?.nombre || "Sin cancha",
+        sortable: true,
+      },
+      { header: "Observaciones", accessor: "observaciones", truncate: 200 },
+      {
+        header: "Pago",
+        render: (_, row) => (
+          <span className="text-sm">
+            {`Pagado: Bs ${row.totalPagado} / Pendiente: Bs ${row.saldoPendiente}`}
+          </span>
+        ),
+      },
+    ],
+    []
+  );
 
-  const actions = useMemo(() => [
-    { label: "", icon: Eye, variant: "botoncrear", onClick: (row) => openView(row) },
-  ], [openView]);
+  const actions = useMemo(
+    () => [
+      { label: "", icon: Eye, variant: "botoncrear", onClick: (row) => openView(row) },
+    ],
+    [openView]
+  );
 
   return (
     <div className="ReservaListAdmin card">
@@ -137,7 +152,10 @@ export default function ReservaListAdmin() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               onSearch={() => handleSearch()}
-              onClear={() => { setSearch(""); load(); }}
+              onClear={() => {
+                setSearch("");
+                load();
+              }}
               placeholder="Buscar por observaciones o cancha..."
               size="md"
               className="search-input"
@@ -163,17 +181,15 @@ export default function ReservaListAdmin() {
         />
       )}
 
-     {showForm && (
-      <ModalReservaList
-        initialData={editing}
-        onCancel={() => {
-          setShowForm(false);
-          setEditing(null);
-        }}
-      />
-    )}
-
-
+      {showForm && (
+        <ModalReservaList
+          initialData={editing}
+          onCancel={() => {
+            setShowForm(false);
+            setEditing(null);
+          }}
+        />
+      )}
     </div>
   );
 }

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import './ZonaForm.css';
 
+import * as MacrodistritoService from "../../../api/macrodistritoApi";
+
 export default function ZonaForm({ initialData, onSave, onCancel }) {
   const [nombre, setNombre] = useState('');
   const [descripcion, setDescripcion] = useState('');
@@ -9,28 +11,30 @@ export default function ZonaForm({ initialData, onSave, onCancel }) {
   //LLAVES FORANEAS
   const [idMacrodistrito, setIdMacrodistrito] = useState(null);  // Guardamos el idMacrodistrito
   const [macrodistritos, setMacrodistritos] = useState([]); // Lista de macrodistritos
+  const [loadingMacrodistritos, setLoadingMacrodistritos] = useState(false);
 
   // Cargar macrodistritos cuando el componente se monta
 
   useEffect(() => {
     const loadMacrodistritos = async () => {
       try {
-        const response = await fetch('http://localhost:8032/api/macrodistrito'); // Ajusta la URL
-        const data = await response.json();
+        setLoadingMacrodistritos(true);
+        const data = await MacrodistritoService.getMacrodistritos();
         if (Array.isArray(data)) {
-          setMacrodistritos(data); // Guardamos la lista de macrodistritos en el estado
+          setMacrodistritos(data);
         } else {
           console.error('La respuesta no es un array:', data);
-          setMacrodistritos([]); // Si no es un array, establecemos un array vacío
+          setMacrodistritos([]);
         }
       } catch (err) {
         console.error("Error cargando los macrodistritos", err);
-        setMacrodistritos([]); // Si hay un error, aseguramos que el estado sea un array vacío
+        setMacrodistritos([]);
+      } finally {
+        setLoadingMacrodistritos(false);
       }
     };
     loadMacrodistritos();
   }, []);
-
 
   // Actualizar el estado cuando se cargan los datos iniciales (para editar)
   useEffect(() => {
@@ -82,7 +86,7 @@ export default function ZonaForm({ initialData, onSave, onCancel }) {
   
   return (
     <form className="Zona-form" onSubmit={handleSubmit}>
-      <h3>{initialData ? 'Editar Zona' : 'Nuevo Zona'}</h3>
+      <h3>{initialData ? 'Editar Zona' : 'Nueva Zona'}</h3>
 
       <div className="form-row">
         <label>Nombre</label>
@@ -98,15 +102,20 @@ export default function ZonaForm({ initialData, onSave, onCancel }) {
       <div className="form-row">
         <label>Macrodistrito</label>
         <select
-          value={idMacrodistrito?? ''}
+          value={idMacrodistrito ?? ''}
           onChange={e => setIdMacrodistrito(e.target.value)}
+          disabled={loadingMacrodistritos}
         >
           <option value="">Seleccione un macrodistrito</option>
-          {macrodistritos.map(macrodistrito => (
-            <option key={macrodistrito.idMacrodistrito} value={macrodistrito.idMacrodistrito}>
-              {macrodistrito.nombre}
-            </option>
-          ))}
+          {loadingMacrodistritos ? (
+            <option value="" disabled>Cargando...</option>
+          ) : (
+            macrodistritos.map(macrodistrito => (
+              <option key={macrodistrito.idMacrodistrito} value={macrodistrito.idMacrodistrito}>
+                {macrodistrito.nombre}
+              </option>
+            ))
+          )}
         </select>
         {errors.idMacrodistrito && <div className="form-error">{errors.idMacrodistrito}</div>}
       </div>

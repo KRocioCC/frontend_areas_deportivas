@@ -34,7 +34,8 @@ export const updateReserva = async (id, payload) => {
 };
 
 export const deleteReserva = async (id) => {
-  const res = await api.delete(`${URL_BASE}/${id}`);
+  // Usar eliminación lógica consistente con otras APIs del proyecto (PUT /{id}/eliminar)
+  const res = await api.put(`${URL_BASE}/${id}/eliminar`);
   return res.data;
 };
 
@@ -132,5 +133,13 @@ export const actualizarEstadoPago = async (id) => {
 ----------------------------------------------------------- */
 export const healthCheckReserva = async () => {
   const res = await api.get(`${URL_BASE}/health`);
+  return res.data;
+};
+
+/**
+obtener reservas por cancha
+ */
+export const getReservasPorCancha = async (idCancha) => {
+  const res = await api.get(`${URL_BASE}/${idCancha}/reservas`);
   return res.data;
 };

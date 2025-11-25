@@ -12,7 +12,7 @@ export default function Nosotros() {
         transition={{ duration: 0.6 }}
       >
         <img 
-          src="/images/equipo-colaborando.jpg"
+          src="/Fondos/Deporte1.png"
           alt="Equipo trabajando"
           className="nosotros-img"
         />

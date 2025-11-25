@@ -1,11 +1,11 @@
 // src/features/Reserva/pages/ReservaConfirmacion.jsx
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { FaArrowLeft, FaTimes } from "react-icons/fa";
-import { calcularMonto } from "../../../api/IncluyeApi";
+//import { FaArrowLeft, FaTimes } from "react-icons/fa";
+import { calcularMonto ,crearAsociacion} from "../../../api/IncluyeApi";
 import { getCancha } from "../../../api/CanchaApi";
 import { getDisciplinaById } from "../../../api/DisciplinaApi";
-import { createReserva, crearAsociacion } from "../../../api/ReservaApi";
+import { createReserva } from "../../../api/ReservaApi";
 import ModalTerminos from "./components/ModalTerminos";
 import AnimacionTransicion from "./components/AnimacionTransicion";
 
@@ -91,18 +91,12 @@ export default function ReservaConfirmacion() {
 
     try {
 
-      // FECHA DE CREACIÓN: 2 HORAS ANTES DE AHORA
-      const ahora = new Date();
-      const dosHorasAntes = new Date(ahora.getTime() - 2 * 60 * 60 * 1000);
-      const fechaCreacion = dosHorasAntes.toISOString().slice(0, 19).replace("T", " ");
-
       // LIMPIAR HORAS (por si vienen con :00)
       const limpiarHora = (h) => h.replace(/:00$/, "").trim();
       const horaInicio = limpiarHora(reserva.horaInicio);
       const horaFin = limpiarHora(reserva.horaFin);
 
-const payloadReserva = {
-      fechaCreacion: fechaCreacion,           // "2025-11-13 08:12:40"
+const payloadReserva = {           // "2025-11-13 08:12:40"
       fechaReserva: reserva.fecha,            // "2025-11-17"
       horaInicio: reserva.horaInicio,                 // "14:00"
       horaFin: reserva.horaFin,                       // "16:00"
@@ -124,7 +118,7 @@ const payloadReserva = {
       };
 
       console.log("Creando asociación incluye:", incluyePayload);
-      //await crearAsociacion(incluyePayload);
+      await crearAsociacion(incluyePayload);
 
       alert("¡Reserva confirmada con éxito!");
       navigate("/");
@@ -156,16 +150,16 @@ const payloadReserva = {
           {/* Cliente */}
           <div className="border-b pb-4">
             <h3 className="font-semibold text-lg mb-2" style={{ color: "var(--color-p-1)" }}>Cliente</h3>
-            <p><strong>Nombre:</strong> {cliente.nombre} {cliente.aPaterno} {cliente.aMaterno}</p>
+            <p><strong>Nombre:</strong> {cliente.nombre} {cliente.apellidoPaterno} {cliente.apellidoMaterno}</p>
             <p><strong>Email:</strong> {cliente.email}</p>
           </div>
 
           {/* Cancha */}
           <div className="border-b pb-4">
             <h3 className="font-semibold text-lg mb-2" style={{ color: "var(--color-p-1)" }}>Cancha</h3>
-            <p><strong>Nombre:</strong> {cancha.nombreCancha}</p>
+            <p><strong>Nombre:</strong> {cancha.nombre}</p>
             <p><strong>Área Deportiva:</strong> {cancha.areaDeportiva?.nombreArea}</p>
-            <p><strong>Ubicación:</strong> {cancha.latitud}, {cancha.longitud}</p>
+            <p><strong>Ubicación:</strong> {cancha.areaDeportiva?.latitud}, {cancha.areaDeportiva?.longitud}</p>
             <p><strong>Equipamientos:</strong> {cancha.equipamientos?.map(e => e.nombre).join(", ") || "Ninguno"}</p>
           </div>
 

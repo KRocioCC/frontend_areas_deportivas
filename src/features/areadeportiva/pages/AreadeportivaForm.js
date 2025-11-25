@@ -1,8 +1,11 @@
 import React, { useEffect, useState, useMemo } from "react";
 import Button from "../../../components/ui/Button";
 import { Plus, X, Upload } from "lucide-react";
-import api from '../../../api/api'; // Tu instancia de Axios
+import api from '../../../api/api';
 import './Areadeportiva.css';
+
+import * as ZonaService from "../../../api/ZonaApi";
+import * as AdministradorService from "../../../api/administradorApi";
 
 // Configuración de ruta base para imágenes
 const BASE_URL_IMG = "http://localhost:8032/"; 
@@ -37,24 +40,31 @@ export default function AreadeportivaForm({
   const [idZona, setIdZona] = useState(null);
   const [id, setId] = useState(null);
 
-  const [zonas, setZonas] = useState([]); 
-  const [administradores, setAdministradores] = useState([]); 
+  const [zonas, setZonas] = useState([]); // Lista de zonas para select
+  const [administradores, setAdministradores] = useState([]); // Lista de administradores
+  const [loadingData, setLoadingData] = useState(false);
   const [errors, setErrors] = useState({});
-
-  // Archivos para subir
   const [selectedFiles, setSelectedFiles] = useState([]);
 
-  // Cargar listas desplegables
+  // Cargar zonas y administradores al montar el componente
   useEffect(() => {
     const loadData = async () => {
       try {
-        const zonasRes = await api.get('/zona'); 
-        setZonas(Array.isArray(zonasRes.data) ? zonasRes.data : []);
-
-        const adminsRes = await api.get('/administradores'); 
-        setAdministradores(Array.isArray(adminsRes.data) ? adminsRes.data : []);
+        setLoadingData(true);
+        // Usa los servicios de API en lugar de fetch directo
+        const [zonasData, adminsData] = await Promise.all([
+          ZonaService.getZonas(),
+          AdministradorService.getAdministradores()
+        ]);
+        
+        setZonas(Array.isArray(zonasData) ? zonasData : []);
+        setAdministradores(Array.isArray(adminsData) ? adminsData : []);
       } catch (err) {
-        console.error("Error cargando listas:", err);
+        console.error("Error cargando zonas o administradores:", err);
+        setZonas([]);
+        setAdministradores([]);
+      } finally {
+        setLoadingData(false);
       }
     };
     loadData();
@@ -158,17 +168,35 @@ export default function AreadeportivaForm({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
           <div>
             <label className="block text-sm font-medium">Zona</label>
-            <select value={idZona ?? ''} onChange={e => setIdZona(Number(e.target.value))} disabled={readonly} className="w-full border p-2 rounded">
+            <select 
+              value={idZona ?? ''} 
+              onChange={e => setIdZona(Number(e.target.value))} 
+              disabled={readonly || loadingData}
+              className="w-full border p-2 rounded"
+            >
               <option value="">Seleccione una zona</option>
-              {zonas.map(z => <option key={z.idZona} value={z.idZona}>{z.nombre}</option>)}
+              {loadingData ? (
+                <option value="" disabled>Cargando zonas...</option>
+              ) : (
+                zonas.map(z => <option key={z.idZona} value={z.idZona}>{z.nombre}</option>)
+              )}
             </select>
             {errors.idZona && <div className="text-red-500 text-sm">{errors.idZona}</div>}
           </div>
           <div>
             <label className="block text-sm font-medium">Administrador</label>
-            <select value={id ?? ''} onChange={e => setId(Number(e.target.value))} disabled={readonly} className="w-full border p-2 rounded">
+            <select 
+              value={id ?? ''} 
+              onChange={e => setId(Number(e.target.value))} 
+              disabled={readonly || loadingData}
+              className="w-full border p-2 rounded"
+            >
               <option value="">Seleccione un administrador</option>
-              {administradores.map(a => <option key={a.id} value={a.id}>{a.nombre}</option>)}
+              {loadingData ? (
+                <option value="" disabled>Cargando administradores...</option>
+              ) : (
+                administradores.map(a => <option key={a.id} value={a.id}>{a.nombre}</option>)
+              )}
             </select>
             {errors.id && <div className="text-red-500 text-sm">{errors.id}</div>}
           </div>

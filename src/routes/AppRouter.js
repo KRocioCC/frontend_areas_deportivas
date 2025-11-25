@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import DashboardLayout from "../components/layout/DashboardLayout";
 import DashboardLayoutAdmin from "../components/layout/DashboardLayoutAdmin";
@@ -31,22 +31,21 @@ import UsuarioControlPage from "../features/personas/pages/UsuarioControlPage";
 import InvitadoPage from "../features/personas/pages/InvitadoPage";
 
 // ADMINISTRADOR
-import MiAreaPage from '../features/RolAdministrador/mi_area/MiAreaPage.js';
+import MiAreaContainer from '../features/RolAdministrador/mi_area/MiAreaContainer.jsx';
 import CanchasPage from "../features/RolAdministrador/canchas/CanchasPage";
 
 import PageClientes from "../features/RolAdministrador/usuarios/clientes/PageClientes";
 import PageUsuariosControl from "../features/RolAdministrador/usuarios/usuarios_control/PageUsuariosControl";
 import Dashboard from "../features/RolAdministrador/dashboard/index.jsx";
+import CanchaReservaPage from "../features/RolAdministrador/canchas/CanchaReservasPage";
+import ReservaListAdmin from "../features/RolAdministrador/reservas/ReservaListAdmin.js";
+import CancelacionesListAdmin from "../features/RolAdministrador/cancelaciones/CancelacionesListAdmin.js";
+import DisciplinaListAdmin from "../features/RolAdministrador/Disciplina/DisciplinaListAdmin.js";
+import PagosAdminPage from "../features/RolAdministrador/pagos/pages/PagosAdminPage.jsx";
 
-import CanchaDetalleAdmin from "../features/RolAdministrador/canchas/CanchaDetalleAdmin";
-import ReservaPageAdmin from "../features/RolAdministrador/Reserva/ReservaPageAdmin";
-import ReservaListAdmin from "../features/RolAdministrador/reservas/ReservaListAdmin";
-
-import PagosAdminPage from "../features/RolAdministrador/pagos/pages/PagosAdminPage.jsx"; // (Cuando lo crees)
 //CLIENTE
 // CLIENTE - componentes visuales
-import Preloader from "../components/ComponentsCli/Preloader.jsx";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import LayoutCliente from "../components/ComponentsCli/LayoutCliente.jsx";  
 
 
@@ -56,12 +55,11 @@ import Inicio from "../features/RolCliente/Inicio/InicioCli.jsx";
 import Areadeportiva from "../features/RolCliente/AreaDeportiva/AreaDeportiva.jsx"
 import Cancha from "../features/RolCliente/Canchas/Cancha.jsx"
 import CanchaDetalle from "../features/RolCliente/Canchas/CanchaDetalle.jsx"
-//import HistorialReserva from "../feature/RolCliente/Areadeportiva/HistorialReserva/HistorialReserva";
+import HistorialReserva from "../features/RolCliente/HistorialReserva/HistorialReservaCli.jsx";
 //import Notificaciones from "../feature/RolCliente/Notificaciones/Notificaciones"; // si existe
 //import HistorialReserva from "../feature/RolCliente/Areadeportiva/HistorialReserva/HistorialReserva";
 //import Notificaciones from "../feature/RolCliente/Notificaciones/Notificaciones"; // si existe
 import ReservaPage from "../features/RolCliente/Reserva/ReservaPage22.jsx";
-import ConfirmacionFinalReservaHorario from "../features/RolCliente/Reserva/ConfirmacionFinal.jsx";
 import ReservaCliente from "../features/RolCliente/Reserva/ReservaCliente.jsx";
 
 import ReservaConfirmacion from "../features/RolCliente/Reserva/ReservaConfirmacion.jsx";
@@ -69,6 +67,11 @@ import ReservaConfirmacion from "../features/RolCliente/Reserva/ReservaConfirmac
 import Calendar from "../features/RolAdministrador/calendar/Calendar";
 import ComoFunciona from "../features/RolCliente/Inicio/ComoFunciona.jsx";
 import SistemaQR from "../features/RolCliente/Inicio/SistemaQR.jsx";
+//import PaymentPage from "../features/RolCliente/Pagos/PaymentPage.jsx";
+import ListPagosPage from "../features/RolCliente/Pagos/ListaPagosPage.jsx";
+import RealizarPagoPage from "../features/RolCliente/Pagos/RealizarPagoPage.jsx";
+import IngresarTarjetaPage from "../features/RolCliente/Pagos/IngresarTarjetaPage.jsx";
+import ConfirmarPagoQRPage from "../features/RolCliente/Pagos/ConfirmarPagoQRPage.jsx";
 
 function AppRouter() {
 
@@ -95,22 +98,17 @@ function AppRouter() {
     })
   };
 
-  const [loading, setLoading] = useState(true);
+  
 
   return (
     <AuthProvider>
       <BrowserRouter>
-        {/*{loading ? (
-            <Preloader onFinish={() => setLoading(false)} />
-          ) : (*/}
+        {/* routes */}
         <Routes>
           
           {/* Redirección por defecto → inicio */}
-          {/* Ruta pública: inicio */}
           <Route path="/" element={<Navigate to="/inicio" replace />} />
 
-          {/* Redirección por defecto → login */}
-          {/*<Route path="/" element={<Navigate to="/login" replace />} />*/}
 
           {/* Rutas de autenticación públicas */}
           <Route path="/login" element={<Login />} />
@@ -169,15 +167,9 @@ function AppRouter() {
            <Route
             path="canchacli/detalle/:id"
             element={
-              <motion.div
-                variants={pageVariants}
-                initial="initial"
-                animate="animate"
-                exit="exit"
-                custom={1}
-              >
+              <LayoutCliente>
                 <CanchaDetalle />
-              </motion.div>
+              </LayoutCliente>
             }
           />
           {/* CLIENTE - Reservas protegidas */}
@@ -211,29 +203,63 @@ function AppRouter() {
                 </LayoutCliente>
               </ProtectedRoute>
             }
-          />
+          />        
 
-          <Route
-            path="/cliente/reservas/confirmacion/:id"
-            element={
-              <ProtectedRoute requireCliente>
-                <LayoutCliente>
-                  <ConfirmacionFinalReservaHorario />
-                </LayoutCliente>
-              </ProtectedRoute>
-            }
-          />
-
-            
-
-            {/*  <Route
-              path="/reservas/historial"
+             <Route
+              path="/reservas/mihistorial"
               element={
-                <ProtectedRoute>
-                  <HistorialReserva />
+                <ProtectedRoute requireCliente>
+                  <LayoutCliente>
+                    <HistorialReserva />
+                  </LayoutCliente>
                 </ProtectedRoute>
               }
             />
+
+            <Route
+              path="/reservas/pagos/:idReserva/listar"
+              element={
+                <ProtectedRoute requireCliente>
+                  <LayoutCliente>
+                    <ListPagosPage />
+                  </LayoutCliente>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/reservas/pagos/:idReserva/pagar"
+              element={
+                <ProtectedRoute requireCliente>
+                  <LayoutCliente>
+                    <RealizarPagoPage />
+                  </LayoutCliente>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/reservas/pagos/tarjeta"
+              element={
+                <ProtectedRoute requireCliente>
+                  <LayoutCliente>
+                    <IngresarTarjetaPage />
+                  </LayoutCliente>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/reservas/pagos/qr"
+              element={
+                <ProtectedRoute requireCliente>
+                  <LayoutCliente>
+                    <ConfirmarPagoQRPage />
+                  </LayoutCliente>
+                </ProtectedRoute>
+              }
+            />
+
+            {/*
             <Route
               path="/notificaciones"
               element={
@@ -241,7 +267,7 @@ function AppRouter() {
                   <Notificaciones />
                 </ProtectedRoute>
               }
-            />
+            />*/}
 
           {/* Ruta accesible para cualquier usuario autenticado */}
           <Route
@@ -346,11 +372,21 @@ function AppRouter() {
 
           {/* RUTAS NUEVAS PARA ADMINISTRADOR - DashboardLayoutAdmin */}
           <Route
+            path="/admin/cancha/ver_reservas/:idCancha"
+            element={
+              <ProtectedRoute requireAdmin>
+                <DashboardLayoutAdmin>
+                  <CanchaReservaPage />
+                </DashboardLayoutAdmin>
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/admin/mi_area"
             element={
               <ProtectedRoute requireAdmin>
                 <DashboardLayoutAdmin>
-                    <MiAreaPage />
+                    <MiAreaContainer />
                 </DashboardLayoutAdmin>
               </ProtectedRoute>
             }
@@ -366,27 +402,19 @@ function AppRouter() {
               </ProtectedRoute>
             }
           />
+          
           <Route
-            path="/admin/cancha/:id"
+            path="/admin/reservaslist"
             element={
               <ProtectedRoute requireAdmin>
                 <DashboardLayoutAdmin>
-                  <CanchaDetalleAdmin />
+                    <ReservaListAdmin/> 
                 </DashboardLayoutAdmin>
               </ProtectedRoute>
             }
           />
 
-        <Route
-          path="/admin/reservascli"
-          element={
-            <ProtectedRoute requireAdmin>
-              <DashboardLayoutAdmin>
-                <ReservaPageAdmin />
-              </DashboardLayoutAdmin>
-            </ProtectedRoute>
-          }
-        />
+        
 
           <Route
             path="/admin/dashboard"
@@ -429,16 +457,25 @@ function AppRouter() {
             }
           />
           <Route
-            path="/admin/reservaslist"
+            path="/admin/reservas/cancelaciones"
             element={
               <ProtectedRoute requireAdmin>
                 <DashboardLayoutAdmin>
-                  <ReservaListAdmin />
+                  <CancelacionesListAdmin/> 
                 </DashboardLayoutAdmin>
               </ProtectedRoute>
             }
           />
-
+          <Route
+            path="/admin/disciplinas"
+            element={
+              <ProtectedRoute requireAdmin>
+                <DashboardLayoutAdmin>
+            <DisciplinaListAdmin />
+                </DashboardLayoutAdmin>
+              </ProtectedRoute>
+            }
+          />
 
           <Route
             path="/admin/notificaciones"

@@ -16,19 +16,20 @@ export async function getCancha(id) {
 
 // Crear una cancha (Solo datos JSON)
 export const createCancha = async (canchaData) => {
-    const response = await api.post(BASE_URL, canchaData);
+    const response = await api.post(API_URL, canchaData);
     return response.data;
 };
 
 // Actualizar una cancha
 export const updateCancha = async (id, canchaData) => {
-    const response = await api.put(`${BASE_URL}/${id}`, canchaData);
+    const response = await api.put(`${API_URL}/${id}`, canchaData);
     return response.data;
 };
 
 // Desactivar (eliminar lógica) una cancha
 export async function deleteCancha(id) {
-  const res = await api.put(`${API_URL}/${id}/eliminar`);
+  // En lugar de eliminar, cambiamos el estado a false (desactivar) K
+  const res = await api.patch(`${API_URL}/${id}/estado?nuevoEstado=false`);
   return res.data;
 }
 
@@ -51,6 +52,7 @@ export async function buscarCanchasPorNombre(nombre) {
   return res.data;
 }
 
+
 export async function buscarCanchasPorFiltros(params) {
   // params: { horaInicio, horaFin, costo, capacidad, tamano, iluminacion, cubierta }
   const query = new URLSearchParams(params).toString();
@@ -68,12 +70,12 @@ export async function getCanchasActivas() {
 
 
 export async function getEquipamientosPorCancha(id) {
-  const res = await api.get(`${API_URL}/equipamientos/${id}`);
+  const res = await api.get(`${API_URL}/${id}/equipamientos`);
   return res.data;
 }
 
 export async function getDisciplinasPorCancha(id) {
-  const res = await api.get(`${API_URL}/disciplinas/${id}`);
+  const res = await api.get(`${API_URL}/${id}/disciplinas`);
   return res.data;
 }
 
@@ -89,7 +91,7 @@ export const agregarImagenesCancha = async (idCancha, archivos) => {
     }
 
     // POST /api/cancha/{id}/imagenes
-    const response = await api.post(`${BASE_URL}/${idCancha}/imagenes`, formData, {
+    const response = await api.post(`${API_URL}/${idCancha}/imagenes`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
     });
     return response.data;
@@ -120,7 +122,7 @@ export async function obtenerCanchaConBloqueo(id) {
 //-------------------NUEVOS SERVICIOS
 // Obtener todas las canchas
 export const getAllCanchas = async () => {
-    const response = await api.get(BASE_URL);
+    const response = await api.get(API_URL);
     return response.data;
 };
 
