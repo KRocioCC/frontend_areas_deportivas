@@ -41,6 +41,7 @@ import CanchaReservaPage from "../features/RolAdministrador/canchas/CanchaReserv
 import ReservaListAdmin from "../features/RolAdministrador/reservas/ReservaListAdmin.js";
 import CancelacionesListAdmin from "../features/RolAdministrador/cancelaciones/CancelacionesListAdmin.js";
 import DisciplinaListAdmin from "../features/RolAdministrador/Disciplina/DisciplinaListAdmin.js";
+import PagosAdminPage from "../features/RolAdministrador/pagos/pages/PagosAdminPage.jsx";
 
 //CLIENTE
 // CLIENTE - componentes visuales
@@ -486,6 +487,16 @@ function AppRouter() {
               </ProtectedRoute>
             }
           />
+          <Route
+  path="/admin/pagos"
+  element={
+    <ProtectedRoute requireAdmin>
+      <DashboardLayoutAdmin>
+        <PagosAdminPage />
+      </DashboardLayoutAdmin>
+    </ProtectedRoute>
+  }
+/>
 
           {/* Ruta 404 - Redirigir a login */}
           <Route path="*" element={<Navigate to="/login" replace />} />
