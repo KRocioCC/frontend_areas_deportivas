@@ -25,7 +25,7 @@ export default function Navbar() {
   // 🔹 Items base (sin cambios)
   const baseItems = [
     { name: "Inicio", path: "/inicio"},
-    { name: "Canchas", path: "/canchas" },
+    { name: "Canchas", path: "/cancha/listado" },
     { name: "Reservar", path: "/reservas" },
     { name: "¿Cómo Funciona?", path: "/como-funciona/reservar",
       children: [
@@ -41,7 +41,7 @@ export default function Navbar() {
       children: [
         { name: "¿Quiénes Somos?", path: "/empresa#nosotros" },
         { name: "Misión y Visión", path: "/empresa#misionvision" },
-        { name: "Equipo", path: "/empresa#misionvision" }
+        { name: "Equipo", path: "/empresa#equipo" }
       ]
     },
   ];

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { getAllCanchas } from "../../api/CanchasApi";
-import CanchaCardTodas from "./CanchaCardTodas";
-import { useTheme } from "../../context/ThemeContext";
+import { getAllCanchas } from "../../../api/CanchaApi";
+import CanchaCardTodas from "./components/CanchaCardTodas";
+import { useTheme } from "../../../context/ThemeContext";
 
 export default function ListadoCanchas() {
   const [canchas, setCanchas] = useState([]);
@@ -13,7 +13,7 @@ export default function ListadoCanchas() {
 
   return (
     <div
-      className={`min-h-screen p-6 
+      className={`min-h-screen p-16 pt-16 
       ${isDarkMode ? "bg-[#0f1213] text-white" : "bg-gray-50 text-black"}`}
     >
       <h2 className="text-3xl font-bold mb-6">Canchas Disponibles</h2>
