@@ -18,23 +18,20 @@ export default function BeneficiosCli() {
 
   return (
     <>
-      {/* Transición Superior */}
-      <div className={`h-32 -mt-1 ${isDarkMode ? "bg-[#0f1213]" : "bg-white"}`}>
-        <svg viewBox="0 0 1440 320" className="w-full h-full" preserveAspectRatio="none">
-          <path
-            fill={isDarkMode ? "#0f1213" : "#FFFFFF"}
-            d="M0,80 C300,200 1100,0 1440,80 L1440,320 L0,320 Z"
-            opacity="0.9"
-          />
-        </svg>
-      </div>
-
       {/* Beneficios */}
       <section 
         id="beneficios"
-        className={`relative py-24 px-4 md:px-10 ${isDarkMode ? "bg-[#0f1213]" : "bg-white"}`}
+        className={`relative py-28 px-4 md:px-10 overflow-hidden borde-0`}
       >
-        <div className="max-w-7xl mx-auto">
+        {/* FONDO NUEVO DE LA SECCIÓN */}
+        <div 
+          className={`absolute inset-0 -z-10 transition-colors duration-300`}
+          style={{
+            background: isDarkMode ? "#000000ff" : "#000000ff",
+          }}
+        />
+
+        <div className="max-w-6xl mx-auto relative z-20">
 
           {/* Título */}
           <motion.div
@@ -45,7 +42,7 @@ export default function BeneficiosCli() {
             className="text-center mb-20"
           >
             <h2 
-              className="text-5xl md:text-7xl font-bold tracking-tight"
+              className="text-5xl md:text-6xl font-bold tracking-tight"
               style={{ fontFamily: "var(--font-Oswald)" }}
             >
               <span className={isDarkMode ? "text-white" : "text-gray-900"}>BENEFICIOS</span>{" "}
@@ -73,10 +70,10 @@ export default function BeneficiosCli() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.6, delay: b.delay }}
-                  className="group"
+                  className="group z-20"
                 >
                   <div 
-                    className={`relative p-8 rounded-3xl transition-all duration-500 border 
+                    className={`relative p-8 rounded-3xl transition-all duration-500 border z-20
                       ${isDarkMode 
                         ? "bg-black/20 border-white/10 shadow-md" 
                         : "bg-white border-gray-200 shadow-xl"} 
@@ -110,18 +107,17 @@ export default function BeneficiosCli() {
                 </motion.div>
               );
             })}
-
           </div>
-
         </div>
-
-        {/* Transición Inferior */}
-        <div className={`absolute bottom-0 left-0 right-0 h-32 ${isDarkMode ? "bg-[#0f1213]" : "bg-white"}`}>
-          <svg viewBox="0 0 1440 320" className="w-full h-full" preserveAspectRatio="none">
-            <path
-              fill={isDarkMode ? "#0f1213" : "#FFFFFF"}
-              d="M0,240 C350,80 1100,360 1440,240 L1440,0 L0,0 Z"
-              opacity="0.9"
+        <div className="absolute bottom-0 left-0 right-0 h-44 -z-10">
+          <svg 
+            viewBox="0 0 100 100" 
+            preserveAspectRatio="none" 
+            className="w-full h-full"
+          >
+            <polygon 
+              points="0,100 100,80 100,100 0,100" 
+              fill={isDarkMode ? "#34a4dcff" : "#e30505ff"}
             />
           </svg>
         </div>

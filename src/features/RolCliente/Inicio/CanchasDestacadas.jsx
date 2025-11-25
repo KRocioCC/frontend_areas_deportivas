@@ -5,10 +5,10 @@ import { useTheme } from "../../../context/ThemeContext";
 import { getCanchasActivas } from "../../../api/CanchaApi"; 
 import { getComentariosPorCancha } from "../../../api/ComentarioApi";
 import { Star, MapPin, Clock, Users } from "lucide-react";
-
+import CardCancha from "./CanchaCard";
 export default function CanchasDestacadas() {
   const { isDarkMode } = useTheme();
-  const [canchasTop, setCanchasTop] = useState([]);
+  const [canchasTop, setCanchasTop] = useState([])
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -47,17 +47,6 @@ export default function CanchasDestacadas() {
 
   return (
     <>
-      {/* TRANSICIÓN SUPERIOR – conecta perfectamente con BeneficiosCli */}
-      <div className={`-mt-1 h-32 ${isDarkMode ? 'bg-[#0f1213]' : 'bg-white'}`}>
-        <svg viewBox="0 0 1440 320" className="w-full h-full" preserveAspectRatio="none">
-          <path
-            fill={isDarkMode ? "#0f1213" : "#FFFFFF"}
-            d="M0,160 C320,280 1120,60 1440,160 L1440,0 L0,0 Z"
-            opacity="0.9"
-          />
-        </svg>
-      </div>
-
       <section
         id="canchas"
         className={`relative py-24 px-4 md:px-8 overflow-hidden ${
@@ -73,7 +62,7 @@ export default function CanchasDestacadas() {
                           rotate-45 bg-[#41bfb2]/10 blur-3xl" />
         </div>
 
-        <div className="max-w-7xl mx-auto relative z-10">
+        <div className="max-w-5xl mx-auto relative z-10">
           {/* Título ÉPICO */}
           <motion.div
             initial={{ opacity: 0, y: 50 }}
@@ -83,7 +72,7 @@ export default function CanchasDestacadas() {
             className="text-center mb-20"
           >
             <h2
-              className="text-5xl md:text-8xl font-black tracking-tighter"
+              className="text-4xl md:text-6xl font-black tracking-tighter"
               style={{ fontFamily: "var(--font-Oswald)" }}
             >
               <span className={isDarkMode ? "text-white" : "text-gray-900"}>
@@ -111,122 +100,69 @@ export default function CanchasDestacadas() {
           )}
 
           {/* Grid de canchas destacadas */}
-          <motion.div
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={{
-              hidden: { opacity: 0 },
-              visible: { opacity: 1, transition: { staggerChildren: 0.2 } }
-            }}
-          >
-            {canchasTop.map((cancha, index) => (
-              <motion.div
-                key={cancha.idCancha}
-                variants={{
-                  hidden: { opacity: 0, y: 60 },
-                  visible: { opacity: 1, y: 0 }
-                }}
-                transition={{ duration: 0.7 }}
-                whileHover={{ y: -12 }}
-                className="group"
-              >
-                <div
-                  className={`relative rounded-3xl overflow-hidden shadow-2xl border transition-all duration-500
-                    ${isDarkMode 
-                      ? 'bg-black/40 backdrop-blur-md border-white/10' 
-                      : 'bg-white/80 backdrop-blur-md border-gray-200'
-                    }`}
+          {/* GALERÍA DINÁMICA – 3 NIVELES */}
+          <div className="space-y-16">
+
+            {/* 🟩 NIVEL 1 — 2 tarjetas grandes */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+              {canchasTop.slice(0, 2).map((cancha, index) => (
+                <motion.div
+                  key={cancha.idCancha}
+                  initial={{ opacity: 0, y: 80 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8 }}
+                  whileHover={{ scale: 1.02 }}
+                  className="relative rounded-3xl overflow-hidden shadow-2xl border 
+                            group cursor-pointer h-[420px]"
                 >
-                  {/* Imagen + overlay */}
-                  <div className="relative h-64 overflow-hidden">
-                    <img
-                      src={cancha.urlImagen || "/placeholder-cancha.jpg"}
-                      alt={cancha.nombre}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                  <CardCancha cancha={cancha} index={index} isDarkMode={isDarkMode} />
+                </motion.div>
+              ))}
+            </div>
 
-                    {/* Ranking badge */}
-                    <div className={`absolute top-4 left-4 w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-xl
-                      ${index === 0 ? 'bg-gradient-to-br from-yellow-400 to-orange-500' :
-                        index === 1 ? 'bg-gradient-to-br from-gray-300 to-gray-500' :
-                        index === 2 ? 'bg-gradient-to-br from-orange-600 to-red-700' :
-                        'bg-gradient-to-br from-[#41bfb2] to-[#2C7366]'
-                      }`}>
-                      {index + 1}
-                    </div>
+            {/* 🟧 NIVEL 2 — 3 tarjetas medianas tipo mosaico */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+              {canchasTop.slice(2, 5).map((cancha, subIndex) => (
+                <motion.div
+                  key={cancha.idCancha}
+                  initial={{ opacity: 0, y: 80 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8 }}
+                  whileHover={{ y: -10 }}
+                  className="relative rounded-3xl overflow-hidden shadow-xl border 
+                            group cursor-pointer h-[360px]"
+                >
+                  <CardCancha cancha={cancha} index={subIndex + 2} isDarkMode={isDarkMode} />
+                </motion.div>
+              ))}
+            </div>
 
-                    {/* Calificación destacada */}
-                    <div className="absolute bottom-4 left-4 flex items-center gap-2 bg-black/70 backdrop-blur-sm px-4 py-2 rounded-full">
-                      <Star className="w-6 h-6 fill-yellow-400 text-yellow-400" />
-                      <span className="text-xl font-bold text-white">{cancha.promedio}</span>
-                      <span className="text-sm text-gray-300">({cancha.totalResenas})</span>
-                    </div>
-                  </div>
-
-                  {/* Info */}
-                  <div className="p-6">
-                    <h3
-                      className="text-2xl md:text-3xl font-bold mb-3"
-                      style={{ fontFamily: "var(--font-Alumni)" }}
-                    >
-                      {cancha.nombre}
-                    </h3>
-
-                    <div className="space-y-3 text-sm opacity-90" style={{ fontFamily: "var(--font-Balo)" }}>
-                      <div className="flex items-center gap-2">
-                        <MapPin className="w-5 h-5 text-[#41bfb2]" />
-                        <span>{cancha.areaDeportiva?.zona?.nombre || "La Paz"}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Clock className="w-5 h-5 text-[#f28627]" />
-                        <span>Bs {cancha.costoHora}/hora</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Users className="w-5 h-5 text-[#41bfb2]" />
-                        <span>Hasta {cancha.capacidad} personas</span>
-                      </div>
-                    </div>
-
-                    {/* Disciplinas */}
-                    <div className="flex flex-wrap gap-2 mt-5">
-                      {cancha.disciplinas?.slice(0, 3).map((d) => (
-                        <span
-                          key={d.idDisciplina}
-                          className={`px-4 py-1.5 rounded-full text-xs font-semibold
-                            ${isDarkMode 
-                              ? 'bg-[#2C7366]/30 text-[#2C7366]' 
-                              : 'bg-[#41bfb2]/20 text-[#41bfb2]'
-                            }`}
-                        >
-                          {d.nombre}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
+            {/* 🟥 NIVEL 3 — 1 tarjeta XL full width */}
+            {canchasTop[5] && (
+              <motion.div
+                initial={{ opacity: 0, y: 80 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 1 }}
+                whileHover={{ scale: 1.01 }}
+                className="relative rounded-3xl overflow-hidden shadow-2xl border 
+                          group cursor-pointer h-[500px]"
+              >
+                <CardCancha cancha={canchasTop[5]} index={5} isDarkMode={isDarkMode} />
               </motion.div>
-            ))}
-          </motion.div>
+            )}
+
+          </div>
+
+
 
           {canchasTop.length === 0 && !loading && (
             <p className="text-center text-xl opacity-70" style={{ fontFamily: "var(--font-Balo)" }}>
               Pronto tendremos las canchas más valoradas
             </p>
           )}
-        </div>
-
-        {/* TRANSICIÓN INFERIOR – para conectar con Testimonios */}
-        <div className={`absolute bottom-0 left-0 right-0 -mb-1 h-32 overflow-hidden`}>
-          <svg viewBox="0 0 1440 320" className="w-full h-full" preserveAspectRatio="none">
-            <path
-              fill={isDarkMode ? "#0f1213" : "#FFFFFF"}
-              d="M0,96 C360,200 1080,20 1440,96 L1440,320 L0,320 Z"
-              opacity="0.9"
-            />
-          </svg>
         </div>
       </section>
     </>

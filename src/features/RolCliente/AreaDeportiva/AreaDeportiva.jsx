@@ -271,12 +271,17 @@ export default function Areadeportiva() {
         </div>
 
         {/* Curva inferior (z-0) */}
-        <div className="absolute bottom-0 left-0 right-0 -mb-1 h-36 overflow-hidden z-0 pointer-events-none">
-          <svg viewBox="0 0 1440 320" className="w-full h-full" preserveAspectRatio="none">
-            <path
-              fill={isDarkMode ? "#0f1213" : "#FFFFFF"}
-              d="M0,160 C220,220 520,80 720,120 C920,160 1220,280 1440,160 L1440,0 L0,0 Z"
-              opacity="0.95"
+        {/* DIAGONAL INFERIOR PROFESIONAL (/ ) */}
+        <div className="absolute bottom-0 left-0 right-0 h-40 overflow-hidden pointer-events-none z-0">
+          <svg 
+            viewBox="0 0 100 100" 
+            preserveAspectRatio="none" 
+            className="w-full h-full"
+          >
+            <polygon 
+              points="0,60 100,100 100,100 0,100" 
+              fill={isDarkMode ? "#000000ff" : "#000000ff"} 
+              opacity="1"
             />
           </svg>
         </div>
