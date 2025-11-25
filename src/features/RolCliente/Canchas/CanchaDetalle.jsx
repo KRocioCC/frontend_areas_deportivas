@@ -125,7 +125,13 @@ export default function CanchaDetalle() {
           {/* Imagen principal */}
           <div className="md:col-span-3 rounded-xl overflow-hidden shadow-lg h-80 md:h-96 relative">
             <img
-              src={cancha.urlImagen || "/defaults/cancha-default.jpg"}
+              src={
+                cancha.imagenes && cancha.imagenes.length > 0
+                  ? cancha.imagenes[0].urlAcceso?.startsWith('http')
+                    ? cancha.imagenes[0].urlAcceso
+                    : `http://localhost:8032${cancha.imagenes[0].urlAcceso}`
+                  : cancha.urlImagen || "/images/default-cancha.jpg"
+              }
               alt={cancha.nombre}
               className="w-full h-full object-cover"
               onError={(e) => {
@@ -142,25 +148,54 @@ export default function CanchaDetalle() {
                 {cancha.nombre}
               </h1>
             </div>
-            <button
-              onClick={() => {}}
-              className="absolute bottom-4 right-4 bg-black/60 hover:bg-black/80 text-white px-3 py-1.5 rounded-lg text-xs backdrop-blur-sm transition"
-              style={{ fontFamily: 'var(--font-josefin)' }}
-            >
-              Ver galería completa
-            </button>
+
+            {/* Botón Ver galería completa 
+            {cancha.imagenes && cancha.imagenes.length > 1 && (
+              <button
+                onClick={() => " "}
+                className="absolute bottom-4 right-4 bg-black/60 hover:bg-black/80 text-white px-4 py-2 rounded-lg text-sm shadow-lg backdrop-blur-md transition"
+              >
+                Ver galería completa ({cancha.imagenes.length} fotos)
+              </button>
+            )}*/}
           </div>
 
           {/* Mini galería */}
-          <div className="md:col-span-1 space-y-3">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="rounded-xl overflow-hidden shadow-md h-28">
-                <img
-                  src={cancha.urlImagen || "/defaults/cancha-default.jpg"}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            ))}
+          <div className="md:col-span-1 space-y-4">
+            {cancha.imagenes && cancha.imagenes.length > 1 ? (
+              cancha.imagenes.slice(1, 4).map((imagen, i) => (
+                <div key={i} className="rounded-xl overflow-hidden shadow-md">
+                  <img
+                    src={
+                      imagen.urlAcceso?.startsWith('http')
+                        ? imagen.urlAcceso
+                        : `http://localhost:8032${imagen.urlAcceso}`
+                    }
+                    alt={`${cancha.nombre} imagen ${i + 2}`}
+                    className="w-full h-[7rem] object-cover"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = "/defaults/cancha-default.jpg";
+                    }}
+                  />
+                </div>
+              ))
+            ) : (
+              // Si no hay suficientes imágenes, mostrar la primera o default
+              [1, 2, 3].map((i) => (
+                <div key={i} className="rounded-xl overflow-hidden shadow-md">
+                  <img
+                    src={cancha.urlImagen || "/defaults/cancha-default.jpg"}
+                    alt={`${cancha.nombre} placeholder`}
+                    className="w-full h-[7rem] object-cover"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = "/defaults/cancha-default.jpg";
+                    }}
+                  />
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>

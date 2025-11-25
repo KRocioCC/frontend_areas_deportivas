@@ -66,14 +66,18 @@ function SidebarAdmin({ open }) {
       isOpen: transaccionesOpen,
       toggle: () => setTransaccionesOpen(!transaccionesOpen),
       items: [
-        { label: "Pagos Realizados", path: "/admin/transacciones/realizados" },
-        { label: "Pagos Pendientes", path: "/admin/transacciones/pendientes" }
+        { label: "Control de Pagos", path: "/admin/pagos" }
       ]
     },
     { 
       label: "Notificaciones", 
       icon: <TfiBell />, 
       path: "/admin/notificaciones" 
+    },
+    { 
+      label: "Disciplinas", 
+      icon: <TfiBasketball />, 
+      path: "/admin/disciplinas" 
     },
     { 
       label: "Calendario", 

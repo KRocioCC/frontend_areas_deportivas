@@ -31,7 +31,7 @@ import UsuarioControlPage from "../features/personas/pages/UsuarioControlPage";
 import InvitadoPage from "../features/personas/pages/InvitadoPage";
 
 // ADMINISTRADOR
-import MiAreaPage from '../features/RolAdministrador/mi_area/MiAreaPage.js';
+import MiAreaContainer from '../features/RolAdministrador/mi_area/MiAreaContainer.jsx';
 import CanchasPage from "../features/RolAdministrador/canchas/CanchasPage";
 
 import PageClientes from "../features/RolAdministrador/usuarios/clientes/PageClientes";
@@ -40,6 +40,8 @@ import Dashboard from "../features/RolAdministrador/dashboard/index.jsx";
 import CanchaReservaPage from "../features/RolAdministrador/canchas/CanchaReservasPage";
 import ReservaListAdmin from "../features/RolAdministrador/reservas/ReservaListAdmin.js";
 import CancelacionesListAdmin from "../features/RolAdministrador/cancelaciones/CancelacionesListAdmin.js";
+import DisciplinaListAdmin from "../features/RolAdministrador/Disciplina/DisciplinaListAdmin.js";
+import PagosAdminPage from "../features/RolAdministrador/pagos/pages/PagosAdminPage.jsx";
 
 //CLIENTE
 // CLIENTE - componentes visuales
@@ -384,7 +386,7 @@ function AppRouter() {
             element={
               <ProtectedRoute requireAdmin>
                 <DashboardLayoutAdmin>
-                    <MiAreaPage />
+                    <MiAreaContainer />
                 </DashboardLayoutAdmin>
               </ProtectedRoute>
             }
@@ -464,7 +466,16 @@ function AppRouter() {
               </ProtectedRoute>
             }
           />
-
+          <Route
+            path="/admin/disciplinas"
+            element={
+              <ProtectedRoute requireAdmin>
+                <DashboardLayoutAdmin>
+            <DisciplinaListAdmin />
+                </DashboardLayoutAdmin>
+              </ProtectedRoute>
+            }
+          />
 
           <Route
             path="/admin/notificaciones"
@@ -476,6 +487,16 @@ function AppRouter() {
               </ProtectedRoute>
             }
           />
+          <Route
+  path="/admin/pagos"
+  element={
+    <ProtectedRoute requireAdmin>
+      <DashboardLayoutAdmin>
+        <PagosAdminPage />
+      </DashboardLayoutAdmin>
+    </ProtectedRoute>
+  }
+/>
 
           {/* Ruta 404 - Redirigir a login */}
           <Route path="*" element={<Navigate to="/login" replace />} />

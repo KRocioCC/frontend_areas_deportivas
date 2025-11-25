@@ -11,19 +11,93 @@ import {
   SquareDashed,
   X
 } from "lucide-react";
+import { FaTimes, FaPhone, FaMapMarkerAlt, FaClock, FaStar, FaFutbol, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { getCanchasPorArea } from "../../../api/CanchaApi";
 
 export default function AreaModal({ area, onClose }) {
   const { isDarkMode } = useTheme();
   const [canchas, setCanchas] = useState([]);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const navigate = useNavigate();
+
+  // Función para obtener la URL de la imagen actual del área
+  const getCurrentImageUrl = () => {
+    if (area.imagenes && area.imagenes.length > 0) {
+      const imagenActual = area.imagenes[currentImageIndex];
+      if (imagenActual.urlAcceso.startsWith('http')) {
+        return imagenActual.urlAcceso;
+      } else {
+        return `http://localhost:8032${imagenActual.urlAcceso}`;
+      }
+    }
+    return area.urlImagen || "/defaults/area-default.jpg";
+  };
+
+  // Función para obtener la primera imagen de una cancha
+  const getCanchaImageUrl = (cancha) => {
+    if (cancha.imagenes && cancha.imagenes.length > 0) {
+      const primeraImagen = cancha.imagenes[0];
+      if (primeraImagen.urlAcceso.startsWith('http')) {
+        return primeraImagen.urlAcceso;
+      } else {
+        return `http://localhost:8032${primeraImagen.urlAcceso}`;
+      }
+    }
+    return cancha.urlImagen || "/defaults/cancha-default.jpg";
+  };
+
+  // Función para manejar errores de carga de imagen
+  const handleImageError = (e) => {
+    e.target.onerror = null;
+    e.target.src = "/defaults/area-default.jpg";
+  };
+
+  // Función para manejar errores de carga de imagen de cancha
+  const handleCanchaImageError = (e) => {
+    e.target.onerror = null;
+    e.target.src = "/defaults/cancha-default.jpg";
+  };
+
+  // Navegar a la siguiente imagen del área
+  const nextImage = () => {
+    if (area.imagenes && area.imagenes.length > 0) {
+      setCurrentImageIndex((prev) => 
+        prev === area.imagenes.length - 1 ? 0 : prev + 1
+      );
+    }
+  };
+
+  // Navegar a la imagen anterior del área
+  const prevImage = () => {
+    if (area.imagenes && area.imagenes.length > 0) {
+      setCurrentImageIndex((prev) => 
+        prev === 0 ? area.imagenes.length - 1 : prev - 1
+      );
+    }
+  };
+
+  // Ir a una imagen específica del área
+  const goToImage = (index) => {
+    setCurrentImageIndex(index);
+  };
+
+  const hasMultipleImages = area.imagenes && area.imagenes.length > 1;
 
   useEffect(() => {
     const cargarCanchas = async () => {
       if (!area?.idAreadeportiva) return;
       try {
         const data = await getCanchasPorArea(area.idAreadeportiva);
+        console.log("✅ Canchas recibidas:", data);
+        
+        // Asegurarnos de que tenemos un array de canchas
         const canchaArray = Array.isArray(data) ? data : data?.canchas || [];
+        console.log("📸 Canchas con imágenes:", canchaArray.map(c => ({
+          nombre: c.nombre,
+          tieneImagenes: c.imagenes && c.imagenes.length > 0,
+          cantidadImagenes: c.imagenes ? c.imagenes.length : 0
+        })));
+        
         setCanchas(canchaArray.slice(0, 3));
       } catch (error) {
         console.error("❌ Error al obtener canchas:", error);
@@ -60,18 +134,64 @@ export default function AreaModal({ area, onClose }) {
           transition={{ type: "spring", stiffness: 280, damping: 20 }}
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Fondo de imagen */}
+          {/* Fondo de imagen con carrusel */}
           <div className="absolute inset-0">
             <img
-              src={area.urlImagen || "/defaults/area-default.jpg"}
+              src={getCurrentImageUrl()}
               alt={area.nombreArea || "Área deportiva"}
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.src = "/defaults/area-default.jpg";
-              }}
+              loading="eager"
+              fetchPriority="high"
+              onError={handleImageError}
+              className="w-full h-full object-cover transition-opacity duration-500"
             />
             <div className="absolute inset-0 bg-black/70"></div>
+
+            {/* Flecha izquierda */}
+            {hasMultipleImages && (
+              <button
+                onClick={prevImage}
+                className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/60 hover:bg-black/80 text-white w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg hover:scale-110 z-20"
+                aria-label="Imagen anterior"
+              >
+                <FaChevronLeft className="text-lg" />
+              </button>
+            )}
+
+            {/* Flecha derecha */}
+            {hasMultipleImages && (
+              <button
+                onClick={nextImage}
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/60 hover:bg-black/80 text-white w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg hover:scale-110 z-20"
+                aria-label="Siguiente imagen"
+              >
+                <FaChevronRight className="text-lg" />
+              </button>
+            )}
+
+            {/* Indicadores de posición (puntos) */}
+            {hasMultipleImages && (
+              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-3 z-20">
+                {area.imagenes.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => goToImage(index)}
+                    className={`w-3 h-3 rounded-full transition-all duration-200 ${
+                      index === currentImageIndex 
+                        ? 'bg-white shadow-lg scale-125' 
+                        : 'bg-white/50 hover:bg-white/70'
+                    }`}
+                    aria-label={`Ir a imagen ${index + 1}`}
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* Contador de imágenes */}
+            {hasMultipleImages && (
+              <div className="absolute top-4 left-4 bg-black/70 text-white px-3 py-2 rounded-full text-sm font-medium z-20">
+                {currentImageIndex + 1} / {area.imagenes.length}
+              </div>
+            )}
           </div>
 
           {/* Botón de cierre */}

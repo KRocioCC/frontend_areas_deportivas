@@ -1,13 +1,69 @@
 // src/features/RolCliente/Cancha/components/CanchaCard.jsx
 import React from "react";
 import { Users, CalendarCheck } from "lucide-react";
+import { useState, useCallback } from "react";
+import { FaUsers } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { useTheme } from "../../../../context/ThemeContext";
-import { motion } from "framer-motion";
+
 
 const CanchaCard = ({ cancha }) => {
   const { isDarkMode } = useTheme();
   const navigate = useNavigate();
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  const totalImages = cancha?.imagenes?.length || 0;
+  const hasMultipleImages = totalImages > 1;
+
+  // Obtener URL de la imagen actual
+  const getCurrentImageUrl = () => {
+    if (cancha.imagenes && cancha.imagenes.length > 0) {
+      const imagenActual = cancha.imagenes[currentImageIndex];
+      if (!imagenActual) return "/defaults/cancha-default.jpg";
+      const raw = imagenActual.urlAcceso || imagenActual.url || "";
+      if (raw.startsWith("http")) return raw;
+      if (raw) return `http://localhost:8032${raw}`;
+      return "/defaults/cancha-default.jpg";
+    }
+    return cancha.urlImagen || "/defaults/cancha-default.jpg";
+  };
+
+  // Manejar error de carga de imagen
+  const handleImageError = (e) => {
+    e.target.onerror = null;
+    e.target.src = "/defaults/cancha-default.jpg";
+  };
+
+  // Navegar a la siguiente imagen
+  const nextImage = useCallback((e) => {
+    if (e) {
+      e.stopPropagation();
+      e.preventDefault();
+    }
+    if (totalImages > 0) {
+      setCurrentImageIndex((prev) => (prev === totalImages - 1 ? 0 : prev + 1));
+    }
+  }, [totalImages]);
+
+  // Navegar a la imagen anterior
+  const prevImage = useCallback((e) => {
+    if (e) {
+      e.stopPropagation();
+      e.preventDefault();
+    }
+    if (totalImages > 0) {
+      setCurrentImageIndex((prev) => (prev === 0 ? totalImages - 1 : prev - 1));
+    }
+  }, [totalImages]);
+
+  // Ir a una imagen específica
+  const goToImage = (e, idx) => {
+    e.stopPropagation();
+    e.preventDefault();
+    if (idx >= 0 && idx < totalImages) setCurrentImageIndex(idx);
+  };
 
   // Colores según modo
   const cardBg = isDarkMode ? 'bg-[#0b0d0e]' : 'bg-white';

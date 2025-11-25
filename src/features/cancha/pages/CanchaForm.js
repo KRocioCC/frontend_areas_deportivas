@@ -4,6 +4,7 @@ import Button from "../../../components/ui/Button";
 import { Plus, X, Upload } from "lucide-react"; // Agregué icono Upload
 import "../pages/CanchaForm.css";
 import CanchaViewModal from "./CanchaViewModal";
+import * as AreadeportivaService from "../../../api/AreadeportivaApi";
 
 export default function CanchaForm({
   initialData,
@@ -37,21 +38,20 @@ export default function CanchaForm({
   const [Areadeportiva, setAreadeportiva] = useState([]);
   const [errors, setErrors] = useState({});
 
-  // ESTADO PARA ARCHIVOS
+  const [loadingAreas, setLoadingAreas] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState([]);
 
-  // Cargar Áreas
   useEffect(() => {
     const loadData = async () => {
       try {
-        // Nota: Idealmente usar api.get('/areasdeportivas')
-        const res = await fetch('http://localhost:8032/api/areasdeportivas');
-        if (!res.ok) throw new Error("Error al conectar con API");
-        const data = await res.json();
+        setLoadingAreas(true);
+        const data = await AreadeportivaService.getAreadeportiva();
         setAreadeportiva(Array.isArray(data) ? data : []);
       } catch (err) {
         console.error("Error cargando Areadeportiva:", err);
         setAreadeportiva([]);
+      } finally {
+        setLoadingAreas(false);
       }
     };
     loadData();
@@ -251,7 +251,29 @@ export default function CanchaForm({
               />
               {errors.capacidad && <div className="text-sm text-red-600">{errors.capacidad}</div>}
             </div>
-           </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Área Deportiva
+              </label>
+              <select
+                value={idAreadeportiva ?? ""}
+                onChange={e => setIdAreadeportiva(e.target.value ? Number(e.target.value) : null)}
+                disabled={readonly || loadingAreas}
+                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.idAreadeportiva ? 'border-red-500' : 'border-gray-300'}`}
+              >
+                <option value="">Seleccione área deportiva</option>
+                {loadingAreas ? (
+                  <option value="" disabled>Cargando áreas...</option>
+                ) : (
+                  Areadeportiva.map(z => (
+                    <option key={z.idAreadeportiva} value={z.idAreadeportiva}>{z.nombreArea}</option>
+                  ))
+                )}
+              </select>
+              {errors.idAreadeportiva && <div className="text-sm text-red-600">{errors.idAreadeportiva}</div>}
+            </div>
+          </div>
         </div>
 
         {/* Horarios y Detalles Técnicos */}
