@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { getHorasDisponibles } from "../../../../api/ReservaApi";
 import { Clock, CheckCircle } from "lucide-react";
 import { useTheme } from "../../../../context/ThemeContext";
-//import { useToast } from "../../../../context/ToastContext";
 import { motion } from "framer-motion";
 
 export default function HorariosDisponibles({ canchaId, fecha, onSelectRango }) {
@@ -11,7 +10,6 @@ export default function HorariosDisponibles({ canchaId, fecha, onSelectRango }) 
   const [horas, setHoras] = useState([]);
   const [seleccion, setSeleccion] = useState([]);
   const [loading, setLoading] = useState(false);
-  //const { showToast } = useToast();
 
   useEffect(() => {
     if (!canchaId || !fecha) return;
@@ -38,17 +36,14 @@ export default function HorariosDisponibles({ canchaId, fecha, onSelectRango }) 
 
     if (seleccion.includes(hora)) {
       nuevaSeleccion = [];
-      //showToast("Selección de horario reiniciada ", "success");
     } else if (seleccion.length === 0) {
       nuevaSeleccion = [hora];
-      //showToast("Bloque inicial seleccionado ", "success");
     } else {
       const primero = horas.indexOf(seleccion[0]);
       const ultimo = horas.indexOf(seleccion[seleccion.length - 1]);
       const inicio = Math.min(primero, index);
       const fin = Math.max(ultimo, index);
       nuevaSeleccion = horas.slice(inicio, fin + 1);
-      //showToast("Rango actualizado", "success");
     }
 
     setSeleccion(nuevaSeleccion);
@@ -66,10 +61,6 @@ export default function HorariosDisponibles({ canchaId, fecha, onSelectRango }) 
   const selectedText = isDarkMode ? '#ffffff' : '#ffffff'; // siempre blanco
   const unselectedBorder = isDarkMode ? 'border-gray-600' : 'border-gray-300';
 
-
-
-  const rangoInicio = seleccion.length > 0 ? seleccion[0].split(/[-a]/)[0].trim() : null;
-  const rangoFin = seleccion.length > 0 ? seleccion[seleccion.length - 1].split(/[-a]/)[1]?.trim() : null;
   return (
     <div className={`p-6 rounded-xl ${cardBg} ${borderColor} border transition-colors duration-300`}>
       <h3
@@ -148,7 +139,9 @@ export default function HorariosDisponibles({ canchaId, fecha, onSelectRango }) 
         >
           <CheckCircle size={18} />
           <span className="text-sm md:text-base">
-            Rango: {rangoInicio} – {rangoFin}
+            {seleccion.length === 1
+              ? `Bloque seleccionado: ${seleccion[0]}`
+              : `Rango: ${seleccion[0]} – ${seleccion[seleccion.length - 1]}`}
           </span>
         </motion.div>
       )}

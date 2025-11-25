@@ -9,6 +9,8 @@ import { ChevronLeft, Phone, Mail } from "lucide-react";
 import { useAuth } from "../../../auth/hooks/useAuth";
 import { useTheme } from "../../../context/ThemeContext";
 import { useToast } from "../../../context/ToastContext"; 
+import EquipamientoCliModal from "../Equipamiento/EquipamientoCliModal";
+import ComentariosCancha from "../Comentario/ComentariosCancha";
 
 export default function CanchaDetalle() {
   const { isDarkMode } = useTheme();
@@ -113,7 +115,7 @@ export default function CanchaDetalle() {
           className="absolute top-4 left-4 flex items-center gap-2 z-20 font-semibold"
           style={{
             fontFamily: 'var(--font-josefin)',
-            color: isDarkMode ? '#f35734' : '#f28627'
+            color: isDarkMode ? '#ffffffff' : '#f9f9f9ff'
           }}
         >
           <ChevronLeft className="w-4 h-4" /> Volver
@@ -329,7 +331,7 @@ export default function CanchaDetalle() {
             </div>
           </div>
 
-          <div className={`p-6 rounded-xl ${cardBg} ${borderColor} border`}>
+          <div className={`p-6 `}>
             <CanchaDetallesExtras cancha={cancha} />
           </div>
         </div>
@@ -384,8 +386,17 @@ export default function CanchaDetalle() {
       </div>
       {/*secion de comentarios */}
       <div id="opiniones-section" className="mt-16">
-        {/*<ComentariosSection canchaId={cancha.idCancha} />*/}
+        <ComentariosCancha canchaId={cancha.idCancha} />
       </div>
+
+      {/* MODAL EQUIPAMIENTO */}
+      {isEquipamientoOpen && (
+        <EquipamientoCliModal 
+          canchaId={cancha.idCancha} 
+          onClose={() => setIsEquipamientoOpen(false)} 
+        />
+      )}
+
     </div>
   );
 }

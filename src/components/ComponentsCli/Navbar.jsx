@@ -24,24 +24,35 @@ export default function Navbar() {
 
   // 🔹 Items base (sin cambios)
   const baseItems = [
-    { name: "Inicio", path: "/inicio#inicio" },
-    { name: "Servicios", path: "/inicio#servicios" },
-    { name: "Áreas", path: "/areasdeportivas" },
-    { 
-      name: "Reservar", 
-      path: "/reservar",
+    { name: "Inicio", path: "/inicio",
       children: [
-        { name: "Cómo Funciona", path: "/reservar/como-funciona" },
-        { name: "Sistema QR", path: "/reservar/qr" },
+        { name: "Inicio", path: "/inicio#inicio" },
+        { name: "Areas Deportivas", path: "/inicio#areasdeportivas" },
+        { name: "Beneficios de reservar aquí", path: "/inicio#beneficios" },
+        { name: "Canchas destacadas", path: "/inicio#beneficios" },
+        { name: "Testimonios", path: "/inicio#beneficios" },
+        { name: "¿Necesitas ayuda?", path: "/inicio#contacto" },
+      ]
+     },
+
+    { name: "Canchas", path: "/canchas" },
+    { name: "Reservar", path: "/reservas" },
+    { name: "¿Cómo Funciona?", path: "/reservar/como-funciona",
+      children: [
+        { name: "Cómo reservar paso a paso", path: "/inicio#nosotros" },
+        { name: "Cómo pagar", path: "/inicio#misionvision" },
+        { name: "Cómo usar el QR", path: "/inicio#misionvision" }
       ]
     },
-  
+
+    { name: "Ayuda/FAQ", path: "/reservar/ayuda" },
     {
-      name: "¿Quienes Somos?",
+      name: "Sobre Nosotros",
       path: "/empresa", 
       children: [
-        { name: "Nosotros", path: "/inicio#nosotros" },
+        { name: "¿Quiénes Somos?", path: "/inicio#nosotros" },
         { name: "Misión y Visión", path: "/inicio#misionvision" },
+        { name: "Equipo", path: "/inicio#misionvision" },
         { name: "Contacto", path: "/inicio#contacto" },
       ]
     },
@@ -52,11 +63,7 @@ export default function Navbar() {
         ...baseItems,
         {
           name: "MisReservas",
-          path: "/cliente/reservas",
-          children: [
-            { name: "Nueva reserva", path: "/cliente/reservas/nueva" },
-            { name: "Mis reservas", path: "/reservas/mihistorial" },
-          ],
+          path: "/reservas/mihistorial"
         },
       ]
     : baseItems;
