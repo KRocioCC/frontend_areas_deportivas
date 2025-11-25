@@ -5,6 +5,7 @@ import * as reservaService from '../../../api/ReservaApi';
 import * as canchaService from '../../../api/CanchaApi';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { MapPin, Clock, Users, Star, Calendar, Search, X, ArrowLeft, Download, Trash2, Ban } from 'lucide-react';
 
 const CanchaReservasPage = () => {
     const { idCancha } = useParams();
@@ -186,7 +187,6 @@ const CanchaReservasPage = () => {
                             <tr><td><strong>Fecha:</strong></td><td>${formatearFecha(reserva.fechaReserva)}</td></tr>
                             <tr><td><strong>Horario:</strong></td><td>${reserva.horaInicio} - ${reserva.horaFin}</td></tr>
                             <tr><td><strong>Estado:</strong></td><td style="color: ${reserva.estadoReserva === 'CONFIRMADA' ? 'green' : reserva.estadoReserva === 'PENDIENTE' ? 'orange' : 'gray'}">${reserva.estadoReserva || 'Estado desconocido'}</td></tr>
-                            ${reserva.observaciones ? `<tr><td><strong>Observaciones:</strong></td><td>${reserva.observaciones}</td></tr>` : ''}
                             ${reserva.duracionMinutos ? `<tr><td><strong>Duración:</strong></td><td>${reserva.duracionMinutos} minutos</td></tr>` : ''}
                         </table>
                     </div>
@@ -302,11 +302,12 @@ const CanchaReservasPage = () => {
         return (
             <div className="flex justify-center items-center min-h-screen bg-gray-100 p-6">
                 <div className="bg-white p-8 rounded-xl shadow-lg max-w-md w-full">
-                    <h2 className="text-red-600 text-xl font-bold mb-4">Error</h2>
-                    <p className="text-gray-700">{error}</p>
+                    <h2 className="text-red-600 text-xl font-bold mb-4" style={{fontFamily: "var(--font-Alumni)"}}>Error</h2>
+                    <p className="text-gray-700" style={{fontFamily: "var(--font-Balo)"}}>{error}</p>
                     <button
                         onClick={handleVolver}
-                        className="mt-6 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+                        className="mt-6 bg-black text-white px-4 py-2 rounded-md hover:bg-gray-800 transition-colors font-semibold"
+                        style={{fontFamily: "var(--font-josefin)"}}
                     >
                         Volver a Canchas
                     </button>
@@ -321,23 +322,25 @@ const CanchaReservasPage = () => {
             {modal.abierto && (
                 <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
                     <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
-                        <h2 className="text-lg font-bold mb-4 text-gray-800">
+                        <h2 className="text-lg font-bold mb-4 text-gray-800" style={{fontFamily: "var(--font-Alumni)"}}>
                             {modal.tipo === 'eliminar' ? '¿Eliminar reserva?' : '¿Cancelar reserva?'}
                         </h2>
-                        <p className="mb-6 text-gray-600">
+                        <p className="mb-6 text-gray-600" style={{fontFamily: "var(--font-Balo)"}}>
                             {modal.tipo === 'eliminar'
                                 ? '¿Seguro que deseas eliminar esta reserva? Esta acción no se puede deshacer.'
                                 : '¿Seguro que deseas cancelar esta reserva?'}
                         </p>
                         <div className="flex justify-end space-x-2">
                             <button
-                                className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+                                className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 font-semibold"
+                                style={{fontFamily: "var(--font-josefin)"}}
                                 onClick={cerrarModal}
                             >
                                 No
                             </button>
                             <button
-                                className={`px-4 py-2 rounded text-white ${modal.tipo === 'eliminar' ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700'}`}
+                                className={`px-4 py-2 rounded text-white font-semibold ${modal.tipo === 'eliminar' ? 'bg-red-600 hover:bg-red-700' : 'bg-black hover:bg-gray-800'}`}
+                                style={{fontFamily: "var(--font-josefin)"}}
                                 onClick={confirmarAccion}
                             >
                                 Sí
@@ -354,19 +357,20 @@ const CanchaReservasPage = () => {
                     <div className="flex justify-between items-center mb-8">
                         <button
                             onClick={handleVolver}
-                            className="flex items-center text-black hover:text-gray-800"
+                            className="flex items-center text-black hover:text-gray-800 font-semibold"
+                            style={{fontFamily: "var(--font-josefin)"}}
                         >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                                <path fillRule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z" clipRule="evenodd" />
-                            </svg>
+                            <ArrowLeft className="h-5 w-5 mr-2" />
                             Volver a Canchas
                         </button>
                         
                         <div className="text-center">
-                            <h1 className="text-4xl font-bold text-black mb-2" style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}>
-                                Reservas de la cancha 
-                                <p className="text-2xl mt-2">{cancha?.nombre ?? 'Nombre no disponible'}</p>
+                            <h1 className="text-4xl font-bold text-black mb-2" style={{fontFamily: "var(--font-Oswald)"}}>
+                                RESERVAS DE LA CANCHA
                             </h1>
+                            <p className="text-2xl mt-2 text-gray-700" style={{fontFamily: "var(--font-Alumni)"}}>
+                                {cancha?.nombre ?? 'Nombre no disponible'}
+                            </p>
                         </div>
                         
                         <div className="w-20"></div> {/* Espacio para balance */}
@@ -382,30 +386,29 @@ const CanchaReservasPage = () => {
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                     placeholder="Buscar por nombre, apellido o email del cliente..."
                                     className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    style={{fontFamily: "var(--font-Balo)"}}
                                 />
                                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                    </svg>
+                                    <Search className="h-5 w-5" />
                                 </div>
                             </div>
                         </div>
 
                         <div className="flex items-center gap-2">
-                            <label className="text-sm font-medium text-gray-700 whitespace-nowrap">Filtrar por fecha:</label>
+                            <label className="text-sm font-medium text-gray-700 whitespace-nowrap" style={{fontFamily: "var(--font-Balo)"}}>Filtrar por fecha:</label>
                             <input
                                 type="date"
                                 value={filterDate}
                                 onChange={(e) => setFilterDate(e.target.value)}
                                 className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                style={{fontFamily: "var(--font-Balo)"}}
                             />
                             <button
                                 onClick={handleClearFilters}
-                                className="ml-2 px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors flex items-center"
+                                className="ml-2 px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors flex items-center font-semibold"
+                                style={{fontFamily: "var(--font-josefin)"}}
                             >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                </svg>
+                                <X className="h-4 w-4 mr-1" />
                                 Limpiar
                             </button>
                         </div>
@@ -414,7 +417,7 @@ const CanchaReservasPage = () => {
                     {/* Información de filtros activos */}
                     {(searchTerm || filterDate) && (
                         <div className="mb-4 p-3 bg-blue-50 rounded-lg">
-                            <p className="text-sm text-blue-800">
+                            <p className="text-sm text-blue-800" style={{fontFamily: "var(--font-Balo)"}}>
                                 Reservas encontradas para: 
                                 {searchTerm && ` Cliente: "${searchTerm}"`}
                                 {filterDate && ` Fecha: ${filterDate}`}
@@ -425,18 +428,22 @@ const CanchaReservasPage = () => {
 
                     {/* Estadísticas */}
                     <div className="mb-6 p-4 bg-gray-100 rounded-lg">
-                        <h2 className="text-lg font-semibold text-black mb-2" style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}>Resumen:</h2>
+                        <h2 className="text-lg font-semibold text-black mb-2" style={{fontFamily: "var(--font-Alumni)"}}>Resumen:</h2>
                         <div className="flex flex-wrap gap-4">
-                            <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
+                            <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm" style={{fontFamily: "var(--font-Balo)"}}>
+                                <Users className="h-4 w-4 inline mr-1" />
                                 Total: {reservasFiltradas.length} reservas
                             </span>
-                            <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
+                            <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm" style={{fontFamily: "var(--font-Balo)"}}>
+                                <Star className="h-4 w-4 inline mr-1" />
                                 Confirmadas: {reservasFiltradas.filter(r => r.estadoReserva === 'CONFIRMADA').length}
                             </span>
-                            <span className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">
+                            <span className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm" style={{fontFamily: "var(--font-Balo)"}}>
+                                <Clock className="h-4 w-4 inline mr-1" />
                                 Pendientes: {reservasFiltradas.filter(r => r.estadoReserva === 'PENDIENTE').length}
                             </span>
-                            <span className="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm">
+                            <span className="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm" style={{fontFamily: "var(--font-Balo)"}}>
+                                <Ban className="h-4 w-4 inline mr-1" />
                                 Canceladas: {reservasFiltradas.filter(r => r.estadoReserva === 'CANCELADA').length}
                             </span>
                         </div>
@@ -452,18 +459,17 @@ const CanchaReservasPage = () => {
                                         <div className="mb-8">
                                             <h2
                                                 className="text-xl font-semibold text-black mb-1"
-                                                style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontSize: '18px' }}
+                                                style={{fontFamily: "var(--font-Alumni)", fontSize: '18px'}}
                                             >
                                                 Reserva #{idx + 1}
                                             </h2>
 
                                             <div className="flex items-center text-blue-600 text-sm">
-                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                </svg>
-                                                <span className="font-medium">{reserva.horaInicio} - {reserva.horaFin}</span>
+                                                <Clock className="h-4 w-4 mr-1" />
+                                                <span className="font-medium" style={{fontFamily: "var(--font-Balo)"}}>{reserva.horaInicio} - {reserva.horaFin}</span>
                                                 <span className="mx-1">•</span>
-                                                <span className="text-gray-600 text-xs">{formatearFecha(reserva.fechaReserva)}</span>
+                                                <Calendar className="h-4 w-4 mr-1" />
+                                                <span className="text-gray-600 text-xs" style={{fontFamily: "var(--font-Balo)"}}>{formatearFecha(reserva.fechaReserva)}</span>
                                             </div>
                                         </div>
                                         
@@ -473,7 +479,7 @@ const CanchaReservasPage = () => {
                                             reserva.estadoReserva === 'PENDIENTE' ? 'bg-yellow-100 text-yellow-800' : 
                                             reserva.estadoReserva === 'CANCELADA' ? 'bg-red-100 text-red-800' :
                                             'bg-gray-100 text-gray-800'
-                                        }`}>
+                                        }`} style={{fontFamily: "var(--font-Balo)"}}>
                                             {(reserva.eliminado || reserva.activo === false) ? 'DESACTIVADA' : (reserva.estadoReserva || 'Estado desconocido')}
                                         </div>
                                     </div>
@@ -482,96 +488,111 @@ const CanchaReservasPage = () => {
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 mt-2">
                                         {/* Información de la Cancha */}
                                         <div>
-                                            <h2 className="font-semibold text-gray-800 mb-1" style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontSize: '14px' }}>Información de la Cancha</h2>
+                                            <h2 className="font-semibold text-gray-800 mb-1" style={{fontFamily: "var(--font-Alumni)", fontSize: '14px'}}>Información de la Cancha</h2>
                                             {reserva.cancha ? (
                                                 <div className="bg-gray-50 p-2 rounded-lg">
-                                                    <p className="text-sm"><span className="font-medium">Nombre:</span> {reserva.cancha.nombre}</p>
-                                                    <p className="text-sm"><span className="font-medium">Capacidad:</span> {reserva.cancha.capacidad} personas</p>
-                                                    <p className="text-sm"><span className="font-medium">Costo:</span> {reserva.cancha.costoHora || 'N/A'} Bs/hora</p>
-                                                    <p className="text-sm"><span className="font-medium">Superficie:</span> {reserva.cancha.tipoSuperficie || 'N/A'}</p>
+                                                    <p className="text-sm" style={{fontFamily: "var(--font-Balo)"}}>
+                                                        <MapPin className="h-4 w-4 inline mr-1 text-[#41bfb2]" />
+                                                        <span className="font-medium">Nombre:</span> {reserva.cancha.nombre}
+                                                    </p>
+                                                    <p className="text-sm" style={{fontFamily: "var(--font-Balo)"}}>
+                                                        <Users className="h-4 w-4 inline mr-1 text-[#41bfb2]" />
+                                                        <span className="font-medium">Capacidad:</span> {reserva.cancha.capacidad} personas
+                                                    </p>
+                                                    <p className="text-sm" style={{fontFamily: "var(--font-Balo)"}}>
+                                                        <span className="font-medium">Costo:</span> {reserva.cancha.costoHora || 'N/A'} Bs/hora
+                                                    </p>
+                                                    <p className="text-sm" style={{fontFamily: "var(--font-Balo)"}}>
+                                                        <span className="font-medium">Superficie:</span> {reserva.cancha.tipoSuperficie || 'N/A'}
+                                                    </p>
                                                 </div>
                                             ) : (
-                                                <p className="text-gray-500 text-sm">Información de cancha no disponible</p>
+                                                <p className="text-gray-500 text-sm" style={{fontFamily: "var(--font-Balo)"}}>Información de cancha no disponible</p>
                                             )}
                                         </div>
                                         
                                         {/* Información del Cliente */}
                                         <div>
-                                            <h2 className="font-semibold text-gray-800 mb-1" style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontSize: '14px' }}>Información del Cliente</h2>
+                                            <h2 className="font-semibold text-gray-800 mb-1" style={{fontFamily: "var(--font-Alumni)", fontSize: '14px'}}>Información del Cliente</h2>
                                             {reserva.cliente ? (
                                                 <div className="bg-gray-50 p-2 rounded-lg">
-                                                    <p className="text-sm"><span className="font-medium">Nombre:</span> {reserva.cliente.nombre} {reserva.cliente.apellidoPaterno || ''} {reserva.cliente.apellidoMaterno || ''}</p>
-                                                    <p className="text-sm"><span className="font-medium">Email:</span> {reserva.cliente.email || 'No disponible'}</p>
-                                                    <p className="text-sm"><span className="font-medium">Teléfono:</span> {reserva.cliente.telefono || 'No disponible'}</p>
-                                                    
+                                                    <p className="text-sm" style={{fontFamily: "var(--font-Balo)"}}>
+                                                        <span className="font-medium">Nombre:</span> {reserva.cliente.nombre} {reserva.cliente.apellidoPaterno || ''} {reserva.cliente.apellidoMaterno || ''}
+                                                    </p>
+                                                    <p className="text-sm" style={{fontFamily: "var(--font-Balo)"}}>
+                                                        <span className="font-medium">Email:</span> {reserva.cliente.email || 'No disponible'}
+                                                    </p>
+                                                    <p className="text-sm" style={{fontFamily: "var(--font-Balo)"}}>
+                                                        <span className="font-medium">Teléfono:</span> {reserva.cliente.telefono || 'No disponible'}
+                                                    </p>
                                                 </div>
                                             ) : (
-                                                <p className="text-gray-500 text-sm">Información del cliente no disponible</p>
+                                                <p className="text-gray-500 text-sm" style={{fontFamily: "var(--font-Balo)"}}>Información del cliente no disponible</p>
                                             )}
                                         </div>
                                         
                                         {/* Información de Pago y Detalles */}
                                         <div>
-                                            <h2 className="font-semibold text-gray-800 mb-1" style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontSize: '14px' }}>Detalles de Pago</h2>
+                                            <h2 className="font-semibold text-gray-800 mb-1" style={{fontFamily: "var(--font-Alumni)", fontSize: '14px'}}>Detalles de Pago</h2>
                                             <div className="bg-gray-50 p-2 rounded-lg">
-                                                <p className="text-sm"><span className="font-medium">Total pagado:</span> {reserva.totalPagado || 0} Bs.</p>
-                                                <p className="text-sm"><span className="font-medium">Saldo pendiente:</span> {reserva.saldoPendiente || 0} Bs.</p>
-                                                <p className="text-sm"><span className="font-medium">Completamente pagada:</span> 
+                                                <p className="text-sm" style={{fontFamily: "var(--font-Balo)"}}>
+                                                    <span className="font-medium">Total pagado:</span> {reserva.totalPagado || 0} Bs.
+                                                </p>
+                                                <p className="text-sm" style={{fontFamily: "var(--font-Balo)"}}>
+                                                    <span className="font-medium">Saldo pendiente:</span> {reserva.saldoPendiente || 0} Bs.
+                                                </p>
+                                                <p className="text-sm" style={{fontFamily: "var(--font-Balo)"}}>
+                                                    <span className="font-medium">Completamente pagada:</span> 
                                                     <span className={reserva.pagadaCompleta ? 'text-green-600 ml-1' : 'text-red-600 ml-1'}>
                                                         {reserva.pagadaCompleta ? 'Sí' : 'No'}
                                                     </span>
                                                 </p>
                                                 {reserva.duracionMinutos && (
-                                                    <p className="text-sm"><span className="font-medium">Duración:</span> {reserva.duracionMinutos} minutos</p>
-                                                )}
-                                                {reserva.observaciones && (
-                                                    <p className="mt-1 text-sm">
-                                                        <span className="font-medium">Observaciones:</span>
-                                                        <span className="block mt-1 text-gray-600">{reserva.observaciones}</span>
+                                                    <p className="text-sm" style={{fontFamily: "var(--font-Balo)"}}>
+                                                        <Clock className="h-4 w-4 inline mr-1 text-[#f28627]" />
+                                                        <span className="font-medium">Duración:</span> {reserva.duracionMinutos} minutos
                                                     </p>
                                                 )}
+                                                
                                             </div>
                                         </div>
                                     </div>
 
                                     {/* Botones de acción */}
                                     <div className="mt-6 flex justify-end space-x-2 flex-wrap gap-2">
-                                        {/* Botón Eliminar (solo si no está ya desactivada) */}
+                                        {/* Botón Eliminar (solo si no está ya desactivada) 
                                         {!(reserva.eliminado || reserva.activo === false) && (
                                             <button
-                                                className="py-2 px-4 bg-red-600 hover:bg-red-700 text-white rounded-lg shadow-md transition-colors flex items-center"
+                                                className="py-2 px-4 bg-red-600 hover:bg-red-700 text-white rounded-lg shadow-md transition-colors flex items-center font-semibold"
+                                                style={{fontFamily: "var(--font-josefin)"}}
                                                 onClick={() => abrirModal('eliminar', reserva)}
                                             >
-                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                </svg>
+                                                <Trash2 className="h-5 w-5 mr-2" />
                                                 Eliminar
                                             </button>
-                                        )}
+                                        )}*/}
 
                                         {/* Botón Cancelar (solo si no es pasada y está confirmada/pendiente) */}
                                         {!esReservaPasada(reserva) && 
                                          reserva.estadoReserva !== 'CANCELADA' && 
                                          !(reserva.eliminado || reserva.activo === false) && (
                                             <button
-                                                className="py-2 px-4 bg-[#1E3A8A] hover:bg-[#172554] text-white rounded-lg shadow-md transition-colors flex items-center"
+                                                className="py-2 px-4 bg-black hover:bg-gray-800 text-white rounded-lg shadow-md transition-colors flex items-center font-semibold"
+                                                style={{fontFamily: "var(--font-josefin)"}}
                                                 onClick={() => abrirModal('cancelar', reserva)}
                                             >
-                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                                </svg>
+                                                <Ban className="h-5 w-5 mr-2" />
                                                 Cancelar
                                             </button>
                                         )}
 
                                         {/* Botón PDF */}
                                         <button
-                                            className="py-2 px-4 bg-green-600 hover:bg-green-700 text-white rounded-lg shadow-md transition-colors flex items-center"
+                                            className="py-2 px-4 bg-green-600 hover:bg-green-700 text-white rounded-lg shadow-md transition-colors flex items-center font-semibold"
+                                            style={{fontFamily: "var(--font-josefin)"}}
                                             onClick={() => generarPDF(reserva)}
                                         >
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                                            </svg>
+                                            <Download className="h-5 w-5 mr-2" />
                                             Generar PDF
                                         </button>
                                     </div>
@@ -580,15 +601,13 @@ const CanchaReservasPage = () => {
                         </div>
                     ) : (
                         <div className="py-12 text-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="mx-auto h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                            <h2 className="mt-4 text-xl font-semibold text-gray-600">
+                            <Calendar className="mx-auto h-16 w-16 text-gray-400" />
+                            <h2 className="mt-4 text-xl font-semibold text-gray-600" style={{fontFamily: "var(--font-Alumni)"}}>
                                 {reservas.length === 0 
                                     ? "No se encontraron reservas para esta cancha" 
                                     : "No hay reservas que coincidan con los filtros aplicados"}
                             </h2>
-                            <p className="mt-2 text-gray-500">
+                            <p className="mt-2 text-gray-500" style={{fontFamily: "var(--font-Balo)"}}>
                                 {reservas.length === 0 
                                     ? "Esta cancha no tiene reservas registradas." 
                                     : "Intenta con otros términos de búsqueda o fecha."}
@@ -596,8 +615,10 @@ const CanchaReservasPage = () => {
                             
                             <button
                                 onClick={handleVolver}
-                                className="mt-6 py-2 px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-md transition-colors inline-flex items-center"
+                                className="mt-6 py-2 px-6 bg-black hover:bg-gray-800 text-white rounded-lg shadow-md transition-colors inline-flex items-center font-semibold"
+                                style={{fontFamily: "var(--font-josefin)"}}
                             >
+                                <ArrowLeft className="h-5 w-5 mr-2" />
                                 Volver a Canchas
                             </button>
                         </div>

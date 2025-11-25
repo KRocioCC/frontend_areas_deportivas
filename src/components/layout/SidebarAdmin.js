@@ -69,11 +69,7 @@ function SidebarAdmin({ open }) {
         { label: "Control de Pagos", path: "/admin/pagos" }
       ]
     },
-    { 
-      label: "Notificaciones", 
-      icon: <TfiBell />, 
-      path: "/admin/notificaciones" 
-    },
+   
     { 
       label: "Disciplinas", 
       icon: <TfiBasketball />, 
