@@ -97,16 +97,17 @@ const CanchaCard = ({
 
   const renderField = (label, field, isCurrency = false) => (
     <div className="flex items-center justify-between py-2 border-b border-gray-100">
-      <span className="text-sm font-medium text-gray-500">{label}</span>
+      <span className="text-sm font-medium text-gray-500" style={{fontFamily: "var(--font-Balo)"}}>{label}</span>
       {isEditing ? (
         <input
           type={isCurrency ? "number" : "text"}
           value={editedData[field] || ""}
           onChange={(e) => onChangeField(field, e.target.value)}
           className="border border-gray-300 px-3 py-1 rounded-lg text-sm w-32 text-right focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          style={{fontFamily: "var(--font-Balo)"}}
         />
       ) : (
-        <span className={`text-sm font-semibold ${desactivada ? "text-red-700" : "text-gray-800"}`}>
+        <span className={`text-sm font-semibold ${desactivada ? "text-red-700" : "text-gray-800"}`} style={{fontFamily: "var(--font-Balo)"}}>
           {isCurrency ? `S/ ${cancha[field] || "—"}` : cancha[field] || "—"}
         </span>
       )}
@@ -130,8 +131,8 @@ const CanchaCard = ({
         <div className="h-[460px] w-full relative overflow-hidden">
           {cargando ? (
             <div className="w-full h-full flex flex-col items-center justify-center bg-gray-200">
-              <div className="text-gray-500 mb-2">Cargando imagen...</div>
-              <div className="text-xs text-gray-400">Cancha: {cancha.nombre}</div>
+              <div className="text-gray-500 mb-2" style={{fontFamily: "var(--font-Balo)"}}>Cargando imagen...</div>
+              <div className="text-xs text-gray-400" style={{fontFamily: "var(--font-Balo)"}}>Cancha: {cancha.nombre}</div>
             </div>
           ) : (
             <>
@@ -149,7 +150,7 @@ const CanchaCard = ({
               {/* Indicador de múltiples imágenes */}
               {cancha.imagenes && cancha.imagenes.length > 1 && (
                 <div className="absolute top-4 left-4">
-                  <span className="px-2 py-1 bg-black/70 text-white text-xs rounded-full backdrop-blur-sm">
+                  <span className="px-2 py-1 bg-black/70 text-white text-xs rounded-full backdrop-blur-sm" style={{fontFamily: "var(--font-Balo)"}}>
                     {cancha.imagenes.length} imágenes
                   </span>
                 </div>
@@ -163,12 +164,14 @@ const CanchaCard = ({
                 <div className="flex gap-2">
                   <button
                     className="px-4 py-2 bg-green-500 text-white rounded-full hover:bg-green-600 text-sm font-medium shadow-lg transition-all duration-200 hover:scale-105"
+                    style={{fontFamily: "var(--font-josefin)"}}
                     onClick={onSave}
                   >
                     ✓
                   </button>
                   <button
                     className="px-4 py-2 bg-red-500 text-white rounded-full hover:bg-red-600 text-sm font-medium shadow-lg transition-all duration-200 hover:scale-105"
+                    style={{fontFamily: "var(--font-josefin)"}}
                     onClick={onCancel}
                   >
                     ✕
@@ -177,6 +180,7 @@ const CanchaCard = ({
               ) : (
                 <button
                   className="px-4 py-2 bg-white/90 backdrop-blur-sm text-gray-700 rounded-full hover:bg-white hover:text-blue-600 text-sm font-medium shadow-lg transition-all duration-200 hover:scale-105"
+                  style={{fontFamily: "var(--font-josefin)"}}
                   onClick={() => onEdit(cancha.idCancha)}
                 >
                   Editar
@@ -220,13 +224,14 @@ const CanchaCard = ({
         <div className="p-6 flex flex-col justify-between flex-1">
           {/* Header */}
           <div className="mb-4">
-            <h3 className={`text-xl font-bold mb-2 ${desactivada ? "text-red-700" : "text-gray-800"}`}>
+            <h3 className={`text-xl font-bold mb-2 ${desactivada ? "text-red-700" : "text-gray-800"}`} style={{fontFamily: "var(--font-Alumni)"}}>
               {isEditing ? (
                 <input
                   type="text"
                   value={editedData.nombre || ""}
                   onChange={(e) => onChangeField("nombre", e.target.value)}
                   className="border border-gray-300 px-3 py-2 rounded-xl text-lg font-bold w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  style={{fontFamily: "var(--font-Alumni)"}}
                   placeholder="Nombre de la cancha"
                 />
               ) : (
@@ -236,14 +241,14 @@ const CanchaCard = ({
 
             {/* Badges */}
             <div className="flex items-center gap-2 mb-4">
-              <span className={`px-3 py-1 rounded-full text-xs font-medium ${cancha.cubierta === "cubierta" ? "bg-blue-100 text-blue-800" : "bg-green-100 text-green-800"}`}>
+              <span className={`px-3 py-1 rounded-full text-xs font-medium ${cancha.cubierta === "cubierta" ? "bg-blue-100 text-blue-800" : "bg-green-100 text-green-800"}`} style={{fontFamily: "var(--font-Balo)"}}>
                 {cancha.cubierta === "cubierta" ? " Cubierta" : " Abierta"}
               </span>
-              <span className="px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+              <span className="px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800" style={{fontFamily: "var(--font-Balo)"}}>
                 {cancha.tipoSuperficie || "Natural"}
               </span>
               {desactivada && (
-                <span className="px-3 py-1 rounded-full text-xs font-medium bg-red-200 text-red-800">
+                <span className="px-3 py-1 rounded-full text-xs font-medium bg-red-200 text-red-800" style={{fontFamily: "var(--font-Balo)"}}>
                   Desactivada
                 </span>
               )}
@@ -266,6 +271,7 @@ const CanchaCard = ({
                 <button
                   onClick={handleVerDisciplinas} // Cambiado para abrir el modal
                   className="w-1/3 py-3 bg-[#45bfb5] text-white rounded-xl hover:bg-[#3aa89f] transition-all duration-300 font-semibold text-sm shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                  style={{fontFamily: "var(--font-josefin)"}}
                 >
                   Ver Disciplinas
                 </button>
@@ -273,6 +279,7 @@ const CanchaCard = ({
                 <button
                   onClick={() => navigate(`/admin/cancha/ver_reservas/${cancha.idCancha}`)}
                   className="w-1/3 py-3 bg-black text-white rounded-xl hover:bg-gray-800 transition-all duration-300 font-semibold text-sm shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                  style={{fontFamily: "var(--font-josefin)"}}
                 >
                   Ver Reservas
                 </button>

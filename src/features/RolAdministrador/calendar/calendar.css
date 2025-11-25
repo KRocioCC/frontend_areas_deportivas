@@ -2,6 +2,8 @@
   background-color: #41BFB3 !important;
   border: none;
   color: white !important;
+  padding: 0.4rem 0.8rem !important;
+  font-size: 0.875rem !important;
 }
 
 .fc .fc-button:hover {
@@ -9,8 +11,66 @@
 }
 
 .fc-toolbar-title {
-  font-size: 1.95rem;       /* tamaño más grande */
+  font-size: 1.75rem;       /* aumentado para más visibilidad */
   font-weight: 600;         /* semibold */
   color: #1F2937;           /* gris oscuro */
   font-family: 'Inter', sans-serif; /* o la fuente que uses en tu app */
 }
+
+/* Controlar el tamaño general del calendario */
+.custom-calendar {
+  max-width: 100%;
+  font-size: 0.875rem;
+}
+
+/* Altura de las celdas del calendario - más altas */
+.fc .fc-daygrid-day {
+  height: 120px !important;
+  min-height: 120px !important;
+}
+
+/* Estilo de los eventos - cursor pointer */
+.fc-event {
+  font-size: 0.75rem !important;
+  padding: 2px 4px !important;
+  cursor: pointer !important;
+  color: #000000 !important;
+}
+
+.fc-event:hover {
+  opacity: 0.85;
+  cursor: pointer !important;
+}
+
+/* Cursor pointer en el contenido del evento */
+.fc-event-main {
+  cursor: pointer !important;
+  color: #000000 !important;
+}
+
+/* Forzar texto negro en todos los eventos */
+.fc-event-title,
+.fc-event-time,
+.fc-daygrid-event-dot,
+.fc-list-event-title,
+.fc-list-event-time {
+  color: #000000 !important;
+}
+
+/* Asegurar que el texto sea negro en vista de lista y tiempo */
+.fc-timegrid-event .fc-event-main,
+.fc-timegrid-event .fc-event-title,
+.fc-timegrid-event .fc-event-time {
+  color: #000000 !important;
+}
+
+/* Reducir espaciado en la vista de semana/día */
+.fc .fc-timegrid-slot {
+  height: 3rem !important;
+}
+
+/* Asegurar que todos los elementos clickeables tengan pointer */
+.fc-daygrid-event-harness {
+  cursor: pointer !important;
+}
+

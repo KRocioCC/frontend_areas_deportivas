@@ -4,11 +4,29 @@ import { X, MessageCircle, Users, Clock } from "lucide-react";
 import Button from "../../../components/ui/Button";
 import ComentarioPanel from "../../comentario/pages/ComentarioPanel";
 
-
 export default function CanchaViewModal({ initialData, onCancel }) {
   const [showComments, setShowComments] = useState(false);
 
   if (!initialData) return null;
+
+  // Función para obtener la primera imagen del vector de imágenes de la cancha
+  const getCanchaImageUrl = () => {
+    if (initialData.imagenes && initialData.imagenes.length > 0) {
+      const primeraImagen = initialData.imagenes[0];
+      if (primeraImagen.urlAcceso.startsWith('http')) {
+        return primeraImagen.urlAcceso;
+      } else {
+        return `http://localhost:8032${primeraImagen.urlAcceso}`;
+      }
+    }
+    return initialData.urlImagen || "https://placehold.co/300x300/2563eb/white?text=Sin+Imagen";
+  };
+
+  // Función para manejar errores de carga de imagen
+  const handleImageError = (e) => {
+    e.target.onerror = null;
+    e.target.src = "https://placehold.co/300x300/2563eb/white?text=Sin+Imagen";
+  };
 
   // Mapear los nombres de propiedades para coincidir con tu estructura de datos
   const canchaData = {
@@ -23,7 +41,7 @@ export default function CanchaViewModal({ initialData, onCancel }) {
     tipoSuperficie: initialData.tipoSuperficie,
     iluminacion: initialData.iluminacion === "true" || initialData.iluminacion === true ? "Sí" : "No",
     cubierta: initialData.cubierta === "true" || initialData.cubierta === true ? "Sí" : "No",
-    imageUrl: initialData.urlImagen || "https://placehold.co/300x300/2563eb/white?text=Sin+Imagen"
+    imageUrl: getCanchaImageUrl()
   };
 
   return (
@@ -65,6 +83,7 @@ export default function CanchaViewModal({ initialData, onCancel }) {
                 src={canchaData.imageUrl} 
                 alt={canchaData.nombre}
                 className="w-full h-full object-cover"
+                onError={handleImageError}
               />
             </div>
 
