@@ -135,14 +135,14 @@ export default function Areadeportiva() {
 
   return (
     <>
-      {/* MANTENGO tus curvas pero aseguro que los indicadores estén por encima (z-index) */}
+      {/* CURVA SUPERIOR (mantengo tu intención pero más orgánica) */}
       <div className="relative">
-        <div className={`absolute top-0 left-0 right-0 -mt-1 h-32 ${isDarkMode ? 'bg-[#0f1213] z-0' : 'bg-white z-0'}`}>
+        <div className={`absolute top-0 left-0 right-0 -mt-1 h-36 ${isDarkMode ? 'bg-[#0f1213] z-0' : 'bg-white z-0'}`}>
           <svg viewBox="0 0 1440 320" className="w-full h-full" preserveAspectRatio="none">
             <path
               fill={isDarkMode ? "#0f1213" : "#FFFFFF"}
-              d="M0,96 C360,180 1080,20 1440,96 L1440,320 L0,320 Z"
-              opacity="0.8"
+              d="M0,64 C220,160 420,0 720,80 C1020,160 1220,80 1440,120 L1440,320 L0,320 Z"
+              opacity="0.92"
             />
           </svg>
         </div>
@@ -150,10 +150,7 @@ export default function Areadeportiva() {
 
       <section 
         id="areasdeportivas"
-        /* CAMBIO: overflow-visible para que elementos posicionado con z-index no se corten.
-           Si necesitas mantener overflow-hidden por alguna razón, puedes extraer las curvas a otro wrapper
-           y dejar el contenido principal con overflow-visible. */
-        className={`relative py-20 px-4 md:px-8 overflow-visible transition-all duration-1000 ${isDarkMode ? 'bg-[#0f1213]' : 'bg-white'}`}
+        className={`relative py-20 px-4 md:px-8 overflow-visible transition-all duration-700 ${isDarkMode ? 'bg-[#0f1213]' : 'bg-white'}`}
       >
         <div className="max-w-7xl mx-auto">
           <motion.div
@@ -161,10 +158,10 @@ export default function Areadeportiva() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.9 }}
-            className="text-center mb-16"
+            className="text-center mb-12"
           >
             <h2 
-              className="text-5xl md:text-7xl font-bold tracking-tight"
+              className="text-4xl md:text-6xl font-bold tracking-tight"
               style={{ fontFamily: "var(--font-Oswald)" }}
             >
               <span className={isDarkMode ? "text-white" : "text-gray-900"}>
@@ -175,7 +172,7 @@ export default function Areadeportiva() {
               </span>
             </h2>
             <p 
-              className="mt-6 text-lg md:text-xl max-w-3xl mx-auto opacity-90"
+              className="mt-4 text-base md:text-lg max-w-3xl mx-auto opacity-90"
               style={{ fontFamily: "var(--font-Alumni)" }}
             >
               Descubre las mejores canchas y disciplinas cerca de ti
@@ -189,80 +186,97 @@ export default function Areadeportiva() {
               if (resumeTimeoutRef.current) clearTimeout(resumeTimeoutRef.current);
               resumeTimeoutRef.current = setTimeout(() => {
                 pausedRef.current = false;
-              }, 1000); // resume rápido al salir
+              }, 1000);
             }}
           >
+            {/* GALLERY: oculto scrollbar, mantengo scroll-snap y hago cards animadas */}
             <div
               ref={galleryRef}
-              className="flex gap-8 py-8 overflow-x-auto scrollbar-hide scroll-smooth"
-              style={{ scrollSnapType: "x mandatory" }}
+              className="flex gap-8 py-8 overflow-x-auto no-scrollbar scroll-snap-x"
+              style={{ scrollSnapType: "x mandatory", WebkitOverflowScrolling: "touch" }}
             >
-              {areas.map((area, index) => (
-                <AreaCard
-                  key={area.id}
-                  area={area}
-                  index={index}
-                  currentIndex={currentIndex}
-                  onClick={() => handleOpenModal(area)}
-                />
-              ))}
+              {areas.map((area, index) => {
+                const isActive = index === currentIndex;
+                return (
+                  <motion.div
+                    key={area.id}
+                    initial={{ opacity: 0.85, scale: 0.96 }}
+                    animate={isActive ? { opacity: 1, scale: 1, rotateY: 0 } : { opacity: 0.82, scale: 0.95 }}
+                    transition={{ type: "spring", stiffness: 120, damping: 18 }}
+                    whileHover={isActive ? { scale: 1.02 } : { scale: 0.98 }}
+                    style={{ scrollSnapAlign: "center", minWidth: "320px", maxWidth: "420px" }}
+                    className="area-card-wrapper"
+                    onClick={() => handleOpenModal(area)}
+                  >
+                    {/* No cambio AreaCard internamente — sólo lo envuelvo para animaciones */}
+                    <AreaCard
+                      area={area}
+                      index={index}
+                      currentIndex={currentIndex}
+                      onClick={() => handleOpenModal(area)}
+                    />
+                  </motion.div>
+                );
+              })}
             </div>
 
-            {/* Flechas (les doy z-index para que estén sobre otros elementos) */}
+            {/* Flechas refinadas (sobre el contenido, no tapan los indicadores) */}
             <button
               onClick={prev}
-              className={`absolute left-4 top-1/2 -translate-y-1/2 w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 shadow-[0_8px_32px_rgba(0,0,0,0.3)] backdrop-blur-md z-20 hover:scale-110 active:scale-95 ${
-                isDarkMode 
-                  ? "bg-[#0f1213]/80 border border-white/20 text-[#2C7366] hover:bg-[#2C7366]/20" 
-                  : "bg-white/80 border border-gray-200 text-[#41bfb2] hover:bg-[#41bfb2]/10"
-              }`}
+              className={`absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 z-20 hover:scale-105 active:scale-95
+                ${isDarkMode 
+                  ? "bg-[#0f1213]/75 border border-white/12 text-[#2C7366] shadow-md" 
+                  : "bg-white/90 border border-gray-100 text-[#41bfb2] shadow-md"
+                }`}
               style={{ fontFamily: "var(--font-josefin)" }}
+              aria-label="Anterior"
             >
-              <ChevronLeft className="w-8 h-8" />
+              <ChevronLeft className="w-6 h-6" />
             </button>
 
             <button
               onClick={next}
-              className={`absolute right-4 top-1/2 -translate-y-1/2 w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 shadow-[0_8px_32px_rgba(0,0,0,0.3)] backdrop-blur-md z-20 hover:scale-110 active:scale-95 ${
-                isDarkMode 
-                  ? "bg-[#0f1213]/80 border border-white/20 text-[#2C7366] hover:bg-[#2C7366]/20" 
-                  : "bg-white/80 border border-gray-200 text-[#41bfb2] hover:bg-[#41bfb2]/10"
-              }`}
+              className={`absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 z-20 hover:scale-105 active:scale-95
+                ${isDarkMode 
+                  ? "bg-[#0f1213]/75 border border-white/12 text-[#2C7366] shadow-md" 
+                  : "bg-white/90 border border-gray-100 text-[#41bfb2] shadow-md"
+                }`}
               style={{ fontFamily: "var(--font-josefin)" }}
+              aria-label="Siguiente"
             >
-              <ChevronRight className="w-8 h-8" />
+              <ChevronRight className="w-6 h-6" />
             </button>
 
-            {/* INDICADORES: pongo z-index alto y relative para que no los tape el SVG */}
-            <div className="flex justify-center gap-3 mt-10 relative z-30" aria-hidden={false}>
-              {areas.map((_, i) => (
-                <motion.div
-                  key={i}
-                  onClick={() => manualNavigate(i)}
-                  className="cursor-pointer"
-                  whileHover={{ scale: 1.3 }}
-                  whileTap={{ scale: 0.9 }}
-                >
-                  <div 
-                    className={`w-3 h-3 rounded-full transition-all duration-500 ${
-                      i === currentIndex
-                        ? isDarkMode ? "bg-[#2C7366] w-12" : "bg-[#41bfb2] w-12"
-                        : isDarkMode ? "bg-gray-700" : "bg-gray-300"
-                    }`}
-                  />
-                </motion.div>
-              ))}
+            {/* INDICADORES: los posiciono absolute y con z-index alto para que nunca los tape el SVG */}
+            <div className="absolute left-1/2 -translate-x-1/2 bottom-0 translate-y-6 z-30">
+              <div className="flex items-center gap-3">
+                {areas.map((_, i) => (
+                  <motion.button
+                    key={i}
+                    onClick={() => manualNavigate(i)}
+                    className="indicator-btn"
+                    whileHover={{ scale: 1.25 }}
+                    whileTap={{ scale: 0.9 }}
+                    aria-label={`Ir al área ${i + 1}`}
+                  >
+                    <div
+                      className={`rounded-full transition-all duration-500 ${i === currentIndex ? (isDarkMode ? 'bg-[#2C7366]' : 'bg-[#41bfb2]') : (isDarkMode ? 'bg-gray-700' : 'bg-gray-300')}`}
+                      style={{ width: i === currentIndex ? 48 : 10, height: 10, borderRadius: 999 }}
+                    />
+                  </motion.button>
+                ))}
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Curva inferior: le doy z-0 para que no tape los indicadores */}
-        <div className="absolute bottom-0 left-0 right-0 -mb-1 h-32 overflow-hidden z-0 pointer-events-none">
+        {/* Curva inferior (z-0) */}
+        <div className="absolute bottom-0 left-0 right-0 -mb-1 h-36 overflow-hidden z-0 pointer-events-none">
           <svg viewBox="0 0 1440 320" className="w-full h-full" preserveAspectRatio="none">
             <path
               fill={isDarkMode ? "#0f1213" : "#FFFFFF"}
-              d="M0,160 C360,80 1080,280 1440,160 L1440,0 L0,0 Z"
-              opacity="0.9"
+              d="M0,160 C220,220 520,80 720,120 C920,160 1220,280 1440,160 L1440,0 L0,0 Z"
+              opacity="0.95"
             />
           </svg>
         </div>

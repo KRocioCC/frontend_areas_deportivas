@@ -1,60 +1,16 @@
-// src/componentsCli/BeneficiosCli.jsx
 import { motion } from "framer-motion";
 import { useTheme } from "../../../context/ThemeContext";
 import { 
-  Shield, 
-  Zap, 
-  QrCode, 
-  Users, 
-  CalendarCheck, 
-  Gift, 
-  Clock, 
-  MapPin 
+  Shield, Zap, QrCode, Users, CalendarCheck, Gift,
 } from "lucide-react";
 
 const beneficios = [
-  {
-    title: "Reserva en segundos",
-    subtitle: "24/7 desde tu celular",
-    icon: Zap,
-    color: "from-[#41bfb2] to-[#2C7366]",
-    delay: 0.1
-  },
-  {
-    title: "Acceso directo con QR",
-    subtitle: "Entras sin hacer fila ni esperar",
-    icon: QrCode,
-    color: "from-[#41bfb2] to-[#2C7366]",
-    delay: 0.2
-  },
-  {
-    title: "Invita a tus amigos",
-    subtitle: "Comparte el acceso QR con tu equipo",
-    icon: Users,
-    color: "from-[#f28627] to-[#f35734]",
-    delay: 0.3
-  },
-  {
-    title: "Pago 100% seguro",
-    subtitle: "QR · Tarjeta · Transferencia",
-    icon: Shield,
-    color: "from-[#41bfb2] to-[#2C7366]",
-    delay: 0.4
-  },
-  {
-    title: "Cancelación flexible",
-    subtitle: "Hasta 2 horas antes sin penalidad",
-    icon: CalendarCheck,
-    color: "from-[#f28627] to-[#f35734]",
-    delay: 0.5
-  },
-  {
-    title: "Promociones exclusivas",
-    subtitle: "Cumpleaños, torneos y más",
-    icon: Gift,
-    color: "from-[#41bfb2] to-[#2C7366]",
-    delay: 0.6
-  }
+  { title: "Reserva en segundos", subtitle: "24/7 desde tu celular", icon: Zap, delay: 0.1 },
+  { title: "Acceso directo con QR", subtitle: "Sin filas ni esperas", icon: QrCode, delay: 0.2 },
+  { title: "Invita a tus amigos", subtitle: "Comparte el acceso QR con tu equipo", icon: Users, delay: 0.3 },
+  { title: "Pago 100% seguro", subtitle: "QR · Tarjeta · Transferencia", icon: Shield, delay: 0.4 },
+  { title: "Cancelación flexible", subtitle: "Hasta 2 horas antes", icon: CalendarCheck, delay: 0.5 },
+  { title: "Promociones exclusivas", subtitle: "Cumpleaños, torneos y más", icon: Gift, delay: 0.6 },
 ];
 
 export default function BeneficiosCli() {
@@ -62,23 +18,25 @@ export default function BeneficiosCli() {
 
   return (
     <>
-      {/* TRANSICIÓN SUPERIOR CONEXIÓN PERFECTA CON Areadeportiva */}
-      <div className={`-mt-1 h-32 ${isDarkMode ? 'bg-[#0f1213]' : 'bg-white'}`}>
+      {/* Transición Superior */}
+      <div className={`h-32 -mt-1 ${isDarkMode ? "bg-[#0f1213]" : "bg-white"}`}>
         <svg viewBox="0 0 1440 320" className="w-full h-full" preserveAspectRatio="none">
           <path
             fill={isDarkMode ? "#0f1213" : "#FFFFFF"}
-            d="M0,96 C360,200 1080,20 1440,96 L1440,320 L0,320 Z"
-            opacity="0.85"
+            d="M0,80 C300,200 1100,0 1440,80 L1440,320 L0,320 Z"
+            opacity="0.9"
           />
         </svg>
       </div>
 
+      {/* Beneficios */}
       <section 
         id="beneficios"
-        className={`relative py-24 px-4 md:px-8 overflow-hidden ${isDarkMode ? 'bg-[#0f1213]' : 'bg-white'}`}
+        className={`relative py-24 px-4 md:px-10 ${isDarkMode ? "bg-[#0f1213]" : "bg-white"}`}
       >
         <div className="max-w-7xl mx-auto">
-          {/* Título impactante */}
+
+          {/* Título */}
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -90,13 +48,10 @@ export default function BeneficiosCli() {
               className="text-5xl md:text-7xl font-bold tracking-tight"
               style={{ fontFamily: "var(--font-Oswald)" }}
             >
-              <span className={isDarkMode ? "text-white" : "text-gray-900"}>
-                POR QUÉ RESERVAR
-              </span>{" "}
-              <span className={isDarkMode ? "text-[#2C7366]" : "text-[#41bfb2]"}>
-                CON NOSOTROS
-              </span>
+              <span className={isDarkMode ? "text-white" : "text-gray-900"}>BENEFICIOS</span>{" "}
+              <span className={isDarkMode ? "text-[#2C7366]" : "text-[#41bfb2]"}>EXCLUSIVOS</span>
             </h2>
+
             <p 
               className="mt-6 text-xl md:text-2xl opacity-90 max-w-3xl mx-auto"
               style={{ fontFamily: "var(--font-Alumni)" }}
@@ -105,83 +60,67 @@ export default function BeneficiosCli() {
             </p>
           </motion.div>
 
-          {/* Grid dinámico y moderno (no 4 cards aburridos) */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12">
-            {beneficios.map((beneficio, index) => {
-              const Icon = beneficio.icon;
-              const isOrange = beneficio.color.includes("f28");
+          {/* GRID de Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+
+            {beneficios.map((b, index) => {
+              const Icon = b.icon;
 
               return (
                 <motion.div
                   key={index}
-                  initial={{ opacity: 0, y: 60 }}
+                  initial={{ opacity: 0, y: 80 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ duration: 0.7, delay: beneficio.delay }}
+                  transition={{ duration: 0.6, delay: b.delay }}
                   className="group"
                 >
                   <div 
-                    className={`relative p-8 rounded-3xl transition-all duration-500 hover:scale-105 hover:shadow-2xl ${
-                      isDarkMode 
-                        ? 'bg-black/30 backdrop-blur-md border border-white/10' 
-                        : 'bg-white/70 backdrop-blur-md border border-gray-200 shadow-xl'
-                    }`}
+                    className={`relative p-8 rounded-3xl transition-all duration-500 border 
+                      ${isDarkMode 
+                        ? "bg-black/20 border-white/10 shadow-md" 
+                        : "bg-white border-gray-200 shadow-xl"} 
+                      hover:shadow-2xl hover:-translate-y-1`}
                   >
-                    {/* Icono con fondo degradado sutil */}
-                    <div className={`absolute -top-6 left-1/2 -translate-x-1/2 w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br ${beneficio.color} ${isDarkMode ? 'opacity-90' : 'opacity-100'}`}>
-                      <Icon className="w-9 h-9 text-white" />
+
+                    {/* Icono Moderno */}
+                    <div 
+                      className={`mx-auto w-16 h-16 rounded-full flex items-center justify-center 
+                        shadow-md mb-6 transition-all duration-500
+                        ${isDarkMode ? "bg-[#2C7366]/20" : "bg-[#41bfb2]/15"}`}
+                    >
+                      <Icon className="w-8 h-8 text-[#41bfb2]" />
                     </div>
 
-                    {/* Contenido */}
-                    <div className="mt-10 text-center">
-                      <h3 
-                        className={`text-2xl md:text-3xl font-bold mb-3 ${
-                          isOrange 
-                            ? isDarkMode ? 'text-[#f35734]' : 'text-[#f28627]'
-                            : isDarkMode ? 'text-[#2C7366]' : 'text-[#41bfb2]'
-                        }`}
-                        style={{ fontFamily: "var(--font-Alumni)" }}
-                      >
-                        {beneficio.title}
-                      </h3>
-                      <p 
-                        className={`text-lg leading-relaxed opacity-90 ${
-                          isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                        }`}
-                        style={{ fontFamily: "var(--font-Balo)" }}
-                      >
-                        {beneficio.subtitle}
-                      </p>
-                    </div>
+                    <h3 
+                      className={`text-2xl font-bold mb-2 text-center`}
+                      style={{ fontFamily: "var(--font-Alumni)" }}
+                    >
+                      {b.title}
+                    </h3>
 
-                    {/* Efecto hover sutil */}
-                    <motion.div
-                      className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                      style={{
-                        background: isOrange
-                          ? "radial-gradient(circle at 30% 30%, rgba(243,87,52,0.15), transparent 70%)"
-                          : "radial-gradient(circle at 30% 30%, rgba(65,191,178,0.15), transparent 70%)"
-                      }}
-                    />
+                    <p 
+                      className={`text-center text-lg opacity-80 leading-relaxed 
+                        ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}
+                      style={{ fontFamily: "var(--font-Balo)" }}
+                    >
+                      {b.subtitle}
+                    </p>
                   </div>
                 </motion.div>
               );
             })}
+
           </div>
 
-          {/* Extra: toque deportivo sutil en el fondo */}
-          <div className="absolute inset-0 pointer-events-none opacity-5">
-            <div className="absolute top-20 left-10 w-96 h-96 rounded-full bg-[#41bfb2] blur-3xl" />
-            <div className="absolute bottom-32 right-20 w-80 h-80 rounded-full bg-[#f28627] blur-3xl" />
-          </div>
         </div>
 
-        {/* TRANSICIÓN INFERIOR FLUIDA para conectar con la siguiente sección */}
-        <div className={`absolute bottom-0 left-0 right-0 -mb-1 h-32 overflow-hidden ${isDarkMode ? 'bg-[#0f1213]' : 'bg-white'}`}>
+        {/* Transición Inferior */}
+        <div className={`absolute bottom-0 left-0 right-0 h-32 ${isDarkMode ? "bg-[#0f1213]" : "bg-white"}`}>
           <svg viewBox="0 0 1440 320" className="w-full h-full" preserveAspectRatio="none">
             <path
               fill={isDarkMode ? "#0f1213" : "#FFFFFF"}
-              d="M0,160 C320,280 1120,60 1440,160 L1440,0 L0,0 Z"
+              d="M0,240 C350,80 1100,360 1440,240 L1440,0 L0,0 Z"
               opacity="0.9"
             />
           </svg>

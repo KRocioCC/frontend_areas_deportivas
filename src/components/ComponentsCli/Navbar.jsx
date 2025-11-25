@@ -24,36 +24,24 @@ export default function Navbar() {
 
   // 🔹 Items base (sin cambios)
   const baseItems = [
-    { name: "Inicio", path: "/inicio",
-      children: [
-        { name: "Inicio", path: "/inicio#inicio" },
-        { name: "Areas Deportivas", path: "/inicio#areasdeportivas" },
-        { name: "Beneficios de reservar aquí", path: "/inicio#beneficios" },
-        { name: "Canchas destacadas", path: "/inicio#beneficios" },
-        { name: "Testimonios", path: "/inicio#beneficios" },
-        { name: "¿Necesitas ayuda?", path: "/inicio#contacto" },
-      ]
-     },
-
+    { name: "Inicio", path: "/inicio"},
     { name: "Canchas", path: "/canchas" },
     { name: "Reservar", path: "/reservas" },
-    { name: "¿Cómo Funciona?", path: "/reservar/como-funciona",
+    { name: "¿Cómo Funciona?", path: "/como-funciona/reservar",
       children: [
-        { name: "Cómo reservar paso a paso", path: "/inicio#nosotros" },
-        { name: "Cómo pagar", path: "/inicio#misionvision" },
-        { name: "Cómo usar el QR", path: "/inicio#misionvision" }
+        { name: "Cómo reservar paso a paso", path: "/como-funciona/reservar" },
+        { name: "Cómo pagar", path: "/como-funciona/pagar" },
+        { name: "Cómo usar el QR", path: "/como-funciona/qr" }
       ]
     },
-
-    { name: "Ayuda/FAQ", path: "/reservar/ayuda" },
+    { name: "Ayuda/FAQ", path: "/ayuda/preguntas" },
     {
       name: "Sobre Nosotros",
       path: "/empresa", 
       children: [
-        { name: "¿Quiénes Somos?", path: "/inicio#nosotros" },
-        { name: "Misión y Visión", path: "/inicio#misionvision" },
-        { name: "Equipo", path: "/inicio#misionvision" },
-        { name: "Contacto", path: "/inicio#contacto" },
+        { name: "¿Quiénes Somos?", path: "/empresa#nosotros" },
+        { name: "Misión y Visión", path: "/empresa#misionvision" },
+        { name: "Equipo", path: "/empresa#misionvision" }
       ]
     },
   ];

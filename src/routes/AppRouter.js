@@ -65,13 +65,17 @@ import ReservaCliente from "../features/RolCliente/Reserva/ReservaCliente.jsx";
 import ReservaConfirmacion from "../features/RolCliente/Reserva/ReservaConfirmacion.jsx";
 //import { ProtectedRoute } from '../auth/components/ProtectedRoute.jsx';
 import Calendar from "../features/RolAdministrador/calendar/Calendar";
-import ComoFunciona from "../features/RolCliente/Inicio/ComoFunciona.jsx";
+//import ComoFunciona from "../features/RolCliente/Inicio/ComoFunciona.jsx";
 import SistemaQR from "../features/RolCliente/Inicio/SistemaQR.jsx";
 //import PaymentPage from "../features/RolCliente/Pagos/PaymentPage.jsx";
 import ListPagosPage from "../features/RolCliente/Pagos/ListaPagosPage.jsx";
 import RealizarPagoPage from "../features/RolCliente/Pagos/RealizarPagoPage.jsx";
 import IngresarTarjetaPage from "../features/RolCliente/Pagos/IngresarTarjetaPage.jsx";
 import ConfirmarPagoQRPage from "../features/RolCliente/Pagos/ConfirmarPagoQRPage.jsx";
+import ComoReservar from "../features/RolCliente/Inicio/ComoFunciona/ComoReservar.jsx";
+import ComoPagar from "../features/RolCliente/Inicio/ComoFunciona/ComoPagar.jsx";
+import ComoUsarQr from "../features/RolCliente/Inicio/ComoFunciona/ComoUsarQr.jsx";
+import PreguntasFrecuentes from "../features/RolCliente/Inicio/Ayuda/PreguntasFrecuentes.jsx";
 
 function AppRouter() {
 
@@ -137,13 +141,39 @@ function AppRouter() {
           />
 
           <Route
-            path="/reservar/como-funciona"
+            path="/como-funciona/reservar"
             element={
               <LayoutCliente>
-                <ComoFunciona />
+                <ComoReservar />
               </LayoutCliente>
             }
           />
+          <Route
+            path="/como-funciona/pagar"
+            element={
+              <LayoutCliente>
+                <ComoPagar/>
+              </LayoutCliente>
+            }
+          />
+
+          <Route
+            path="/ayuda/preguntas"
+            element={
+              <LayoutCliente>
+                <PreguntasFrecuentes/>
+              </LayoutCliente>
+            }
+          />
+          <Route
+            path="/como-funciona/qr"
+            element={
+              <LayoutCliente>
+                <ComoUsarQr/>
+              </LayoutCliente>
+            }
+          />
+
           <Route
             path="/reservar/qr"
             element={
