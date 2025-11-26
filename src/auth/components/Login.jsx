@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import authService from '../services/authService';
@@ -10,12 +10,58 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [usernameError, setUsernameError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [touched, setTouched] = useState({
+    username: false,
+    password: false
+  });
+
   const navigate = useNavigate();
   const { login } = useAuth();
   const location = useLocation();
 
+  // Validaciones en tiempo real
+  useEffect(() => {
+    if (touched.username) {
+      if (!username.trim()) {
+        setUsernameError('El usuario es requerido');
+      } else if (username.length < 3) {
+        setUsernameError('El usuario debe tener al menos 3 caracteres');
+      } else {
+        setUsernameError('');
+      }
+    }
+  }, [username, touched.username]);
+
+  useEffect(() => {
+    if (touched.password) {
+      if (!password.trim()) {
+        setPasswordError('La contraseña es requerida');
+      } else if (password.length < 6) {
+        setPasswordError('La contraseña debe tener al menos 6 caracteres');
+      } else {
+        setPasswordError('');
+      }
+    }
+  }, [password, touched.password]);
+
+  const handleBlur = (field) => {
+    setTouched(prev => ({ ...prev, [field]: true }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Marcar todos los campos como tocados para mostrar errores
+    setTouched({ username: true, password: true });
+    
+    // Validar antes de enviar
+    if (usernameError || passwordError || !username || !password) {
+      setError('Por favor corrige los errores antes de continuar');
+      return;
+    }
+
     setIsLoading(true);
     setError('');
 
@@ -51,6 +97,8 @@ const Login = () => {
       setIsLoading(false);
     }
   };
+
+  const isSubmitDisabled = isLoading || usernameError || passwordError || !username || !password;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-4">
@@ -94,12 +142,21 @@ const Login = () => {
               <label className="block text-sm font-medium text-gray-300 mb-2">
                 Usuario
               </label>
+              {touched.username && usernameError && (
+                <div className="text-red-400 text-xs mb-2 flex items-center">
+                  <span className="mr-1">⚠</span>
+                  {usernameError}
+                </div>
+              )}
               <input
                 type="text"
                 required
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="w-full px-4 py-3 bg-white/5 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3AAFA9] focus:border-transparent transition-all text-white placeholder-gray-400"
+                onBlur={() => handleBlur('username')}
+                className={`w-full px-4 py-3 bg-white/5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3AAFA9] focus:border-transparent transition-all text-white placeholder-gray-400 ${
+                  touched.username && usernameError ? 'border-red-500' : 'border-gray-600'
+                }`}
                 placeholder="Ingresa tu usuario"
               />
             </div>
@@ -108,20 +165,31 @@ const Login = () => {
               <label className="block text-sm font-medium text-gray-300 mb-2">
                 Contraseña
               </label>
+              {touched.password && passwordError && (
+                <div className="text-red-400 text-xs mb-2 flex items-center">
+                  <span className="mr-1">⚠</span>
+                  {passwordError}
+                </div>
+              )}
               <PasswordInput
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                onBlur={() => handleBlur('password')}
                 required
                 placeholder="Ingresa tu contraseña"
-                className="bg-white/5 border border-gray-600 focus:ring-2 focus:ring-[#3AAFA9] focus:border-transparent text-white placeholder-gray-400"
+                className={`bg-white/5 border focus:ring-2 focus:ring-[#3AAFA9] focus:border-transparent text-white placeholder-gray-400 ${
+                  touched.password && passwordError ? 'border-red-500' : 'border-gray-600'
+                }`}
               />
             </div>
 
             <button
               type="submit"
-              disabled={isLoading}
-              className={`w-full py-3 px-4 text-white font-semibold rounded-xl bg-gradient-to-r from-[#2B7A78] to-[#3AAFA9] hover:from-[#3AAFA9] hover:to-[#2B7A78] transition-all duration-300 ${
-                isLoading ? 'opacity-70 cursor-not-allowed' : 'hover:shadow-lg'
+              disabled={isSubmitDisabled}
+              className={`w-full py-3 px-4 text-white font-semibold rounded-xl bg-gradient-to-r from-[#2B7A78] to-[#3AAFA9] transition-all duration-300 ${
+                isSubmitDisabled
+                  ? 'opacity-50 cursor-not-allowed'
+                  : 'hover:from-[#3AAFA9] hover:to-[#2B7A78] hover:shadow-lg'
               }`}
             >
               {isLoading ? (

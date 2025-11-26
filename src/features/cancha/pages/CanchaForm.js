@@ -191,6 +191,7 @@ export default function CanchaForm({
             </div>
             
             {/* Input para URL de Texto (Opcional) */}
+            {/*
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700">URL Imagen (Portada)</label>
               <input
@@ -202,9 +203,11 @@ export default function CanchaForm({
                 placeholder="https://..."
               />
             </div>
+            */}
           </div>
-          
+          {/*
           {/* NUEVO: Input para SUBIR IMÁGENES REALES */}
+          
           <div className="mt-4 p-4 border-2 border-dashed border-blue-200 bg-blue-50 rounded-lg">
             <label className="flex items-center gap-2 text-sm font-bold text-blue-700 mb-2">
                 <Upload size={18} /> Subir Fotografías (Galería)

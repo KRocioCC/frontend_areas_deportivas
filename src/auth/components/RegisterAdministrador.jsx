@@ -1,7 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import authService from '../services/authService';
 import PasswordInput from '../components/PasswordInput';
+
+// Componente Toast integrado
+const Toast = ({ message, type = 'success', onClose }) => {
+  if (!message) return null;
+
+  const bgColor = type === 'success' ? 'bg-green-500' : 'bg-red-500';
+
+  return (
+    <div className="fixed top-4 right-4 z-50 animate-fade-in-down">
+      <div className={`${bgColor} text-white px-6 py-3 rounded-lg shadow-lg flex items-center`}>
+        <span className="mr-2">{type === 'success' ? '✅' : '⚠️'}</span>
+        <span className="font-medium">{message}</span>
+        <button 
+          onClick={onClose}
+          className="ml-4 text-white hover:text-gray-200 text-lg font-bold"
+        >
+          ×
+        </button>
+      </div>
+    </div>
+  );
+};
 
 const RegisterAdministrador = () => {
   const [formData, setFormData] = useState({
@@ -19,49 +41,188 @@ const RegisterAdministrador = () => {
     cargo: 'Administrador general'
   });
 
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [errors, setErrors] = useState({});
+  const [touched, setTouched] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [toast, setToast] = useState({ message: '', type: 'success', visible: false });
   const navigate = useNavigate();
 
   // Contraseña especial definida en el backend
   const ADMIN_SPECIAL_PASSWORD = 'passwordadmin';
 
+  // Función para mostrar toast
+  const showToast = (message, type = 'success') => {
+    setToast({ message, type, visible: true });
+    setTimeout(() => {
+      setToast(prev => ({ ...prev, visible: false }));
+    }, 5000);
+  };
+
+  const hideToast = () => {
+    setToast(prev => ({ ...prev, visible: false }));
+  };
+
+  // Validaciones en tiempo real
+  useEffect(() => {
+    const newErrors = {};
+
+    // Validar nombre
+    if (touched.nombre && !formData.nombre.trim()) {
+      newErrors.nombre = 'El nombre es requerido';
+    } else if (touched.nombre && formData.nombre.length < 2) {
+      newErrors.nombre = 'El nombre debe tener al menos 2 caracteres';
+    }
+
+    // Validar apellidos
+    if (touched.apellidoPaterno && !formData.apellidoPaterno.trim()) {
+      newErrors.apellidoPaterno = 'El apellido paterno es requerido';
+    }
+
+    if (touched.apellidoMaterno && !formData.apellidoMaterno.trim()) {
+      newErrors.apellidoMaterno = 'El apellido materno es requerido';
+    }
+
+    // Validar teléfono
+    if (touched.telefono) {
+      if (!formData.telefono.trim()) {
+        newErrors.telefono = 'El teléfono es requerido';
+      } else if (!/^\d{8}$/.test(formData.telefono)) {
+        newErrors.telefono = 'El teléfono debe tener exactamente 8 dígitos';
+      }
+    }
+
+    // Validar fecha de nacimiento
+    if (touched.fechaNacimiento) {
+      if (!formData.fechaNacimiento) {
+        newErrors.fechaNacimiento = 'La fecha de nacimiento es requerida';
+      } else {
+        const birthDate = new Date(formData.fechaNacimiento);
+        const today = new Date();
+        const age = today.getFullYear() - birthDate.getFullYear();
+        if (age < 18) {
+          newErrors.fechaNacimiento = 'Debes tener al menos 18 años para ser administrador';
+        }
+      }
+    }
+
+    // Validar dirección
+    if (touched.direccion && !formData.direccion.trim()) {
+      newErrors.direccion = 'La dirección es requerida';
+    } else if (touched.direccion && formData.direccion.length < 10) {
+      newErrors.direccion = 'La dirección debe tener al menos 10 caracteres';
+    }
+
+    // Validar username
+    if (touched.username) {
+      if (!formData.username.trim()) {
+        newErrors.username = 'El nombre de usuario es requerido';
+      } else if (formData.username.length < 3) {
+        newErrors.username = 'El usuario debe tener al menos 3 caracteres';
+      } else if (!/^[a-zA-Z0-9_]+$/.test(formData.username)) {
+        newErrors.username = 'Solo se permiten letras, números y guiones bajos';
+      }
+    }
+
+    // Validar email
+    if (touched.email) {
+      if (!formData.email.trim()) {
+        newErrors.email = 'El email es requerido';
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+        newErrors.email = 'El formato del email no es válido';
+      }
+    }
+
+    // Validar contraseña
+    if (touched.password) {
+      if (!formData.password) {
+        newErrors.password = 'La contraseña es requerida';
+      } else if (formData.password.length < 6) {
+        newErrors.password = 'La contraseña debe tener al menos 6 caracteres';
+      } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
+        newErrors.password = 'Debe contener mayúsculas, minúsculas y números';
+      }
+    }
+
+    // Validar contraseña de administrador
+    if (touched.adminPassword) {
+      if (!formData.adminPassword.trim()) {
+        newErrors.adminPassword = 'La contraseña de administrador es requerida';
+      } else if (formData.adminPassword !== ADMIN_SPECIAL_PASSWORD) {
+        newErrors.adminPassword = 'Contraseña de administrador incorrecta, contacta con el superusuario o verifica nuevamente';
+      }
+    }
+
+    setErrors(newErrors);
+  }, [formData, touched]);
+
   const handleChange = (e) => {
+    const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [e.target.name]: e.target.value
+      [name]: value
     }));
   };
 
-  const validateForm = () => {
-    if (!formData.adminPassword.trim()) {
-      throw new Error('La contraseña de administrador es requerida');
-    }
+  const handleBlur = (field) => {
+    setTouched(prev => ({ ...prev, [field]: true }));
+  };
 
-    if (formData.adminPassword !== ADMIN_SPECIAL_PASSWORD) {
-      throw new Error('Contraseña de administrador incorrecta. Verifica la contraseña especial proporcionada por el superusuario.');
-    }
+  const isFormValid = () => {
+    return Object.keys(errors).length === 0 && 
+           formData.nombre && 
+           formData.apellidoPaterno && 
+           formData.apellidoMaterno && 
+           formData.telefono && 
+           formData.fechaNacimiento && 
+           formData.direccion &&
+           formData.username && 
+           formData.email && 
+           formData.password &&
+           formData.adminPassword;
+  };
 
-    if (formData.password.length < 6) {
-      throw new Error('La contraseña debe tener al menos 6 caracteres');
+  const getInputClassName = (fieldName) => {
+    const baseClass = "w-full px-4 py-3 bg-white/5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3AAFA9] focus:border-transparent transition-all text-white placeholder-gray-400";
+    
+    if (touched[fieldName] && errors[fieldName]) {
+      return `${baseClass} border-red-500`;
+    } else if (touched[fieldName] && !errors[fieldName] && formData[fieldName]) {
+      return `${baseClass} border-green-500`;
     }
+    return `${baseClass} border-gray-600`;
+  };
 
-    if (formData.telefono && !/^\d{8}$/.test(formData.telefono)) {
-      throw new Error('El teléfono debe tener exactamente 8 dígitos');
+  const getAdminPasswordClassName = () => {
+    const baseClass = "w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:border-transparent transition-all text-white placeholder-gray-400 pr-12";
+    
+    if (touched.adminPassword && errors.adminPassword) {
+      return `${baseClass} bg-yellow-500/10 border-yellow-500/50 focus:ring-yellow-500`;
+    } else if (touched.adminPassword && !errors.adminPassword && formData.adminPassword) {
+      return `${baseClass} bg-green-500/10 border-green-500 focus:ring-green-500`;
     }
+    return `${baseClass} bg-yellow-500/10 border-yellow-500/30 focus:ring-yellow-500`;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
+    
+    // Marcar todos los campos como tocados
+    const allTouched = {};
+    Object.keys(formData).forEach(key => {
+      if (key !== 'urlImagen' && key !== 'cargo') {
+        allTouched[key] = true;
+      }
+    });
+    setTouched(allTouched);
+
+    if (!isFormValid()) {
+      showToast('Por favor corrige los errores antes de enviar', 'error');
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      // Validación frontend de la contraseña especial
-      validateForm();
-
       console.log('Enviando solicitud de administrador:', {
         ...formData,
         password: '***',
@@ -70,7 +231,7 @@ const RegisterAdministrador = () => {
 
       const resultado = await authService.registerAdministrador(formData);
       
-      setSuccess('Solicitud de administrador registrada correctamente. Pendiente de aprobación por el superusuario.');
+      showToast('Solicitud de administrador registrada correctamente. Pendiente de aprobación por el superusuario.');
       
       setFormData({
         username: '',
@@ -89,7 +250,7 @@ const RegisterAdministrador = () => {
 
     } catch (err) {
       console.error('Error en registro administrador:', err);
-      setError(err.message || 'Error al registrar administrador. Verifica los datos e intenta nuevamente.');
+      showToast(err.message || 'Error al registrar administrador. Verifica los datos e intenta nuevamente.', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -97,6 +258,15 @@ const RegisterAdministrador = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 py-8">
+      {/* Toast Global */}
+      {toast.visible && (
+        <Toast 
+          message={toast.message} 
+          type={toast.type} 
+          onClose={hideToast}
+        />
+      )}
+
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto">
           
@@ -126,24 +296,6 @@ const RegisterAdministrador = () => {
 
           {/* Form Card */}
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl shadow-2xl p-6 lg:p-8 border border-white/20">
-            {error && (
-              <div className="bg-red-500/20 border border-red-500/30 text-red-200 px-6 py-4 rounded-xl mb-6">
-                <div className="flex items-center">
-                  <span className="text-red-400 mr-3">⚠</span>
-                  <span className="font-medium">{error}</span>
-                </div>
-              </div>
-            )}
-
-            {success && (
-              <div className="bg-green-500/20 border border-green-500/30 text-green-200 px-6 py-4 rounded-xl mb-6">
-                <div className="flex items-center">
-                  <span className="text-green-400 mr-3"></span>
-                  <span className="font-medium">{success}</span>
-                </div>
-              </div>
-            )}
-
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Información Personal */}
               <div className="bg-white/5 p-6 rounded-xl border border-white/10">
@@ -154,83 +306,166 @@ const RegisterAdministrador = () => {
                 
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Nombre *</label>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Nombre *
+                      {touched.nombre && !errors.nombre && formData.nombre && (
+                        <span className="text-green-400 text-xs ml-2">✓ Válido</span>
+                      )}
+                    </label>
+                    {touched.nombre && errors.nombre && (
+                      <div className="text-red-400 text-xs mb-2 flex items-center">
+                        <span className="mr-1">⚠</span>
+                        {errors.nombre}
+                      </div>
+                    )}
                     <input 
                       type="text" 
                       name="nombre" 
                       value={formData.nombre} 
-                      onChange={handleChange} 
-                      required 
-                      className="w-full px-4 py-3 bg-white/5 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3AAFA9] focus:border-transparent transition-all text-white placeholder-gray-400"
+                      onChange={handleChange}
+                      onBlur={() => handleBlur('nombre')}
+                      className={getInputClassName('nombre')}
                       placeholder="Tu nombre"
                     />
                   </div>
+                  
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Apellido Paterno *</label>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Apellido Paterno *
+                      {touched.apellidoPaterno && !errors.apellidoPaterno && formData.apellidoPaterno && (
+                        <span className="text-green-400 text-xs ml-2">✓ Válido</span>
+                      )}
+                    </label>
+                    {touched.apellidoPaterno && errors.apellidoPaterno && (
+                      <div className="text-red-400 text-xs mb-2 flex items-center">
+                        <span className="mr-1">⚠</span>
+                        {errors.apellidoPaterno}
+                      </div>
+                    )}
                     <input 
                       type="text" 
                       name="apellidoPaterno" 
                       value={formData.apellidoPaterno} 
-                      onChange={handleChange} 
-                      required 
-                      className="w-full px-4 py-3 bg-white/5 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3AAFA9] focus:border-transparent transition-all text-white placeholder-gray-400"
+                      onChange={handleChange}
+                      onBlur={() => handleBlur('apellidoPaterno')}
+                      className={getInputClassName('apellidoPaterno')}
                       placeholder="Apellido paterno"
                     />
                   </div>
                 </div>
                 
                 <div className="mt-4">
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Apellido Materno *</label>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Apellido Materno *
+                    {touched.apellidoMaterno && !errors.apellidoMaterno && formData.apellidoMaterno && (
+                      <span className="text-green-400 text-xs ml-2">✓ Válido</span>
+                    )}
+                  </label>
+                  {touched.apellidoMaterno && errors.apellidoMaterno && (
+                    <div className="text-red-400 text-xs mb-2 flex items-center">
+                      <span className="mr-1">⚠</span>
+                      {errors.apellidoMaterno}
+                    </div>
+                  )}
                   <input 
                     type="text" 
                     name="apellidoMaterno" 
                     value={formData.apellidoMaterno} 
-                    onChange={handleChange} 
-                    required 
-                    className="w-full px-4 py-3 bg-white/5 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3AAFA9] focus:border-transparent transition-all text-white placeholder-gray-400"
+                    onChange={handleChange}
+                    onBlur={() => handleBlur('apellidoMaterno')}
+                    className={getInputClassName('apellidoMaterno')}
                     placeholder="Apellido materno"
                   />
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-4 mt-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Teléfono *</label>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Teléfono *
+                      {touched.telefono && !errors.telefono && formData.telefono && (
+                        <span className="text-green-400 text-xs ml-2">✓ Válido</span>
+                      )}
+                    </label>
+                    {touched.telefono && errors.telefono && (
+                      <div className="text-red-400 text-xs mb-2 flex items-center">
+                        <span className="mr-1">⚠</span>
+                        {errors.telefono}
+                      </div>
+                    )}
                     <input 
-                      type="tel" 
+                      type="text" 
                       name="telefono" 
                       value={formData.telefono} 
-                      onChange={handleChange} 
-                      required 
-                      pattern="[0-9]{8}"
-                      title="El teléfono debe tener 8 dígitos"
-                      className="w-full px-4 py-3 bg-white/5 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3AAFA9] focus:border-transparent transition-all text-white placeholder-gray-400"
+                      onChange={handleChange}
+                      onBlur={() => handleBlur('telefono')}
+                      className={getInputClassName('telefono')}
                       placeholder="12345678"
+                      maxLength="8"
                     />
+                    {formData.telefono && (
+                      <div className="text-xs text-gray-400 mt-1">
+                        {formData.telefono.length}/8 dígitos
+                        {formData.telefono.length === 8 && !errors.telefono && (
+                          <span className="text-green-400 ml-2">✓ Completo</span>
+                        )}
+                      </div>
+                    )}
                   </div>
+                  
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Fecha de Nacimiento *</label>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Fecha de Nacimiento *
+                      {touched.fechaNacimiento && !errors.fechaNacimiento && formData.fechaNacimiento && (
+                        <span className="text-green-400 text-xs ml-2">✓ Válido</span>
+                      )}
+                    </label>
+                    {touched.fechaNacimiento && errors.fechaNacimiento && (
+                      <div className="text-red-400 text-xs mb-2 flex items-center">
+                        <span className="mr-1">⚠</span>
+                        {errors.fechaNacimiento}
+                      </div>
+                    )}
                     <input 
                       type="date" 
                       name="fechaNacimiento" 
                       value={formData.fechaNacimiento} 
-                      onChange={handleChange} 
-                      required 
-                      className="w-full px-4 py-3 bg-white/5 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3AAFA9] focus:border-transparent transition-all text-white placeholder-gray-400"
+                      onChange={handleChange}
+                      onBlur={() => handleBlur('fechaNacimiento')}
+                      className={getInputClassName('fechaNacimiento')}
                     />
                   </div>
                 </div>
 
                 <div className="mt-4">
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Dirección *</label>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Dirección *
+                    {touched.direccion && !errors.direccion && formData.direccion && (
+                      <span className="text-green-400 text-xs ml-2">✓ Válido</span>
+                    )}
+                  </label>
+                  {touched.direccion && errors.direccion && (
+                    <div className="text-red-400 text-xs mb-2 flex items-center">
+                      <span className="mr-1">⚠</span>
+                      {errors.direccion}
+                    </div>
+                  )}
                   <input 
                     type="text" 
                     name="direccion" 
                     value={formData.direccion} 
-                    onChange={handleChange} 
-                    required 
-                    className="w-full px-4 py-3 bg-white/5 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3AAFA9] focus:border-transparent transition-all text-white placeholder-gray-400"
+                    onChange={handleChange}
+                    onBlur={() => handleBlur('direccion')}
+                    className={getInputClassName('direccion')}
                     placeholder="Dirección completa"
                   />
+                  {formData.direccion && (
+                    <div className="text-xs text-gray-400 mt-1">
+                      {formData.direccion.length}/10 caracteres mínimos
+                      {formData.direccion.length >= 10 && !errors.direccion && (
+                        <span className="text-green-400 ml-2">✓ Suficiente</span>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 <input type="hidden" name="cargo" value="Administrador general" />
@@ -245,52 +480,113 @@ const RegisterAdministrador = () => {
                 
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Nombre de Usuario *</label>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Nombre de Usuario *
+                      {touched.username && !errors.username && formData.username && (
+                        <span className="text-green-400 text-xs ml-2">✓ Válido</span>
+                      )}
+                    </label>
+                    {touched.username && errors.username && (
+                      <div className="text-red-400 text-xs mb-2 flex items-center">
+                        <span className="mr-1">⚠</span>
+                        {errors.username}
+                      </div>
+                    )}
                     <input 
                       type="text" 
                       name="username" 
                       value={formData.username} 
-                      onChange={handleChange} 
-                      required 
-                      minLength="3"
-                      className="w-full px-4 py-3 bg-white/5 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3AAFA9] focus:border-transparent transition-all text-white placeholder-gray-400"
+                      onChange={handleChange}
+                      onBlur={() => handleBlur('username')}
+                      className={getInputClassName('username')}
                       placeholder="usuario123"
                     />
+                    {formData.username && (
+                      <div className="text-xs text-gray-400 mt-1">
+                        {formData.username.length}/3 caracteres mínimos
+                        {formData.username.length >= 3 && !errors.username && (
+                          <span className="text-green-400 ml-2">✓ Suficiente</span>
+                        )}
+                      </div>
+                    )}
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Correo Electrónico *</label>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Correo Electrónico *
+                      {touched.email && !errors.email && formData.email && (
+                        <span className="text-green-400 text-xs ml-2">✓ Válido</span>
+                      )}
+                    </label>
+                    {touched.email && errors.email && (
+                      <div className="text-red-400 text-xs mb-2 flex items-center">
+                        <span className="mr-1">⚠</span>
+                        {errors.email}
+                      </div>
+                    )}
                     <input 
                       type="email" 
                       name="email" 
                       value={formData.email} 
-                      onChange={handleChange} 
-                      required 
-                      className="w-full px-4 py-3 bg-white/5 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3AAFA9] focus:border-transparent transition-all text-white placeholder-gray-400"
+                      onChange={handleChange}
+                      onBlur={() => handleBlur('email')}
+                      className={getInputClassName('email')}
                       placeholder="tu@email.com"
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Contraseña *</label>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Contraseña *
+                      {touched.password && !errors.password && formData.password && (
+                        <span className="text-green-400 text-xs ml-2">✓ Válida</span>
+                      )}
+                    </label>
+                    {touched.password && errors.password && (
+                      <div className="text-red-400 text-xs mb-2 flex items-center">
+                        <span className="mr-1">⚠</span>
+                        {errors.password}
+                      </div>
+                    )}
                     <PasswordInput
                       name="password"
                       value={formData.password}
                       onChange={handleChange}
+                      onBlur={() => handleBlur('password')}
                       required
-                      placeholder="Mínimo 6 caracteres"
+                      placeholder="Mínimo 6 caracteres con mayúsculas, minúsculas y números"
                       minLength="6"
-                      className="bg-white/5 border border-gray-600 focus:ring-2 focus:ring-[#3AAFA9] focus:border-transparent text-white placeholder-gray-400"
+                      className={getInputClassName('password').replace('py-3', 'py-3')}
                     />
+                    {formData.password && (
+                      <div className="text-xs text-gray-400 mt-1">
+                        <div>Longitud: {formData.password.length}/6 caracteres {formData.password.length >= 6 && '✓'}</div>
+                        {formData.password.length >= 6 && (
+                          <>
+                            <div className={/(?=.*[a-z])/.test(formData.password) ? 'text-green-400' : 'text-red-400'}>
+                              • {/(?=.*[a-z])/.test(formData.password) ? '✓' : '✗'} Minúsculas
+                            </div>
+                            <div className={/(?=.*[A-Z])/.test(formData.password) ? 'text-green-400' : 'text-red-400'}>
+                              • {/(?=.*[A-Z])/.test(formData.password) ? '✓' : '✗'} Mayúsculas
+                            </div>
+                            <div className={/(?=.*\d)/.test(formData.password) ? 'text-green-400' : 'text-red-400'}>
+                              • {/(?=.*\d)/.test(formData.password) ? '✓' : '✗'} Números
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    )}
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">URL de Imagen (Opcional)</label>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      URL de Imagen (Opcional)
+                    </label>
                     <input 
                       type="url" 
                       name="urlImagen" 
                       value={formData.urlImagen} 
-                      onChange={handleChange} 
+                      onChange={handleChange}
                       className="w-full px-4 py-3 bg-white/5 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3AAFA9] focus:border-transparent transition-all text-white placeholder-gray-400"
                       placeholder="https://ejemplo.com/imagen.jpg"
                     />
@@ -308,16 +604,26 @@ const RegisterAdministrador = () => {
                 <div>
                   <label className="block text-sm font-medium text-yellow-300 mb-2">
                     Contraseña Especial de Administrador *
+                    {touched.adminPassword && !errors.adminPassword && formData.adminPassword && (
+                      <span className="text-green-400 text-xs ml-2">✓ Correcta</span>
+                    )}
                   </label>
+                  {touched.adminPassword && errors.adminPassword && (
+                    <div className="text-red-400 text-xs mb-2 flex items-center">
+                      <span className="mr-1">⚠</span>
+                      {errors.adminPassword}
+                    </div>
+                  )}
                   <PasswordInput
                     name="adminPassword"
                     value={formData.adminPassword}
                     onChange={handleChange}
+                    onBlur={() => handleBlur('adminPassword')}
                     required
                     placeholder="Ingresa la contraseña especial para administradores"
-                    minLength="6"
-                    className="bg-yellow-500/10 border border-yellow-500/30 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 text-white placeholder-yellow-300"
+                    className={getAdminPasswordClassName().replace('pr-12', '')} // Remover pr-12 porque PasswordInput ya lo tiene
                   />
+                  
                   <div className="mt-3 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
                     <p className="text-yellow-300 text-sm font-medium flex items-center">
                       <span className="mr-2">💡</span>
@@ -334,9 +640,11 @@ const RegisterAdministrador = () => {
 
               <button 
                 type="submit" 
-                disabled={isLoading}
-                className={`w-full py-4 px-6 text-white font-semibold rounded-xl bg-gradient-to-r from-[#2B7A78] to-[#3AAFA9] hover:from-[#3AAFA9] hover:to-[#2B7A78] transition-all duration-300 ${
-                  isLoading ? 'opacity-70 cursor-not-allowed' : 'hover:shadow-lg'
+                disabled={isLoading || !isFormValid()}
+                className={`w-full py-4 px-6 text-white font-semibold rounded-xl transition-all duration-300 ${
+                  isLoading || !isFormValid()
+                    ? 'bg-gray-600 opacity-50 cursor-not-allowed'
+                    : 'bg-gradient-to-r from-[#2B7A78] to-[#3AAFA9] hover:from-[#3AAFA9] hover:to-[#2B7A78] hover:shadow-lg'
                 }`}
               >
                 {isLoading ? (
