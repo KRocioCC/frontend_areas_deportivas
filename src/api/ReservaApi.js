@@ -139,30 +139,46 @@ export const healthCheckReserva = async () => {
 /**
 obtener reservas por cancha
  */
+
 export const getReservasPorCancha = async (idCancha) => {
   const res = await api.get(`${URL_BASE}/${idCancha}/reservas`);
   return res.data;
 };
+
 /**RESERVAS DE UN CLIENTE POR ESTADO */
+
 export const getReservasPorClienteYEstado = async (idCliente, estado) => {
   const res = await api.get(`${URL_BASE}/cliente/${idCliente}/estado/${estado}`);
   return res.data;
 };
 
 export const getReservasClienteOrdenAsc = async (idCliente) => {
-  const res = await api.get(`${URL_BASE}/cliente/${idCliente}/orden/fecha-creacion/asc`);
+  const res = await api.get(`${URL_BASE}/cliente/${idCliente}/orden/asc`);
   return res.data;
 };
 
 export const getReservasClienteOrdenDesc = async (idCliente) => {
-  const res = await api.get(`${URL_BASE}/cliente/${idCliente}/orden/fecha-creacion/desc`);
+  const res = await api.get(`${URL_BASE}/cliente/${idCliente}/orden/desc`);
+  return res.data;
+};
+//pasarle el id
+// Buscar por cancha
+// services/reservaService.js
+
+// Por nombre de cancha (solo del cliente)
+export const getReservasPorClienteYNombreCancha = async (idCliente, nombre) => {
+  const res = await api.get(
+    `${URL_BASE}/cliente/${idCliente}/cancha/${encodeURIComponent(nombre)}`
+  );
   return res.data;
 };
 
-
-// Buscar por cancha
-export const getReservasPorNombreCancha = async (nombre) => {
-  const res = await api.get(`${URL_BASE}/cancha/${nombre}`);
+// Por rango de fechas (solo del cliente)
+export const getReservasPorClienteEnRango = async (idCliente, inicio, fin) => {
+  const res = await api.get(
+    `${URL_BASE}/cliente/${idCliente}/rango-fechas`,
+    { params: { inicio, fin } }
+  );
   return res.data;
 };
 

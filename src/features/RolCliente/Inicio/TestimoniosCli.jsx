@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useTheme } from "../../../context/ThemeContext";
-import { getComentarios } from "../../../api/ComentarioApi";
+import { getComentariosMayorCalificacionRecientes } from "../../../api/ComentarioApi"; // ✅ Endpoint corregido
 import { Quote, User } from "lucide-react";
 
 export default function TestimoniosCli() {
@@ -13,16 +13,29 @@ export default function TestimoniosCli() {
   useEffect(() => {
     async function cargarTestimonios() {
       try {
-        const data = await getComentarios();
-        setTestimonios(data.slice(0, 9));
+        const data = await getComentariosMayorCalificacionRecientes();
+        // Tomamos máximo 5 testimonios
+        setTestimonios(data.slice(0, 5));
       } catch (err) {
-        console.error("Error cargando testimonios:", err);
+        console.error("Error cargando testimonios destacados:", err);
+        setTestimonios([]);
       } finally {
         setLoading(false);
       }
     }
     cargarTestimonios();
   }, []);
+
+  // Mapeo seguro: usa contenido, persona.nombre, etc.
+  const testimoniosMapeados = testimonios.map(t => ({
+    idComentario: t.idComentario,
+    comentario: t.contenido, // ✅ API usa "contenido"
+    fecha: t.fecha,
+    calificacion: t.calificacion,
+    usuario: {
+      nombre: t.persona?.nombre || "Jugador", // ✅ viene en "persona"
+    },
+  }));
 
   return (
     <section
@@ -32,7 +45,7 @@ export default function TestimoniosCli() {
       }`}
     >
       <div className="max-w-7xl mx-auto relative z-10">
-        {/* Título */}
+        {/* Título - SIN CAMBIOS */}
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -51,21 +64,22 @@ export default function TestimoniosCli() {
             </span>
           </h2>
           <p className="mt-6 text-xl md:text-2xl opacity-90" style={{ fontFamily: "var(--font-Alumni)" }}>
-            Solo comentarios reales con 5 estrellas
+            Solo comentarios reales con las mejores calificaciones
           </p>
         </motion.div>
 
         {loading ? (
+          // Skeleton - SIN CAMBIOS
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[...Array(6)].map((_, i) => (
+            {[...Array(5)].map((_, i) => (
               <div key={i} className="h-64 bg-gray-200 dark:bg-gray-800 rounded-3xl animate-pulse" />
             ))}
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Columna testimonios */}
+            {/* Columna testimonios - MISMO DISEÑO */}
             <div className="flex flex-col gap-4">
-              {testimonios.map((t, index) => {
+              {testimoniosMapeados.map((t, index) => {
                 const isLeft = index % 2 === 0;
                 return (
                   <motion.div
@@ -87,7 +101,7 @@ export default function TestimoniosCli() {
                       <p className="text-lg italic leading-relaxed mb-4" style={{ fontFamily: "var(--font-Balo)" }}>
                         "{t.comentario}"
                       </p>
-                      <div className="flex items-center gap-24">
+                      <div className="flex items-center gap-4">
                         {isLeft && (
                           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#41bfb2] to-[#2C7366] flex items-center justify-center">
                             <User className="w-6 h-6 text-white" />
@@ -95,7 +109,7 @@ export default function TestimoniosCli() {
                         )}
                         <div className="text-sm">
                           <p className="font-bold" style={{ fontFamily: "var(--font-Alumni)" }}>
-                            {t.usuario?.nombre || "Jugador"}
+                            {t.usuario.nombre}
                           </p>
                           <p className="opacity-70">
                             {new Date(t.fecha).toLocaleDateString("es-ES", {
@@ -117,19 +131,19 @@ export default function TestimoniosCli() {
               })}
             </div>
 
-            {/* Columna imagen */}
+            {/* Columna imagen - SIN CAMBIOS */}
             <div className="flex justify-center items-start">
               <div
                 className="w-full aspect-square rounded-2xl bg-gray-300 dark:bg-gray-700"
                 style={{ maxWidth: '500px' }}
               >
-                {/* Aquí agregarás tu imagen */}
+                {/* Imagen placeholder */}
               </div>
             </div>
           </div>
         )}
 
-        {testimonios.length === 0 && !loading && (
+        {testimoniosMapeados.length === 0 && !loading && (
           <p className="text-center text-2xl opacity-70" style={{ fontFamily: "var(--font-Balo)" }}>
             Pronto tendremos los primeros testimonios
           </p>
