@@ -151,7 +151,7 @@ export default function AreadeportivaForm({
   const title = computedMode === "view" ? "Ver Área" : computedMode === "edit" ? "Editar Área" : "Nueva Área Deportiva";
 
   return (
-    <form className="Areadeportiva-form p-4" onSubmit={handleSubmit}>
+    <form className="Areadeportiva-form card text-gray-900 p-4" onSubmit={handleSubmit}>
       <h3 className="text-xl font-bold mb-4">{title}</h3>
 
       <div className="form-row mb-3">

@@ -68,7 +68,7 @@ export default function UploadAreaImages({ areaId, onUploaded }) {
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto">
+    <div className="w-full max-w-2xl mx-auto card text-gray-900">
       <label className="block text-sm font-medium text-gray-700 mb-2">Imágenes de la Área Deportiva</label>
       <input type="file" accept="image/*" multiple onChange={handleSelect} />
 

@@ -8,6 +8,13 @@ export async function getCanchas() {
   return res.data;
 }
 
+
+// Obtener canchas activas por área
+export async function getCanchasActivasPorArea(idArea) {
+  const res = await api.get(`${API_URL}/area/${idArea}/activas`);
+  return res.data;
+}
+
 //  Obtener una cancha por ID
 export async function getCancha(id) {
   const res = await api.get(`${API_URL}/porid/${id}`);
