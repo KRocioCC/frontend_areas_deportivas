@@ -181,7 +181,7 @@ export default function Cancha() {
   }
 
   return (
-    <div className="bg-white min-h-screen pb-6">
+    <div className={`${isDarkMode ? 'bg-[#0f1213]' : 'bg-white'} min-h-screen pb-6 transition-colors duration-300`}>
       {/* HERO CON CARRUSEL */}
       <div className="relative w-full h-64 md:h-80 lg:h-96 overflow-hidden">
         {/* Imagen principal */}

@@ -8,7 +8,7 @@ import {
   FaLayerGroup 
 } from "react-icons/fa6";
 import { useTheme } from "../../../context/ThemeContext";
-
+//{/*{ icon: <FaClock style={{ color: iconColor }} />, titulo: "Horario", valor: cancha.horaInicio ? `${cancha.horaInicio} - ${cancha.horaFin}` : "No especificado" },*/}
 export default function CanchaDetallesExtras({ cancha }) {
   const { isDarkMode } = useTheme();
 
@@ -24,7 +24,7 @@ export default function CanchaDetallesExtras({ cancha }) {
     { icon: <FaToolbox style={{ color: iconColor }} />, titulo: "Mantenimiento", valor: cancha.mantenimiento },
     { icon: <FaLightbulb style={{ color: iconColor }} />, titulo: "Iluminación", valor: cancha.iluminacion === "Si" ? "Sí" : "No" },
     { icon: <FaUmbrellaBeach style={{ color: iconColor }} />, titulo: "Cubierta", valor: cancha.cubierta === "Si" ? "Sí" : "No" },
-    { icon: <FaClock style={{ color: iconColor }} />, titulo: "Horario", valor: cancha.horaInicio ? `${cancha.horaInicio} - ${cancha.horaFin}` : "No especificado" },
+    { icon: <FaClock style={{ color: iconColor }} />, titulo: "Horario",valor: cancha.areaDeportiva?.horaInicioArea? `${cancha.areaDeportiva.horaInicioArea} - ${cancha.areaDeportiva.horaFinArea}`: "No especificado"},
   ];
 
   return (

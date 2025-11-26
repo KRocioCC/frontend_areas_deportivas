@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../../../context/ThemeContext";
+import { useToast } from "../../../context/ToastContext";
 import {
   Phone,
   MapPin,
@@ -11,7 +12,7 @@ import {
   SquareDashed,
   X
 } from "lucide-react";
-import { FaTimes, FaPhone, FaMapMarkerAlt, FaClock, FaStar, FaFutbol, FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import {  FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { getCanchasPorArea } from "../../../api/CanchaApi";
 
 export default function AreaModal({ area, onClose }) {
@@ -19,6 +20,7 @@ export default function AreaModal({ area, onClose }) {
   const [canchas, setCanchas] = useState([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const navigate = useNavigate();
+  const { showToast } = useToast();
 
   // Función para obtener la URL de la imagen actual del área
   const getCurrentImageUrl = () => {
@@ -88,7 +90,7 @@ export default function AreaModal({ area, onClose }) {
       if (!area?.idAreadeportiva) return;
       try {
         const data = await getCanchasPorArea(area.idAreadeportiva);
-        console.log("✅ Canchas recibidas:", data);
+        //console.log("✅ Canchas recibidas:", data);
         
         // Asegurarnos de que tenemos un array de canchas
         const canchaArray = Array.isArray(data) ? data : data?.canchas || [];
@@ -100,6 +102,7 @@ export default function AreaModal({ area, onClose }) {
         
         setCanchas(canchaArray.slice(0, 3));
       } catch (error) {
+        showToast("Error al cargar canchas. Intenta recargar la página.", "error");
         console.error("❌ Error al obtener canchas:", error);
         setCanchas([]);
       }
@@ -294,6 +297,7 @@ export default function AreaModal({ area, onClose }) {
                       <div
                         key={cancha.idCancha || i}
                         className="relative rounded-lg overflow-hidden group cursor-pointer"
+                        onClick={() => navigate(`/canchacli/detalle/${cancha.idCancha}`)}
                       >
                         <img
                           src={cancha.urlImagen || "/defaults/cancha-default.jpg"}

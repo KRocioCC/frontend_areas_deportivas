@@ -2,8 +2,10 @@
 import { memo } from "react";
 import { motion } from "framer-motion";
 import { EyeIcon } from '@heroicons/react/24/outline';
+import { useTheme } from "../../../context/ThemeContext";
 
 // memo() evita re-renders si props no cambian
+
 const AreaCard = memo(({ area, index, currentIndex, onClick }) => {
   // Función para obtener la URL de la imagen
   const getImageUrl = () => {
@@ -27,6 +29,23 @@ const AreaCard = memo(({ area, index, currentIndex, onClick }) => {
     e.target.onerror = null;
     e.target.src = "/defaults/area-default.jpg";
   };
+
+  let estaAbierta = false;
+  if (area?.horaInicioArea && area?.areaDeportiva?.horaFinArea) {
+    const ahora = new Date();
+    const horaActual = ahora.getHours();
+    const minutoActual = ahora.getMinutes();
+    const tiempoActual = horaActual * 60 + minutoActual;
+
+    const [hInicio, mInicio] = area.horaInicioArea.split(':').map(Number);
+    const [hFin, mFin] = area.horaFinArea.split(':').map(Number);
+
+    const inicioMin = hInicio * 60 + mInicio;
+    const finMin = hFin * 60 + mFin;
+
+    estaAbierta = tiempoActual >= inicioMin && tiempoActual <= finMin;
+  }
+  const { isDarkMode } = useTheme();
 
   return (
     <motion.div
@@ -107,13 +126,18 @@ const AreaCard = memo(({ area, index, currentIndex, onClick }) => {
 
           {/* Estado */}
           <div className="flex justify-between items-center mt-2">
-            <span className={`text-xs px-2 py-1 rounded-full ${
-              area.estado 
-                ? 'bg-green-500/80 text-white' 
-                : 'bg-red-500/80 text-white'
-            }`}>
-              {area.estado ? 'Abierto' : 'Cerrado'}
-            </span>
+            
+              <span
+                className="px-3 py-1.5 rounded-lg text-sm font-medium"
+                style={{
+                  backgroundColor: estaAbierta
+                    ? (isDarkMode ? '#30786bf2' : '#41bfb2d3')   // Verde suave
+                    : (isDarkMode ? '#8a2628e3' : '#d6172720'), 
+                  color: estaAbierta ? '#d4e3e1ff' : '#c4dcddff'
+                }}
+              >
+                {estaAbierta ? "Abierto" : "Cerrado"}
+              </span>
             
             {/* Contador de imágenes */}
             {area.imagenes && area.imagenes.length > 0 && (

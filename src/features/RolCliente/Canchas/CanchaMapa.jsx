@@ -1,90 +1,50 @@
 // src/features/RolCliente/Canchas/CanchaMapa.jsx
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 import { MapPin } from "lucide-react";
-import { useState } from "react";
 
 export default function CanchaMapa({ cancha }) {
   const lat = parseFloat(cancha.areaDeportiva?.latitud || -16.5);
   const lng = parseFloat(cancha.areaDeportiva?.longitud || -68.15);
+  const nombreArea = cancha.areaDeportiva?.nombreArea || "Área Deportiva";
   const direccion = cancha.areaDeportiva?.direccion || "Dirección no disponible";
-  const nombreArea = cancha.areaDeportiva?.nombre || "Área Deportiva";
 
-  // URL del mapa estático de OpenStreetMap
-  const mapUrl = `https://image.maps.ls.hereapi.com/mia/1.6/mapview?lat=${lat}&lon=${lng}&z=15&w=400&h=200&apiKey=YOUR_API_KEY`;
+  // Icono personalizado para el marcador
+  const icon = L.icon({
+    iconUrl: "https://cdn-icons-png.flaticon.com/512/684/684908.png",
+    iconSize: [32, 32],
+    iconAnchor: [16, 32],
+  });
 
-  // Si usas HERE Maps, puedes obtener una API Key gratuita temporalmente.
-  // Pero si prefieres OpenStreetMap, no hay API oficial para mapas estáticos,
-  // así que la opción 1 (solo texto) es más confiable.
-
-  // Para esta opción, usaremos un iframe con OpenStreetMap
-  const osmUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${lng - 0.01}%2C${lat - 0.01}%2C${lng + 0.01}%2C${lat + 0.01}&layer=mapnik`;
+  // Link directo a Google Maps
+  const googleMapsLink = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
 
   return (
-    <div className="bg-[var(--color-p-6)] rounded-lg p-4 shadow-sm">
+    <div className="bg-[var(--color-p-6)] rounded-lg p-4 z-1 shadow-sm">
       <h3 className="font-[var(--font-Oswald)] text-lg text-[var(--primary)] mb-3 flex items-center gap-2">
-        <MapPin size={20} />
-        Ubicación
+        <MapPin size={20} /> Nos encontramos en : 
       </h3>
-      <div className="space-y-2">
-        <p className="text-sm text-gray-700">
-          <strong>Área:</strong> {nombreArea}
-        </p>
-        <p className="text-sm text-gray-700">
-          <strong>Dirección:</strong> {direccion}
-        </p>
-      </div>
 
-      {/* Mapa interactivo embebido */}
-      <div className="mt-3 rounded-lg overflow-hidden">
-        <iframe
-          width="100%"
-          height="200"
-          frameBorder="0"
-          scrolling="no"
-          marginHeight="0"
-          marginWidth="0"
-          src={osmUrl}
-          title="Mapa de ubicación"
-        ></iframe>
+      <div className="map-wrapper" style={{ height: "250px", width: "100%", borderRadius: "12px", overflow: "hidden" }}>
+        <MapContainer center={[lat, lng]} zoom={15} style={{ height: "100%", width: "100%" }}>
+          <TileLayer
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution="© OpenStreetMap contributors"
+          />
+          <Marker position={[lat, lng]} icon={icon}>
+            <Popup>
+              <strong>{nombreArea}</strong>
+              <br />
+              {direccion}
+              <br />
+              <a href={googleMapsLink} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
+                Abrir en Google Maps
+              </a>
+            </Popup>
+          </Marker>
+        </MapContainer>
       </div>
-
-      <a
-        href={`https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}#map=16/${lat}/${lng}`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-sm text-[var(--secondary)] hover:underline mt-2 block"
-      >
-        Abrir en OpenStreetMap
-      </a>
     </div>
   );
-
-//import { LoadScript, GoogleMap, Marker } from "@react-google-maps/api";
-{/*
-export default function CanchaMapa({ cancha }) {
-
-  const lat = parseFloat(cancha.areaDeportiva?.latitud || -16.5);
-  const lng = parseFloat(cancha.areaDeportiva?.longitud || -68.15);
-  const center = { lat, lng };
-
-  return (
-
-    <div className="bg-[var(--color-p-6)] rounded-lg p-4 shadow-sm">
-      <h3 className="font-[var(--font-Oswald)] text-lg text-[var(--primary)] mb-3">Ubicación</h3>
-      <LoadScript googleMapsApiKey="TU_API_KEY_DE_GOOGLE_MAPS">
-        <GoogleMap
-          mapContainerStyle={{ width: "100%", height: "250px", borderRadius: "12px" }}
-          center={center}
-          zoom={15}
-          options={{ disableDefaultUI: true, zoomControl: true }}
-        >
-          <Marker position={center} />
-        </GoogleMap>
-      </LoadScript>
-    </div>
-      
-  );
-
-}
-*/}
-
 }

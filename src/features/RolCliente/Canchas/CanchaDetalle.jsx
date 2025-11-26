@@ -23,7 +23,7 @@ export default function CanchaDetalle() {
   const [disciplina, setDisciplina] = useState(null);
   const [activeTab, setActiveTab] = useState("descripcion");
   const [isEquipamientoOpen, setIsEquipamientoOpen] = useState(false);
-  const { addToast } = useToast(); 
+    const { showToast } = useToast();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -42,11 +42,7 @@ export default function CanchaDetalle() {
   const handleReservar = () => {
     if (!disciplina) {
       //setError("Por favor, selecciona una disciplina antes de reservar.");
-      addToast({
-        message: "Por favor, selecciona una disciplina antes de reservar.",
-        type: "warning",
-        duration: 4000
-      });
+      showToast(" Por favor, selecciona una disciplina antes de reservar.", "warning");
       return;
     }
     setError("");
@@ -68,6 +64,7 @@ export default function CanchaDetalle() {
   const warningColor = isDarkMode ? '#f35734' : '#f28627';
   const errorColor = isDarkMode ? '#8a2628' : '#d61727';
   const spinnerColor = isDarkMode ? '#f35734' : '#f28627';
+
 
   if (loading) {
     return (
@@ -99,6 +96,22 @@ export default function CanchaDetalle() {
       </div>
     );
   }
+
+  let estaAbierta = false;
+  if (cancha?.areaDeportiva?.horaInicioArea && cancha?.areaDeportiva?.horaFinArea) {
+    const ahora = new Date();
+    const horaActual = ahora.getHours();
+    const minutoActual = ahora.getMinutes();
+    const tiempoActual = horaActual * 60 + minutoActual;
+
+    const [hInicio, mInicio] = cancha.areaDeportiva.horaInicioArea.split(':').map(Number);
+    const [hFin, mFin] = cancha.areaDeportiva.horaFinArea.split(':').map(Number);
+
+    const inicioMin = hInicio * 60 + mInicio;
+    const finMin = hFin * 60 + mFin;
+
+    estaAbierta = tiempoActual >= inicioMin && tiempoActual <= finMin;
+  }
   const scrollToSection = (id) => {
     const section = document.getElementById(id);
     if (section) {
@@ -112,13 +125,14 @@ export default function CanchaDetalle() {
       <div className="relative w-full max-w-6xl mx-auto mt-4 px-4">
         <button
           onClick={() => navigate(-1)}
-          className="absolute top-4 left-4 flex items-center gap-2 z-20 font-semibold"
+          className="absolute top-6 left-6 flex items-center gap-2 z-30 font-semibold px-4 py-2 rounded-lg shadow-lg backdrop-blur-md transition"
           style={{
-            fontFamily: 'var(--font-josefin)',
-            color: isDarkMode ? '#ffffffff' : '#f9f9f9ff'
+            backgroundColor: isDarkMode ? "rgba(167, 3, 3, 0.55)" : "rgba(237, 13, 13, 0.75)",
+            color: isDarkMode ? "#ffffff" : "#fafafaff",
+            fontFamily: "var(--font-josefin)",
           }}
         >
-          <ChevronLeft className="w-4 h-4" /> Volver
+          <ChevronLeft className="w-5 h-5" /> Volver
         </button>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -309,11 +323,13 @@ export default function CanchaDetalle() {
               <span
                 className="px-3 py-1.5 rounded-lg text-sm font-medium"
                 style={{
-                  backgroundColor: cancha.estado ? (isDarkMode ? '#2C736640' : '#41bfb220') : (isDarkMode ? '#8a262840' : '#d6172720'),
-                  color: cancha.estado ? accentColor : errorColor
+                  backgroundColor: estaAbierta
+                    ? (isDarkMode ? '#2C736640' : '#41bfb220')   // Verde suave
+                    : (isDarkMode ? '#8a262840' : '#d6172720'), 
+                  color: estaAbierta ? accentColor : errorColor
                 }}
               >
-                {cancha.estado ? "Abierto" : "Cerrado"}
+                {estaAbierta ? "Abierto" : "Cerrado"}
               </span>
             </div>
 
@@ -354,7 +370,7 @@ export default function CanchaDetalle() {
               <div className={`flex-1 min-w-[140px] ${cardBg} ${borderColor} border rounded-xl p-4`}>
                 <p className={`text-sm ${secondaryText}`}>Costo/Hora</p>
                 <p className="text-xl font-bold mt-1" style={{ color: warningColor }}>
-                  S/ {cancha.costoHora?.toFixed(2) || '0.00'}
+                  {cancha.costoHora?.toFixed(2) || '0.00'} Bs
                 </p>
               </div>
               <div className={`flex-1 min-w-[140px] ${cardBg} ${borderColor} border rounded-xl p-4`}>
@@ -405,17 +421,17 @@ export default function CanchaDetalle() {
           <div className="mt-8 flex justify-center">
             <button
               onClick={handleReservar}
-              disabled={!disciplina}
-              className="px-8 py-3 rounded-lg font-semibold text-white shadow-md flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed transition-all"
+              className={`px-8 py-3 rounded-lg font-semibold text-white shadow-md flex items-center justify-center gap-2 transition-all`}
               style={{
                 fontFamily: 'var(--font-josefin)',
-                backgroundColor: disciplina ? errorColor : (isDarkMode ? '#4a5568' : '#9ca3af'),
+                backgroundColor: disciplina ? errorColor : warningColor,
                 boxShadow: '0 4px 14px rgba(0,0,0,0.18)',
                 minWidth: '180px'
               }}
             >
               Reservar Ya
             </button>
+
           </div>
         </div>
       </div>
