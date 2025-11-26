@@ -7,7 +7,7 @@ const RegisterTypeSelector = () => {
   const Card = ({ title, description, features, onClick, borderColor, hoverColor }) => (
     <div 
       onClick={onClick}
-      className={`p-8 border-2 ${borderColor} rounded-xl cursor-pointer bg-white/10 backdrop-blur-sm hover:shadow-2xl transition-all duration-300 group border-white/20`}
+      className={`p-8 border-2 ${borderColor} rounded-xl cursor-pointer bg-white/10 backdrop-blur-sm hover:shadow-2xl transition-all duration-300 group border-white/20 hover:scale-105 transform`}
     >
       <div className="text-center">
         <div className={`w-16 h-16 mx-auto mb-4 rounded-full ${hoverColor} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
@@ -59,7 +59,7 @@ const RegisterTypeSelector = () => {
             description="Acceso rápido para reservar canchas deportivas"
             features={[
               "Reserva canchas inmediatamente",
-              "Sin necesidad de aprobación",
+              "Ingresa directamente",
               "Gestión de tus reservas personales",
               "Acceso 24/7"
             ]}
@@ -73,9 +73,9 @@ const RegisterTypeSelector = () => {
             description="Para gestionar áreas deportivas y canchas"
             features={[
               "Requiere contraseña especial",
-              "Aprobación del superusuario",
-              "Gestión de áreas deportivas",
-              "Supervisión de canchas"
+              "Solicita la aprobacion al superusuario",
+              "Gestiona tu area deportiva",
+              "Supervisa tus canchas, reservas y mucho mas"
             ]}
             onClick={() => navigate('/register/administrador')}
             borderColor="border-[#3AAFA9]"

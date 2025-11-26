@@ -4,6 +4,7 @@ const PasswordInput = ({
   name, 
   value, 
   onChange, 
+  onBlur,
   placeholder, 
   required, 
   minLength, 
@@ -22,10 +23,11 @@ const PasswordInput = ({
         name={name}
         value={value}
         onChange={onChange}
+        onBlur={onBlur}
         required={required}
         minLength={minLength}
         placeholder={placeholder}
-        className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#2B7A78] focus:border-[#2B7A78] transition-colors pr-12 ${className}`}
+        className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-1 focus:ring-[#2B7A78] focus:border-[#2B7A78] transition-colors pr-12 ${className}`}
       />
       <button
         type="button"
