@@ -18,7 +18,7 @@ export default function ReservaConfirmacion() {
   const { state } = useLocation();
   const { reserva: reservaRaw, cliente } = state || {};
 
-  const { isDarkMode } = useTheme(); // asumo que el hook devuelve isDarkMode (adapta si tu hook tiene otra forma)
+  const { isDarkMode } = useTheme();
   const { showToast } = useToast();
 
   const [reserva, setReserva] = useState(null);
@@ -29,7 +29,6 @@ export default function ReservaConfirmacion() {
   const [mostrarModal, setMostrarModal] = useState(false);
   const [cargando, setCargando] = useState(false);
 
-  // Logs iniciales y validación
   useEffect(() => {
     console.log("Datos recibidos en Confirmación:", { reservaRaw, cliente });
     if (!reservaRaw || !cliente) {
@@ -38,7 +37,6 @@ export default function ReservaConfirmacion() {
     }
   }, [reservaRaw, cliente, navigate]);
 
-  // Procesar reserva + cargar cancha y disciplina (LOGICA NO MODIFICADA)
   useEffect(() => {
     if (!reservaRaw) return;
 
@@ -187,25 +185,6 @@ export default function ReservaConfirmacion() {
               <p className="mt-1 text-sm" style={{ color: isDarkMode ? "rgba(255,255,255,0.72)" : "#575757", fontFamily: "var(--font-Balo)" }}>
                 Revisa los detalles abajo y confirma tu reserva. Los cambios no afectarán la lógica ni las llamadas a la API.
               </p>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => {
-                  showToast("Volviendo a la pantalla anterior", "info");
-                  navigate(-1);
-                }}
-                className="flex items-center gap-2 px-3 py-2 rounded-md border transition-transform active:scale-[0.97]"
-                style={{
-                  fontFamily: "var(--font-josefin)",
-                  borderColor: headerAccent,
-                  color: headerAccent,
-                  background: isDarkMode ? "transparent" : "transparent",
-                }}
-              >
-                <ArrowLeft size={18} />
-                <span className="text-sm font-medium">Atrás</span>
-              </button>
             </div>
           </div>
         </div>
@@ -381,6 +360,23 @@ export default function ReservaConfirmacion() {
 
               {/* BOTONES */}
               <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-end">
+                <button
+                  onClick={() => {
+                    showToast("Volviendo a la pantalla anterior", "info");
+                    navigate(-1);
+                  }}
+                  className="flex items-center gap-2 px-3 py-2 rounded-md border transition-transform active:scale-[0.97]"
+                  style={{
+                    fontFamily: "var(--font-josefin)",
+                    borderColor: headerAccent,
+                    color: headerAccent,
+                    background: isDarkMode ? "transparent" : "transparent",
+                  }}
+                >
+                  <ArrowLeft size={18} />
+                  <span className="text-sm font-medium">Atrás</span>
+                </button>
+                
                 <button
                   onClick={() => {
                     showToast("Has cancelado la operación", "warning");

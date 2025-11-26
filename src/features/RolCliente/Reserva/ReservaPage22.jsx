@@ -81,7 +81,7 @@ export default function ReservaPage() {
               className="text-3xl md:text-4xl font-bold mb-8 text-center"
               style={{ fontFamily: 'var(--font-Alumni)', color: textColor }}
             >
-              Selecciona tu fecha y horario
+              Selecciona tu fecha y horario para Reservar
             </h2>
 
             <div className="grid lg:grid-cols-2 gap-8">
@@ -104,49 +104,51 @@ export default function ReservaPage() {
               )}
             </div>
 
-            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-10 pt-6 border-t"
-              style={{ borderColor: isDarkMode ? '#2d3748' : '#e5e7eb' }}
+            <div
+              className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-10 pt-6 border-t"
+              style={{ borderColor: isDarkMode ? "#2d3748" : "#e5e7eb" }}
             >
               {/* Botón Volver */}
               <button
                 onClick={() => navigate(-1)}
-                className="flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all duration-200 shadow-sm"
+                className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all duration-200 border shadow-sm hover:shadow-md"
                 style={{
-                  fontFamily: 'var(--font-josefin)',
-                  backgroundColor: isDarkMode ? '#2d3748' : 'white',
+                  fontFamily: "var(--font-josefin)",
+                  backgroundColor: isDarkMode ? "#1f2937" : "#ffffff",
                   color: accentColor,
-                  border: `2px solid ${accentColor}`,
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.08)'
+                  borderColor: accentColor,
                 }}
               >
-                <ChevronLeft size={18} /> Volver
+                <ChevronLeft size={18} />
+                Volver
               </button>
 
-              {/* Grupo de botones derecha */}
-              <div className="flex gap-3">
+              {/* Grupo derecha */}
+              <div className="flex gap-4">
                 {/* Botón Salir */}
                 <button
                   onClick={() => navigate("/")}
-                  className="flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-white transition-all duration-200 shadow-sm"
+                  className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-white transition-all duration-200 shadow-sm hover:shadow-lg"
                   style={{
-                    fontFamily: 'var(--font-josefin)',
+                    fontFamily: "var(--font-josefin)",
                     backgroundColor: errorColor,
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
                   }}
-                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = isDarkMode ? '#a02e3b' : '#b51e2a')}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.backgroundColor = isDarkMode ? "#b13644" : "#c21f2e")
+                  }
                   onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = errorColor)}
                 >
-                  <X size={18} /> Salir
+                  <X size={18} />
+                  Salir
                 </button>
 
                 {/* Botón Siguiente */}
                 <button
                   onClick={handleSiguiente}
-                  className="flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-white transition-all duration-200 shadow-sm"
+                  className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-white transition-all duration-200 shadow-sm hover:shadow-lg"
                   style={{
-                    fontFamily: 'var(--font-josefin)',
+                    fontFamily: "var(--font-josefin)",
                     backgroundColor: accentColor,
-                    boxShadow: '0 4px 14px rgba(0,0,0,0.18)'
                   }}
                   onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = btnHoverBg)}
                   onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = accentColor)}
@@ -155,6 +157,9 @@ export default function ReservaPage() {
                 </button>
               </div>
             </div>
+
+
+
           </div>
         </div>
       </div>
