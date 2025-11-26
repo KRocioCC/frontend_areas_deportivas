@@ -332,7 +332,7 @@ export default function ModalDisciplinas({ canchaId, adminId, onClose }) {
                     No hay disciplinas disponibles en el área deportiva.
                   </p>
                   <p className="text-gray-500 text-base" style={{fontFamily: "var(--font-Balo)"}}>
-                    Crea disciplinas primero en la sección de administración.
+                    CREA DISCIPLINAS PRIMERO EN LA SECCION DE ADMINISTRACION, LUEGO PODRAS AGINARLAS.
                   </p>
                 </div>
               ) : (

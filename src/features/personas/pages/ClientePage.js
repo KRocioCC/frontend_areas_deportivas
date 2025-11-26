@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import ClienteForm from "../components/ClienteForm";
+import ClienteFormRegister from "../components/ClienteFormRegister";
 import * as clienteService from "../../../api/clienteApi";
 import "../pages/userPage.css";
 
@@ -49,6 +50,7 @@ export default function ClientePage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [showRegisterForm, setShowRegisterForm] = useState(false);
   const [showDetail, setShowDetail] = useState(false);
   const [editing, setEditing] = useState(null);
   const [selectedCliente, setSelectedCliente] = useState(null);
@@ -91,7 +93,7 @@ export default function ClientePage() {
 
   function openCreate() {
     setEditing(null);
-    setShowForm(true);
+    setShowRegisterForm(true);
   }
 
   function openEdit(cliente) {
@@ -106,6 +108,7 @@ export default function ClientePage() {
 
   function closeModals() {
     setShowForm(false);
+    setShowRegisterForm(false);
     setShowDetail(false);
     setEditing(null);
     setSelectedCliente(null);
@@ -113,7 +116,10 @@ export default function ClientePage() {
 
   async function handleSave(payload) {
     try {
+      console.log("Payload recibido:", payload);
+      
       if (editing && editing.id) {
+        // Editar cliente existente
         const existingFromServer = await clienteService.getClienteById(editing.id);
         const merged = {
           ...existingFromServer,
@@ -121,8 +127,9 @@ export default function ClientePage() {
           nombre: payload.nombre ?? existingFromServer.nombre ?? "",
           telefono: payload.telefono ?? existingFromServer.telefono ?? "",
           email: payload.email ?? existingFromServer.email ?? "",
-          apaterno: payload.apaterno ?? payload.aPaterno ?? existingFromServer.apaterno ?? existingFromServer.aPaterno ?? existingFromServer.apellidoPaterno ?? "",
-          amaterno: payload.amaterno ?? payload.aMaterno ?? existingFromServer.amaterno ?? existingFromServer.aMaterno ?? existingFromServer.apellidoMaterno ?? "",
+          apaterno: payload.apellidoPaterno ?? payload.apaterno ?? existingFromServer.apaterno ?? "",
+          amaterno: payload.apellidoMaterno ?? payload.amaterno ?? existingFromServer.amaterno ?? "",
+          estado: payload.estado !== undefined ? payload.estado : existingFromServer.estado
         };
 
         console.log("PUT payload (merged):", merged);
@@ -130,31 +137,42 @@ export default function ClientePage() {
         const normalized = normalizeCliente(updated);
         setClientes((prev) => prev.map((c) => (c.id === normalized.id ? normalized : c)));
       } else {
+        // Crear nuevo cliente
         const createPayload = {
-          nombre: payload.nombre ?? "",
-          fechaNacimiento: payload.fechaNacimiento || null,
-          telefono: payload.telefono ?? "",
-          email: payload.email ?? "",
-          urlImagen: payload.urlImagen ?? "",
-          estado: Boolean(payload.estado),
-          categoria: payload.categoria ?? "",
-          apaterno: payload.apaterno ?? payload.aPaterno ?? payload.apellidoPaterno ?? "",
-          aPaterno: payload.apaterno ?? payload.aPaterno ?? payload.apellidoPaterno ?? "",
-          apellidoPaterno: payload.apaterno ?? payload.aPaterno ?? payload.apellidoPaterno ?? "",
-          amaterno: payload.amaterno ?? payload.aMaterno ?? payload.apellidoMaterno ?? "",
-          aMaterno: payload.amaterno ?? payload.aMaterno ?? payload.apellidoMaterno ?? "",
-          apellidoMaterno: payload.amaterno ?? payload.aMaterno ?? payload.apellidoMaterno ?? "",
+          username: payload.username || '',
+          password: payload.password || '',
+          email: payload.email || '',
+          nombre: payload.nombre || '',
+          apellidoPaterno: payload.apellidoPaterno || payload.apaterno || '',
+          apellidoMaterno: payload.apellidoMaterno || payload.amaterno || '',
+          telefono: payload.telefono || '',
+          fechaNacimiento: payload.fechaNacimiento || '',
+          urlImagen: payload.urlImagen || '',
+          categoria: payload.categoria || 'NUEVO',
+          estado: payload.estado !== undefined ? payload.estado : true // Asegurar que estado esté presente
         };
 
         console.log("POST payload:", createPayload);
+        
+        // Validar campos requeridos
+        const requiredFields = ['username', 'password', 'email', 'nombre', 'apellidoPaterno', 'apellidoMaterno', 'telefono'];
+        const missingFields = requiredFields.filter(field => !createPayload[field]);
+        
+        if (missingFields.length > 0) {
+          throw new Error(`Faltan campos requeridos: ${missingFields.join(', ')}`);
+        }
+
         const created = await clienteService.createCliente(createPayload);
-        setClientes((prev) => [normalizeCliente(created), ...prev]);
+        console.log("Cliente creado:", created);
+        
+        const normalized = normalizeCliente(created);
+        setClientes((prev) => [normalized, ...prev]);
       }
 
       closeModals();
     } catch (err) {
       console.error("handleSave error:", err);
-      alert("Error guardando cliente. Revisa la consola para más detalle.");
+      alert(`Error guardando cliente: ${err.message}`);
     }
   }
 
@@ -287,11 +305,9 @@ export default function ClientePage() {
             <button className="btn btn-accent" onClick={loadClientes}>
               Limpiar
             </button>
-            {/*
             <button className="btn btn-primary" onClick={openCreate}>
               Nuevo Cliente
             </button>
-            */}
           </div>
         </div>
       </div>
@@ -387,16 +403,23 @@ export default function ClientePage() {
         </div>
       )}
 
+      {/* Modal para editar (formulario original) */}
       {showForm && (
         <div className="modal">
-          <div className="modal-content">
-            <ClienteForm
-              initialData={editing}
-              onCancel={closeModals}
-              onSave={handleSave}
-            />
-          </div>
+          <ClienteForm
+            initialData={editing}
+            onCancel={closeModals}
+            onSave={handleSave}
+          />
         </div>
+      )}
+
+      {/* Modal para crear nuevo (formulario de registro) */}
+      {showRegisterForm && (
+        <ClienteFormRegister
+          onCancel={closeModals}
+          onSave={handleSave}
+        />
       )}
 
       {showDetail && selectedCliente && (

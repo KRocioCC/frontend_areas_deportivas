@@ -39,6 +39,15 @@ export default function MiAreaContainer() {
                     console.log("❌ [MiAreaContainer] NO se encontró área deportiva");
                     setAreaDeportiva(null);
                     setShowCreate(true);
+                    // Preparar tour para nuevo admin sin área
+                    try {
+                        const tourRaw = localStorage.getItem('adminTourStatus');
+                        const tourObj = tourRaw ? JSON.parse(tourRaw) : null;
+                        if (!tourObj || tourObj.done || tourObj.stage !== 'start') {
+                            localStorage.setItem('adminTourStatus', JSON.stringify({ done: false, stage: 'start', ts: Date.now() }));
+                        }
+                        window.dispatchEvent(new Event('adminTourForceCheck'));
+                    } catch { /* noop */ }
                 }
             } catch (error) {
                 console.error("💥 [MiAreaContainer] ERROR en verificarAreaDeportiva:", error);
@@ -49,10 +58,23 @@ export default function MiAreaContainer() {
                     console.log("🔍 [MiAreaContainer] Error 404 - Mostrando creación");
                     setAreaDeportiva(null);
                     setShowCreate(true);
+                    // Forzar inicio del tour para admins sin área
+                    try {
+                        localStorage.setItem('adminTourStatus', JSON.stringify({ done: false, stage: 'start', ts: Date.now() }));
+                        window.dispatchEvent(new Event('adminTourForceCheck'));
+                    } catch { /* noop */ }
                 } else {
                     console.log("🔍 [MiAreaContainer] Otro error - Mostrando creación también");
                     setAreaDeportiva(null);
                     setShowCreate(true);
+                    try {
+                        const tourRaw = localStorage.getItem('adminTourStatus');
+                        const tourObj = tourRaw ? JSON.parse(tourRaw) : null;
+                        if (!tourObj) {
+                            localStorage.setItem('adminTourStatus', JSON.stringify({ done: false, stage: 'start', ts: Date.now() }));
+                        }
+                        window.dispatchEvent(new Event('adminTourForceCheck'));
+                    } catch { /* noop */ }
                 }
             } finally {
                 setLoading(false);
@@ -61,6 +83,8 @@ export default function MiAreaContainer() {
         };
 
         verificarAreaDeportiva();
+        // showCreate solo se usa para logging al final; evitar re-fetch infinito
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentUser]);
 
     const handleAreaCreada = () => {

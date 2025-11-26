@@ -1,28 +1,103 @@
 // src/features/reservas/components/ModalReservaList.js
-import React from "react";
+import React, { useState, useEffect, useMemo } from "react";
+import { getCancha } from "../../../api/CanchaApi"; // para traer imágenes completas
 import { X, Users, Clock, CreditCard, CalendarDays } from "lucide-react";
 import Button from "../../../components/ui/Button";
 import "./ModalReservaList.css";
 
 export default function ModalReservaList({ initialData, onCancel }) {
-  if (!initialData) return null;
+  // Hooks deben declararse siempre sin retornar antes
+  const [imagenPrincipal, setImagenPrincipal] = useState("");
+  const [cargandoImagen, setCargandoImagen] = useState(true);
 
-  const cancha = initialData.cancha || {};
-  const cliente = initialData.cliente || {};
-  const pago = initialData.pago || {};
+  // Memo para evitar recrear objeto en cada render y ruido en dependencias
+  const cancha = useMemo(() => (initialData?.cancha || {}), [initialData]);
+  const cliente = initialData?.cliente || {};
+  const pago = initialData?.pago || {};
 
-  // Función para obtener la primera imagen del vector de imágenes de la cancha
-  const getCanchaImageUrl = () => {
-    if (cancha.imagenes && cancha.imagenes.length > 0) {
-      const primeraImagen = cancha.imagenes[0];
-      if (primeraImagen.urlAcceso.startsWith('http')) {
-        return primeraImagen.urlAcceso;
-      } else {
-        return `http://localhost:8032${primeraImagen.urlAcceso}`;
+  // No retornamos antes de hooks; manejamos estado sin datos en el render.
+
+  // === LÓGICA DE IMÁGENES ADAPTADA DE CanchaCard ===
+  // (Declarado arriba antes de cualquier return)
+
+  const getUrlImagenCompleta = (urlAcceso) => {
+    if (!urlAcceso) return "https://placehold.co/600x400?text=Sin+Imagen";
+    if (urlAcceso.startsWith("http")) return urlAcceso;
+    const baseUrl = "http://localhost:8032";
+    return `${baseUrl}${urlAcceso.startsWith('/') ? urlAcceso : '/' + urlAcceso}`;
+  };
+
+  useEffect(() => {
+    let cancelado = false;
+    async function cargarImagenes() {
+      setCargandoImagen(true);
+      try {
+        // 1. Si la reserva ya trae imágenes en cancha, usarlas
+        if (cancha && Array.isArray(cancha.imagenes) && cancha.imagenes.length > 0) {
+          const primera = cancha.imagenes[0];
+          const url = getUrlImagenCompleta(primera?.urlAcceso);
+          if (!cancelado) setImagenPrincipal(url);
+          const img = new Image();
+          img.onload = () => !cancelado && setCargandoImagen(false);
+          img.onerror = () => {
+            if (!cancelado) {
+              setImagenPrincipal("https://placehold.co/600x400?text=Error+Cargando");
+              setCargandoImagen(false);
+            }
+          };
+          img.src = url;
+          return;
+        }
+
+        // 2. Intentar arrays directos en el objeto de reserva
+        const arraysAlternativos = [initialData?.imagenes, initialData?.imagenesCancha];
+        for (const arr of arraysAlternativos) {
+          if (Array.isArray(arr) && arr.length > 0) {
+            const primera = arr[0];
+            const url = getUrlImagenCompleta(primera?.urlAcceso);
+            if (!cancelado) setImagenPrincipal(url);
+            setCargandoImagen(false);
+            return;
+          }
+        }
+
+        // 3. Fetch adicional a la API de cancha para obtener imágenes
+        if (cancha?.idCancha) {
+          const canchaCompleta = await getCancha(cancha.idCancha);
+          const imgs = canchaCompleta?.imagenes;
+          if (Array.isArray(imgs) && imgs.length > 0) {
+            const url = getUrlImagenCompleta(imgs[0]?.urlAcceso);
+            if (!cancelado) setImagenPrincipal(url);
+            setCargandoImagen(false);
+            return;
+          }
+        }
+
+        // 4. Campos directos urlImagen / imageUrl
+        const directa = cancha?.urlImagen || cancha?.imageUrl || initialData?.urlImagen || initialData?.imageUrl;
+        if (directa) {
+          const url = getUrlImagenCompleta(directa);
+          if (!cancelado) setImagenPrincipal(url);
+          setCargandoImagen(false);
+          return;
+        }
+
+        // 5. Fallback final
+        if (!cancelado) {
+          setImagenPrincipal("https://placehold.co/600x400?text=Sin+Imágenes");
+          setCargandoImagen(false);
+        }
+      } catch (err) {
+        console.error('[ModalReservaList] Error cargando imágenes cancha:', err);
+        if (!cancelado) {
+          setImagenPrincipal("https://placehold.co/600x400?text=Error");
+          setCargandoImagen(false);
+        }
       }
     }
-    return cancha.urlImagen || "https://placehold.co/300x300/2563eb/white?text=Sin+Imagen";
-  };
+    cargarImagenes();
+    return () => { cancelado = true; };
+  }, [cancha, initialData]);
 
   // Función para manejar errores de carga de imagen
   const handleImageError = (e) => {
@@ -30,7 +105,11 @@ export default function ModalReservaList({ initialData, onCancel }) {
     e.target.src = "https://placehold.co/300x300/2563eb/white?text=Sin+Imagen";
   };
 
-  const imageUrl = getCanchaImageUrl();
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[ModalReservaList] initialData completo:', initialData);
+    console.log('[ModalReservaList] cancha.imagenes:', cancha?.imagenes);
+    console.log('[ModalReservaList] imagenPrincipal:', imagenPrincipal, 'cargando:', cargandoImagen);
+  }
 
   return (
     <div className="modal-reserva-overlay">
@@ -49,11 +128,22 @@ export default function ModalReservaList({ initialData, onCancel }) {
           {/* Imagen y datos principales */}
           <div className="modal-reserva-grid">
             <div className="modal-reserva-image">
-              <img 
-                src={imageUrl} 
-                alt={cancha.nombre} 
-                onError={handleImageError}
-              />
+              {cargandoImagen ? (
+                <div className="w-full h-full flex flex-col items-center justify-center bg-gray-200 text-xs text-gray-600">
+                  <span>Cargando imagen...</span>
+                  <span>{cancha.nombre}</span>
+                </div>
+              ) : (
+                <img
+                  src={imagenPrincipal}
+                  alt={cancha.nombre}
+                  onError={(e) => {
+                    handleImageError(e);
+                    e.target.src = "https://placehold.co/600x400?text=Error+Mostrando+Imagen";
+                  }}
+                  className="w-full h-full object-cover"
+                />
+              )}
             </div>
 
             <div className="modal-reserva-info">

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import AdministradorForm from "../components/AdministradorForm";
+import AdministradorFormRegister from "../components/AdministradorFormRegister";
 import * as administradorService from "../../../api/administradorApi";
 import "../pages/userPage.css";
 
@@ -37,7 +38,6 @@ function normalizeAdministrador(raw = {}) {
     fechaNacimiento,
     telefono: raw.telefono ?? raw.phone ?? "",
     email: raw.email ?? "",
-    //ci: raw.ci ?? "",
     urlImagen,
     estado,
     cargo: raw.cargo ?? "",
@@ -51,6 +51,7 @@ export default function AdministradorPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [showRegisterForm, setShowRegisterForm] = useState(false);
   const [showDetail, setShowDetail] = useState(false);
   const [editing, setEditing] = useState(null);
   const [selectedAdministrador, setSelectedAdministrador] = useState(null);
@@ -93,7 +94,7 @@ export default function AdministradorPage() {
 
   function openCreate() {
     setEditing(null);
-    setShowForm(true);
+    setShowRegisterForm(true);
   }
 
   function openEdit(administrador) {
@@ -108,6 +109,7 @@ export default function AdministradorPage() {
 
   function closeModals() {
     setShowForm(false);
+    setShowRegisterForm(false);
     setShowDetail(false);
     setEditing(null);
     setSelectedAdministrador(null);
@@ -115,7 +117,10 @@ export default function AdministradorPage() {
 
   async function handleSave(payload) {
     try {
+      console.log("Payload recibido:", payload);
+      
       if (editing && editing.id) {
+        // Mantener la lógica existente para editar
         const existingFromServer = await administradorService.getAdministradorById(editing.id);
         const merged = {
           ...existingFromServer,
@@ -123,7 +128,6 @@ export default function AdministradorPage() {
           nombre: payload.nombre ?? existingFromServer.nombre ?? "",
           telefono: payload.telefono ?? existingFromServer.telefono ?? "",
           email: payload.email ?? existingFromServer.email ?? "",
-          //ci: payload.ci ?? existingFromServer.ci ?? "",
           apaterno: payload.apaterno ?? payload.aPaterno ?? existingFromServer.apaterno ?? existingFromServer.aPaterno ?? existingFromServer.apellidoPaterno ?? "",
           amaterno: payload.amaterno ?? payload.aMaterno ?? existingFromServer.amaterno ?? existingFromServer.aMaterno ?? existingFromServer.apellidoMaterno ?? "",
         };
@@ -133,22 +137,20 @@ export default function AdministradorPage() {
         const normalized = normalizeAdministrador(updated);
         setAdministradores((prev) => prev.map((a) => (a.id === normalized.id ? normalized : a)));
       } else {
+        // Para crear, usar el formato que funcionaba antes
         const createPayload = {
-          nombre: payload.nombre ?? "",
-          fechaNacimiento: payload.fechaNacimiento || null,
-          telefono: payload.telefono ?? "",
-          email: payload.email ?? "",
-          //ci: payload.ci ?? "",
-          urlImagen: payload.urlImagen ?? "",
-          estado: Boolean(payload.estado),
-          cargo: payload.cargo ?? "",
-          direccion: payload.direccion ?? "",
-          apaterno: payload.apaterno ?? payload.aPaterno ?? payload.apellidoPaterno ?? "",
-          aPaterno: payload.apaterno ?? payload.aPaterno ?? payload.apellidoPaterno ?? "",
-          apellidoPaterno: payload.apaterno ?? payload.aPaterno ?? payload.apellidoPaterno ?? "",
-          amaterno: payload.amaterno ?? payload.aMaterno ?? payload.apellidoMaterno ?? "",
-          aMaterno: payload.amaterno ?? payload.aMaterno ?? payload.apellidoMaterno ?? "",
-          apellidoMaterno: payload.amaterno ?? payload.aMaterno ?? payload.apellidoMaterno ?? "",
+          username: payload.username || '',
+          password: payload.password || '',
+          email: payload.email || '',
+          nombre: payload.nombre || '',
+          apaterno: payload.apaterno || payload.aPaterno || '', // Priorizar minúsculas
+          amaterno: payload.amaterno || payload.aMaterno || '', // Priorizar minúsculas
+          telefono: payload.telefono || '',
+          fechaNacimiento: payload.fechaNacimiento || '',
+          urlImagen: payload.urlImagen || '',
+          direccion: payload.direccion || '',
+          cargo: payload.cargo || 'Administrador general',
+          estado: payload.estado !== undefined ? payload.estado : true
         };
 
         console.log("POST payload:", createPayload);
@@ -248,12 +250,6 @@ export default function AdministradorPage() {
                 <span className="detail-label">Teléfono</span>
                 <span className="detail-value">{administrador.telefono || <span className="empty-text">No especificado</span>}</span>
               </div>
-              {/*
-              <div className="detail-item">
-                <span className="detail-label">CI</span>
-                <span className="detail-value">{administrador.ci || <span className="empty-text">No especificado</span>}</span>
-              </div>
-              */}
               <div className="detail-item">
                 <span className="detail-label">Cargo</span>
                 <span className="detail-value">{administrador.cargo || <span className="empty-text">No especificado</span>}</span>
@@ -311,11 +307,9 @@ export default function AdministradorPage() {
             <button className="btn btn-accent" onClick={loadAdministradores}>
               Limpiar
             </button>
-            {/* 
             <button className="btn btn-primary" onClick={openCreate}>
               Nuevo Administrador
             </button>
-            */}
           </div>
         </div>
       </div>
@@ -413,16 +407,23 @@ export default function AdministradorPage() {
         </div>
       )}
 
+      {/* Modal para editar (formulario original) */}
       {showForm && (
         <div className="modal">
-          <div className="modal-content">
-            <AdministradorForm
-              initialData={editing}
-              onCancel={closeModals}
-              onSave={handleSave}
-            />
-          </div>
+          <AdministradorForm
+            initialData={editing}
+            onCancel={closeModals}
+            onSave={handleSave}
+          />
         </div>
+      )}
+
+      {/* Modal para crear nuevo (formulario de registro) */}
+      {showRegisterForm && (
+        <AdministradorFormRegister
+          onCancel={closeModals}
+          onSave={handleSave}
+        />
       )}
 
       {showDetail && selectedAdministrador && (

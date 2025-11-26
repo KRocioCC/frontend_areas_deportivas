@@ -7,7 +7,7 @@ const Register = () => {
     username: '',
     password: '',
     email: '',
-    rolSolicitado: 'ROL_ADMINISTRADOR', //aqui deberia ser cliente no
+    rolSolicitado: 'ROL_CLIENTE',
     nombre: '',
     apellidoPaterno: '',
     apellidoMaterno: '',
@@ -68,8 +68,11 @@ const Register = () => {
         )}
 
         {success && (
-          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-            <span>{success}</span>
+          <div className="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in-down">
+            <div className="flex items-center">
+              <span className="text-lg mr-2">✅</span>
+              <span className="font-medium">{success}</span>
+            </div>
           </div>
         )}
 
@@ -87,7 +90,6 @@ const Register = () => {
           <select name="rolSolicitado" value={formData.rolSolicitado} onChange={handleChange} className="w-full px-3 py-2 border rounded-md">
             <option value="ROL_CLIENTE">Cliente</option>
             <option value="ROL_ADMINISTRADOR">Administrador</option>
-            {/*<option value="ROL_SUPERUSUARIO">Superusuario</option>*/}
           </select>
 
           <button type="submit" disabled={isLoading} className={`w-full py-2 px-4 text-white font-medium rounded-md bg-[#2B7A78] hover:bg-[#3AAFA9] ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}>

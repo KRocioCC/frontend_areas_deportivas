@@ -77,20 +77,20 @@ const MetaMensual = ({ idAdministrador }) => {
   const closeDropdown = () => setIsOpen(false);
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-gray-100 dark:border-gray-800 dark:bg-white/[0.03]">
-      <div className="px-5 pt-5 bg-white shadow-default rounded-2xl pb-11 dark:bg-gray-900 sm:px-6 sm:pt-6">
+    <div className="rounded-2xl border border-gray-200 bg-gray-100">
+      <div className="px-5 pt-5 bg-white shadow-default rounded-2xl pb-11 sm:px-6 sm:pt-6">
         <div className="flex justify-between">
           <div>
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
+            <h3 className="text-lg font-semibold text-gray-800">
               Meta Mensual
             </h3>
-            <p className="mt-1 text-gray-500 text-theme-sm dark:text-gray-400">
+            <p className="mt-1 text-gray-500 text-theme-sm">
               Reservas acumuladas este mes (Administrador {idAdministrador})
             </p>
           </div>
           <div className="relative inline-block">
             <button className="dropdown-toggle" onClick={toggleDropdown}>
-              <MoreDotIcon className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 w-6 h-6" />
+              <MoreDotIcon className="text-gray-400 hover:text-gray-700 w-6 h-6" />
             </button>
             <Dropdown isOpen={isOpen} onClose={closeDropdown} className="w-40 p-2">
               <DropdownItem onItemClick={closeDropdown}>Ver más</DropdownItem>
@@ -103,7 +103,7 @@ const MetaMensual = ({ idAdministrador }) => {
           <div className="max-h-[330px]" id="chartDarkStyle">
             <Chart options={options} series={series} type="radialBar" height={330} />
           </div>
-          <span className="absolute left-1/2 top-full -translate-x-1/2 -translate-y-[95%] rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-600 dark:bg-green-500/15 dark:text-green-500">
+          <span className="absolute left-1/2 top-full -translate-x-1/2 -translate-y-[95%] rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-600">
             {reservasMes} / {metaReservas}
           </span>
         </div>
