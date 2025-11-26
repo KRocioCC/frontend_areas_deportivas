@@ -1,0 +1,97 @@
+.equipos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 2rem;
+    padding-top: 1rem;
+    animation: slideUp 0.4s ease-out;
+}
+
+.equipo-card {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0,0,0,0.05);
+    position: relative;
+}
+
+.equipo-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+    border-color: var(--secondary); /* Borde turquesa al hover */
+}
+
+.equipo-img-container {
+    height: 160px;
+    background: linear-gradient(45deg, #f3f4f6, #e5e7eb);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+}
+
+.equipo-img-container img {
+    width: 100%; height: 100%; object-fit: cover;
+    transition: transform 0.5s;
+}
+.equipo-card:hover .equipo-img-container img {
+    transform: scale(1.1);
+}
+
+.placeholder-icon { font-size: 4rem; opacity: 0.3; }
+
+.equipo-info { padding: 1.5rem; }
+
+.equipo-info h4 {
+    margin: 0 0 5px 0;
+    color: var(--color-p-8);
+    font-family: var(--font-Oswald);
+    font-size: 1.4rem;
+    text-transform: uppercase;
+}
+
+.equipo-tipo {
+    display: inline-block;
+    font-size: 0.75rem;
+    color: var(--primary);
+    font-family: var(--font-Alumni);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border: 1px solid var(--primary);
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+.equipo-desc {
+    color: #666;
+    font-family: var(--font-Balo);
+    font-size: 0.95rem;
+    margin: 10px 0;
+    line-height: 1.5;
+}
+
+.equipo-status {
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
+    font-family: var(--font-josefin);
+    font-weight: 700;
+    color: #555;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #f0f0f0;
+}
+
+.status-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    margin-right: 8px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.2);
+}
+
+.status-dot.active { background-color: #28a745; box-shadow: 0 0 8px #28a745; }
+.status-dot.inactive { background-color: var(--color-danger); }

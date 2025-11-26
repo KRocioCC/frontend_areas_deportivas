@@ -1,0 +1,274 @@
+.container {
+    padding: 2rem;
+    background-color: var(--color-background, #F2EFEB);
+    /* Textura de fondo sutil igual al Dashboard */
+    background-image: 
+        linear-gradient(rgba(242, 239, 235, 0.95), rgba(242, 239, 235, 0.95)),
+        url('../../../../../public//Fondos/Deporte1.png'); /* Ajusta la ruta */
+    background-size: cover;
+    background-attachment: fixed;
+    min-height: calc(100vh - 70px);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+
+/* Wrapper Principal */
+.profileWrapper {
+    display: grid;
+    /* EN PC: 350px para la izquierda, el resto para la derecha */
+    grid-template-columns: 350px 1fr; 
+    gap: 2rem;
+    width: 100%;
+    max-width: 1200px;
+    margin-top: 1rem;
+}
+
+/* --- MODO MÓVIL / TABLET (La corrección clave) --- */
+@media (max-width: 1024px) {
+    .profileWrapper {
+        /* Cambiamos a una sola columna */
+        grid-template-columns: 1fr; 
+        gap: 1.5rem;
+    }
+
+    .sidebarCard {
+        /* Quitamos el sticky para que no moleste al bajar */
+        position: relative !important; 
+        top: 0 !important;
+        /* Centramos el texto */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .sidebarInfo {
+        width: 100%; /* Que la info ocupe todo el ancho */
+    }
+}
+
+/* --- TARJETA LATERAL (IZQUIERDA) --- */
+.sidebarCard {
+    background: linear-gradient(145deg, #1a1a1a 0%, #333 100%);
+    border-radius: 20px;
+    padding: 3rem 2rem;
+    text-align: center;
+    color: white;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    /* Sticky para PC */
+    position: sticky;
+    top: 100px;
+    border-top: 5px solid var(--primary, #D92332);
+    height: fit-content;
+}
+
+.avatarWrapper {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    margin: 0 auto 1.5rem;
+}
+
+.avatar {
+    width: 100%; height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid var(--primary, #D92332);
+    padding: 3px;
+    background: transparent;
+    box-shadow: 0 0 20px rgba(217, 35, 50, 0.4);
+}
+
+.avatarPlaceholder {
+    width: 100%; height: 100%;
+    border-radius: 50%;
+    background: var(--color-p-8, #8a2628);
+    color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 4rem; font-family: var(--font-Oswald, sans-serif);
+    border: 4px solid rgba(255,255,255,0.1);
+}
+
+.userName {
+    font-family: var(--font-Oswald, sans-serif);
+    font-size: 2rem;
+    margin: 0 0 5px 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    line-height: 1;
+}
+
+.userEmail {
+    font-family: var(--font-Balo, sans-serif);
+    color: #aaa;
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+}
+
+.roleBadge {
+    background: var(--secondary, #41BFB3);
+    color: white;
+    padding: 6px 20px;
+    border-radius: 30px;
+    font-family: var(--font-Alumni, sans-serif);
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-size: 1rem;
+    display: inline-block;
+    box-shadow: 0 4px 10px rgba(65, 191, 179, 0.3);
+}
+
+.sidebarInfo {
+    margin-top: 3rem;
+    text-align: left;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    padding-top: 2rem;
+    width: 100%;
+}
+
+.infoRow {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 1.5rem;
+    color: #ccc;
+}
+
+.infoIcon {
+    width: 40px; height: 40px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--primary, #D92332);
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+.infoData label { font-size: 0.75rem; text-transform: uppercase; opacity: 0.6; display: block; font-family: var(--font-josefin, sans-serif); }
+.infoData span { font-size: 1rem; font-weight: 600; color: white; font-family: var(--font-Balo, sans-serif); }
+
+/* --- TARJETA FORMULARIO (DERECHA) --- */
+.formCard {
+    background: white;
+    border-radius: 20px;
+    padding: 3rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    border: 1px solid rgba(0,0,0,0.02);
+}
+
+.formHeader {
+    margin-bottom: 2.5rem;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 1rem;
+}
+
+.formTitle {
+    font-family: var(--font-Oswald, sans-serif);
+    font-size: 1.8rem;
+    color: #333;
+    margin: 0;
+    text-transform: uppercase;
+}
+
+.formSubtitle {
+    color: #888;
+    font-family: var(--font-Balo, sans-serif);
+    margin-top: 5px;
+}
+
+/* Grid interno del formulario */
+.formGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+/* Cuando la pantalla es muy chica, el formulario también se vuelve de 1 columna */
+@media (max-width: 700px) {
+    .formGrid { grid-template-columns: 1fr; }
+    .formCard { padding: 1.5rem; } /* Menos padding en móvil */
+}
+
+.formGroup { margin-bottom: 0.5rem; }
+
+.label {
+    display: block;
+    font-family: var(--font-josefin, sans-serif);
+    font-weight: 700;
+    color: #555;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+}
+
+.inputContainer {
+    position: relative;
+}
+
+.inputIcon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #aaa;
+}
+
+.input {
+    width: 100%;
+    padding: 14px 15px 14px 45px;
+    border: 2px solid #eee;
+    border-radius: 10px;
+    font-family: var(--font-Balo, sans-serif);
+    font-size: 1rem;
+    color: #333;
+    transition: all 0.3s;
+    background-color: #fbfbfb;
+}
+
+.input:focus {
+    border-color: var(--primary, #D92332);
+    background-color: white;
+    box-shadow: 0 0 0 4px rgba(217, 35, 50, 0.1);
+    outline: none;
+}
+
+.input:disabled {
+    background-color: #f5f5f5;
+    color: #999;
+    cursor: not-allowed;
+    border-color: #f0f0f0;
+}
+
+.actions {
+    margin-top: 3rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.btnSave {
+    background: linear-gradient(90deg, var(--primary, #D92332) 0%, #b91c1c 100%);
+    color: white;
+    padding: 14px 40px;
+    border: none;
+    border-radius: 30px;
+    font-family: var(--font-josefin, sans-serif);
+    font-weight: 700;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 5px 15px rgba(217, 35, 50, 0.3);
+}
+
+.btnSave:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(217, 35, 50, 0.4);
+}
+
+.btnSave:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    box-shadow: none;
+}

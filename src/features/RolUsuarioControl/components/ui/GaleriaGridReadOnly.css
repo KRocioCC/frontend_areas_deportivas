@@ -1,0 +1,121 @@
+.galeria-muro {
+    display: grid;
+    /* Columnas automáticas pero mínimo 250px */
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    /* Altura de filas automática pero con base de 200px */
+    grid-auto-rows: 250px; 
+    gap: 15px;
+    grid-auto-flow: dense; /* Rellena huecos vacíos */
+    padding: 1rem 0;
+}
+
+.muro-item {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.muro-item:hover {
+    transform: scale(1.02);
+    z-index: 2;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+/* --- LA MAGIA: FOTO DESTACADA --- */
+/* La primera foto ocupa 2 columnas y 2 filas */
+.muro-item.destacada {
+    grid-column: span 2;
+    grid-row: span 2;
+}
+
+/* En móviles, quitamos el destacado para que sea una sola columna */
+@media (max-width: 768px) {
+    .muro-item.destacada {
+        grid-column: span 1;
+        grid-row: span 1;
+    }
+    .galeria-muro {
+        grid-template-columns: 1fr; /* Una sola columna en celular */
+        grid-auto-rows: 300px;
+    }
+}
+
+.muro-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Recorta la imagen para llenar el cuadro */
+    transition: filter 0.3s;
+}
+
+.muro-item:hover img {
+    filter: brightness(0.8);
+}
+
+/* Overlay con icono de lupa */
+.muro-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.muro-overlay i {
+    color: white;
+    font-size: 2rem;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+
+.muro-item:hover .muro-overlay {
+    opacity: 1;
+}
+
+/* Estado Vacío */
+.galeria-vacia {
+    text-align: center;
+    padding: 4rem;
+    color: #999;
+    background: #fff;
+    border-radius: 16px;
+    border: 2px dashed #eee;
+}
+
+.galeria-vacia i {
+    margin-bottom: 1rem;
+    color: #ddd;
+}
+
+/* --- LIGHTBOX (MODAL PANTALLA COMPLETA) --- */
+.lightbox {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.9);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: zoom-out;
+    animation: fadeIn 0.2s;
+}
+
+.lightbox img {
+    max-width: 90%;
+    max-height: 90vh;
+    border-radius: 8px;
+    box-shadow: 0 0 50px rgba(0,0,0,0.5);
+}
+
+.lightbox-close {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    color: white;
+    font-size: 3rem;
+    cursor: pointer;
+    font-family: sans-serif;
+}

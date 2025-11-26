@@ -1,0 +1,30 @@
+.layout-control-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    /* Fondo crema suave de tu paleta */
+    background-color: var(--color-background, #F2EFEB);
+    /* Fuente base para textos largos */
+    font-family: var(--font-Balo), sans-serif;
+}
+
+.layout-content {
+    padding-top: 80px; /* Un poco más de espacio para el nuevo header */
+    flex: 1;
+    width: 100%;
+    max-width: 1400px; /* Que no se estire infinito en pantallas gigantes */
+    margin: 0 auto;
+    padding-bottom: 2rem;
+}
+
+/* Títulos generales del módulo */
+h1, h2, h3 {
+    font-family: var(--font-Oswald), sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Botones generales */
+button {
+    font-family: var(--font-josefin), sans-serif;
+}

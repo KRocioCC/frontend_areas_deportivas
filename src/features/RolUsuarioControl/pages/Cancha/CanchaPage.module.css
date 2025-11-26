@@ -1,0 +1,217 @@
+.container {
+    padding: 0;
+    background-color: var(--color-background, #F2EFEB);
+    min-height: calc(100vh - 70px);
+}
+
+/* --- HERO SECTION (Cabecera) --- */
+.hero {
+    position: relative;
+    /* Aumentamos la altura mínima para que se vea "más grande y ancho" */
+    min-height: 400px; 
+    
+    background: linear-gradient(to bottom, rgba(11, 13, 14, 0.4) 0%, rgba(11, 13, 14, 0.95) 100%), 
+                url('../../../../assets/Fondos/Deporte7.png'); 
+    background-size: cover;
+    background-position: center;
+    
+    /* Más espacio interno */
+    padding: 4rem 3rem; 
+    
+    color: var(--color-white);
+    border-bottom: 5px solid var(--primary);
+    display: flex;
+    align-items: center; /* Centrado vertical */
+    gap: 3rem; /* Más separación entre foto redonda y texto */
+    flex-wrap: wrap;
+}
+
+/* Hacemos la imagen de perfil un poco más grande también */
+.imageContainer {
+    width: 180px; /* Antes 150px */
+    height: 180px; /* Antes 150px */
+    /* ... resto igual ... */
+    border-radius: 20px;
+    overflow: hidden;
+    background: var(--color-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 5rem;
+    color: var(--color-p-8);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+    border: 5px solid rgba(255,255,255,0.2);
+}
+
+/* Aumentamos el título */
+.title {
+    margin: 0;
+    font-family: var(--font-Oswald);
+    font-size: 4rem; /* Antes 3rem */
+    /* ... resto igual ... */
+    font-weight: 700;
+    color: var(--color-white);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    line-height: 1;
+    text-shadow: 2px 2px 15px rgba(0,0,0,0.6);
+}
+
+
+
+
+
+
+/* Botón Volver (Estilo Cristal) */
+.btnBack {
+    border: 1px solid rgba(255,255,255,0.3);
+    background: rgba(0, 0, 0, 0.3);
+    color: var(--color-white, #fff);
+    cursor: pointer;
+    margin-right: 15px;
+    font-size: 1rem;
+    font-family: var(--font-josefin, sans-serif);
+    padding: 10px 20px;
+    border-radius: 30px;
+    backdrop-filter: blur(5px);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.btnBack:hover {
+    background: var(--primary, #D92332);
+    border-color: var(--primary, #D92332);
+    transform: translateX(-5px);
+}
+
+
+.canchaImg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.info {
+    flex: 1;
+}
+
+
+/* Badges de Disciplinas (Estilo Turquesa) */
+.badgesContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 15px 0;
+}
+
+.badgeDisciplina {
+    background-color: var(--secondary, #41BFB3); /* Turquesa */
+    color: var(--color-white, #fff);
+    padding: 5px 15px;
+    border-radius: 6px;
+    font-family: var(--font-Alumni, sans-serif);
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+/* Badge de Estado */
+.badgeEstado {
+    padding: 8px 25px;
+    border-radius: 30px;
+    font-family: var(--font-Oswald, sans-serif);
+    font-weight: 700;
+    font-size: 1rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    background: var(--color-white, #fff);
+    color: var(--color-p-11, #2C7366);
+}
+
+/* Metadatos (Precios, etc) */
+.meta {
+    display: flex;
+    gap: 2rem;
+    margin-top: 1.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.metaItem {
+    color: rgba(255,255,255,0.9);
+    font-family: var(--font-Balo, sans-serif);
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255,255,255,0.1);
+    padding: 8px 20px;
+    border-radius: 12px;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.metaItem i {
+    color: var(--color-accent, #F28627); /* Iconos naranjas */
+}
+
+.metaItem strong {
+    font-family: var(--font-Oswald, sans-serif);
+    font-size: 1.4rem;
+    color: var(--color-accent, #F28627); /* Números naranjas */
+    margin-right: 4px;
+}
+
+/* --- TABS --- */
+.tabsContainer {
+    background: var(--color-white, #fff);
+    padding: 0 2rem;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    position: sticky;
+    top: 70px; /* Ajustado a tu navbar */
+    z-index: 90;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.tabs {
+    display: flex;
+    gap: 2rem;
+}
+
+.tab {
+    padding: 1.5rem 1rem;
+    background: none;
+    border: none;
+    border-bottom: 4px solid transparent;
+    font-family: var(--font-Oswald, sans-serif);
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    color: #6c757d;
+    cursor: pointer;
+    transition: all 0.3s;
+    letter-spacing: 0.5px;
+}
+
+.tab:hover {
+    color: var(--primary, #D92332);
+    background-color: rgba(0,0,0,0.02);
+}
+
+.activeTab {
+    color: var(--primary, #D92332);
+    border-bottom-color: var(--primary, #D92332);
+}
+
+.content {
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}

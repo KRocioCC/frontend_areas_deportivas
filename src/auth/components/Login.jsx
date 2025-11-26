@@ -40,7 +40,9 @@ const Login = () => {
         redirectTo = '/inicio';
       } else if (roles.includes('ROLE_SUPERUSUARIO')) {
         redirectTo = '/solicitudes';
-      } else {
+      } else if (roles.includes('ROLE_USUARIO_CONTROL')) {
+        redirectTo = '/control/dashboard'; 
+      }else {
         setError('Tu cuenta no tiene un rol válido asignado.');
       }
       navigate(redirectTo, { replace: true });

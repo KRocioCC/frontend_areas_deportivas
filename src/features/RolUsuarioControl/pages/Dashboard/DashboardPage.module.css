@@ -1,0 +1,142 @@
+.dashboardContainer {
+    padding: 2rem;
+    /* Fondo base */
+    background-color: #F2EFEB;
+    
+    /* --- IMAGEN DE FONDO FULL SCREEN --- */
+    background-image: 
+        linear-gradient(rgba(242, 239, 235, 0.92), rgba(242, 239, 235, 0.92)), /* Velo blanco */
+        url('../../../../../public//Fondos/Deporte11.png'); /* Ajusta la ruta */
+    
+    background-size: cover;      /* Cubre todo el ancho y alto */
+    background-position: center; /* Centrada */
+    background-repeat: no-repeat; /* NO repetir */
+    background-attachment: fixed; /* Efecto Parallax (La imagen se queda fija al bajar) */
+    
+    min-height: 100vh; /* Altura mínima de toda la pantalla */
+    width: 100%;       /* Ancho total */
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.title {
+    font-family: var(--font-Oswald);
+    font-size: 2.5rem;
+    color: var(--color-p-8);
+    margin: 0;
+    text-transform: uppercase;
+}
+
+.dateBadge {
+    background: var(--color-white);
+    padding: 8px 20px;
+    border-radius: 30px;
+    font-family: var(--font-josefin);
+    font-weight: 700;
+    color: #555;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    border: 1px solid #eee;
+}
+
+/* --- BARRA DE ESTADÍSTICAS (Horizontal) --- */
+.statsContainer {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.statCard {
+    background: var(--color-white);
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border-left: 5px solid var(--secondary);
+    transition: transform 0.2s;
+}
+
+.statCard:hover { transform: translateY(-3px); }
+
+.statIcon {
+    width: 50px; height: 50px;
+    background: rgba(65, 191, 179, 0.1); /* Fondo turquesa suave */
+    color: var(--secondary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.statInfo h4 { margin: 0; font-size: 0.9rem; color: #888; font-family: var(--font-josefin); text-transform: uppercase;}
+.statInfo p { margin: 0; font-size: 1.8rem; font-weight: 700; color: #333; font-family: var(--font-Oswald); }
+
+/* --- AGENDA (Uso del espacio horizontal) --- */
+.sectionTitle {
+    font-family: var(--font-Alumni);
+    font-size: 1.8rem;
+    color: var(--primary);
+    margin-bottom: 1rem;
+    border-bottom: 2px solid #e5e7eb;
+    padding-bottom: 5px;
+}
+
+.agendaTableContainer {
+    background: var(--color-white);
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    overflow-x: auto; /* Scroll horizontal si es necesario */
+    margin-bottom: 3rem;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px; /* Fuerza el ancho para aprovechar el espacio */
+}
+
+.table th {
+    background: #f9fafb;
+    padding: 1rem;
+    text-align: left;
+    font-family: var(--font-Oswald);
+    color: #555;
+    font-size: 1rem;
+    text-transform: uppercase;
+}
+
+.table td {
+    padding: 1rem;
+    border-top: 1px solid #eee;
+    font-family: var(--font-Balo);
+    color: #333;
+}
+
+.timeCell {
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.canchaTag {
+    background: #eef2ff;
+    color: #4f46e5;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+}

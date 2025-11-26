@@ -73,6 +73,8 @@ import RealizarPagoPage from "../features/RolCliente/Pagos/RealizarPagoPage.jsx"
 import IngresarTarjetaPage from "../features/RolCliente/Pagos/IngresarTarjetaPage.jsx";
 import ConfirmarPagoQRPage from "../features/RolCliente/Pagos/ConfirmarPagoQRPage.jsx";
 
+//USUARIO CONTROL
+import ControlRoutes from '../features/RolUsuarioControl/routes/ControlRoutes.jsx';
 function AppRouter() {
 
   const pageVariants = {
@@ -498,6 +500,13 @@ function AppRouter() {
   }
 />
 
+{/* Rutas para el Rol Usuario Control */}
+<Route path="/control/*" element={
+    /* OJO: Aquí usa el nombre exacto como lo importaste arriba (Singular) */
+    <ProtectedRoute allowedRoles={['ROL_USUARIOCONTROL']}> 
+        <ControlRoutes />
+    </ProtectedRoute>
+} />
           {/* Ruta 404 - Redirigir a login */}
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>

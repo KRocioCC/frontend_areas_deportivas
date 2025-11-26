@@ -1,0 +1,144 @@
+.tab-reservas-container {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+    overflow: hidden;
+    border: 1px solid rgba(0,0,0,0.05);
+    animation: slideUp 0.4s ease-out;
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+.reservas-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    min-width: 700px;
+}
+
+/* --- CABECERA --- */
+.reservas-table th {
+    background: #1a1a1a; /* Negro suave */
+    color: white;
+    padding: 1.5rem;
+    text-align: left;
+    font-family: var(--font-Oswald, sans-serif);
+    font-weight: 500;
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border-bottom: 4px solid var(--primary); /* Línea Roja corporativa */
+}
+
+/* --- FILAS --- */
+.reservas-table td {
+    padding: 1.2rem 1.5rem;
+    border-bottom: 1px solid #f0f0f0;
+    color: #444;
+    vertical-align: middle;
+    font-family: var(--font-Balo, sans-serif);
+    font-size: 1rem;
+    transition: all 0.2s;
+}
+
+/* Efecto cebra sutil */
+.reservas-table tr:nth-child(even) {
+    background-color: #fafafa;
+}
+
+.reservas-table tr:hover td {
+    background-color: #fff5f5; /* Rojo muy pálido al hover */
+    color: var(--color-p-8);
+}
+
+/* --- ESTILOS DE CELDAS --- */
+.font-weight-bold {
+    font-weight: 700;
+    color: var(--primary);
+    font-family: var(--font-Oswald);
+    font-size: 1.1rem;
+}
+
+.cliente-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.cliente-info span {
+    font-weight: 700;
+    font-family: var(--font-josefin);
+    font-size: 1.05rem;
+    color: #2c3e50;
+}
+
+.cliente-info small {
+    color: #888;
+    font-size: 0.85rem;
+    font-family: var(--font-Alumni);
+    letter-spacing: 0.5px;
+}
+
+/* --- BADGES (Etiquetas de Estado) --- */
+.badge {
+    padding: 6px 14px;
+    border-radius: 6px; /* Menos redondo, más técnico */
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-family: var(--font-Oswald);
+    display: inline-block;
+    min-width: 90px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+/* Usamos tu paleta */
+.badge-warning { background-color: #fff7ed; color: #c2410c; border: 1px solid #ffedd5; } 
+.badge-success { background-color: var(--secondary); color: white; border: 1px solid var(--secondary); } /* Turquesa */
+.badge-danger  { background-color: #fee2e2; color: var(--color-danger); border: 1px solid #fecaca; } 
+.badge-info    { background-color: #eff6ff; color: #1d4ed8; border: 1px solid #dbeafe; }
+.badge-primary { background-color: #f0f9ff; color: #0284c7; border: 1px solid #e0f2fe; }
+.badge-secondary{ background-color: #f3f4f6; color: #6b7280; border: 1px solid #e5e7eb; }
+
+/* --- BOTÓN ACCIÓN --- */
+.btn-action {
+    padding: 8px 18px;
+    background: transparent;
+    border: 2px solid #e5e7eb;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-family: var(--font-josefin, sans-serif);
+    font-weight: 700;
+    color: #666;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-action:hover {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    box-shadow: 0 4px 12px rgba(217, 35, 50, 0.3);
+}
+
+.empty-reservas {
+    text-align: center;
+    padding: 5rem;
+    color: #999;
+    background: white;
+    border-radius: 16px;
+    border: 2px dashed #e5e7eb;
+    font-family: var(--font-josefin);
+    font-size: 1.2rem;
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}

@@ -1,0 +1,96 @@
+.galeria-container {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.upload-area {
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.btn-upload {
+    background: var(--color-p-10, #0B0D0E);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: var(--font-josefin);
+    font-weight: 700;
+    text-transform: uppercase;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-upload:hover {
+    background: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(217, 35, 50, 0.3);
+}
+
+.btn-upload.disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+/* GRID */
+.imagenes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 15px;
+}
+
+.img-card {
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    aspect-ratio: 1/1; /* Cuadrado */
+    border: 1px solid #eee;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+}
+
+.img-card:hover {
+    transform: scale(1.02);
+}
+
+.img-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Botón Eliminar (aparece al hover) */
+.btn-delete-img {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: rgba(255, 0, 0, 0.8);
+    color: white;
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.img-card:hover .btn-delete-img {
+    opacity: 1;
+}
+
+.no-images {
+    color: #999;
+    font-style: italic;
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 2rem;
+}

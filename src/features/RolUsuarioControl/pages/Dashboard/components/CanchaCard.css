@@ -1,0 +1,125 @@
+.cancha-card {
+  background: white;
+  border-radius: 16px; /* Más redondeado */
+  overflow: hidden;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.05); /* Sombra suave premium */
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  cursor: pointer;
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+.cancha-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+}
+
+/* Contenedor de la imagen: Le damos una altura fija */
+.card-image-container {
+    position: relative;
+    /* Define la altura que quieras para todas las portadas de las cards */
+    height: 180px; 
+    width: 100%;
+    overflow: hidden; /* Asegura que lo que se recorte no sobresalga */
+    border-top-left-radius: 16px; /* Mantenemos los bordes redondeados */
+    border-top-right-radius: 16px;
+}
+
+/* La imagen en sí: Hacemos que cubra el contenedor sin estirarse */
+.card-img {
+    width: 100%;
+    height: 100%;
+    /* ESTA ES LA CLAVE: 'cover' recorta la imagen para llenar el espacio */
+    object-fit: cover;
+    /* Opcional: 'center' asegura que el recorte se centre en la imagen */
+    object-position: center;
+    transition: transform 0.5s ease;
+}
+
+
+
+.card-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  background: rgba(255,255,255,0.9);
+  backdrop-filter: blur(4px);
+}
+
+.card-badge.active { 
+  background-color: var(--color-secondary); /* Turquesa para activo */
+  color: white;
+}
+
+.card-badge.inactive { 
+  color: #ef4444; 
+}
+
+.card-body { padding: 1.5rem; }
+
+.card-header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.card-title {
+  margin: 0;
+  font-size: 1.4rem; /* Actualizado a 1.4rem */
+  font-family: var(--font-Oswald); /* Fuente de títulos */
+  color: var(--color-p-8); /* Rojo oscuro o negro */
+  text-transform: uppercase;
+}
+
+.price-tag {
+  background: var(--color-secondary); /* El Turquesa #41BFB3 */
+  color: white;
+  padding: 2px 10px;
+  border-radius: 4px;
+  font-family: var(--font-Alumni);
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: 0.5px;
+}
+
+.specs-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 1.5rem;
+}
+
+.spec-item {
+  display: flex;
+  flex-direction: column;
+  background: #f9fafb;
+  padding: 8px;
+  border-radius: 8px;
+}
+
+.spec-label { font-size: 0.7rem; color: #9ca3af; text-transform: uppercase; }
+.spec-value { font-size: 0.9rem; color: #4b5563; font-weight: 600; }
+
+.card-btn {
+  width: 100%;
+  padding: 12px;
+  background-color: var(--primary); /* Rojo principal */
+  font-family: var(--font-josefin);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.card-btn:hover {
+  background-color: var(--color-p-8); /* Rojo más oscuro al hover */
+}

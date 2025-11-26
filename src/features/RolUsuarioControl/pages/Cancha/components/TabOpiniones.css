@@ -1,0 +1,77 @@
+.opiniones-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    max-width: 900px;
+    margin: 0 auto;
+    padding-top: 1rem;
+    animation: slideUp 0.4s ease-out;
+}
+
+.opinion-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    border: 1px solid rgba(0,0,0,0.05);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    transition: transform 0.2s;
+}
+
+.opinion-card:hover {
+    transform: scale(1.01);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+}
+
+.opinion-header {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    margin-bottom: 1.2rem;
+    border-bottom: 1px solid #f5f5f5;
+    padding-bottom: 1rem;
+}
+
+.usuario-avatar {
+    width: 50px; height: 50px;
+    background: var(--color-background);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-family: var(--font-Oswald); font-size: 1.2rem;
+    color: var(--primary);
+    border: 2px solid white;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.usuario-info { flex: 1; }
+
+.usuario-info h4 {
+    margin: 0;
+    font-family: var(--font-josefin);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #333;
+}
+
+.estrellas {
+    font-size: 1rem;
+    margin-top: 2px;
+}
+
+.fecha {
+    font-size: 0.85rem;
+    color: #999;
+    font-family: var(--font-Alumni);
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+.opinion-texto {
+    color: #555;
+    line-height: 1.6;
+    font-family: var(--font-Balo);
+    font-size: 1.05rem;
+    margin: 0;
+    position: relative;
+    padding-left: 15px;
+    border-left: 3px solid var(--secondary); /* Línea turquesa al lado */
+}
