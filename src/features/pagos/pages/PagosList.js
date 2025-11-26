@@ -27,7 +27,7 @@ const PagosList = ({ idReserva, onClose }) => {
   }, [idReserva]);
 
   return (
-    <div className="modal-overlay">
+    <div className="modal-overlay text-gray-900">
       <div className="modal-content">
         <button className="modal-close" onClick={onClose}>×</button>
         <h2 className="modal-title">Pagos de la Reserva</h2>

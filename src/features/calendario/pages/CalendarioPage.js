@@ -54,7 +54,7 @@ const CalendarioPage = () => {
 
 
   return (
-    <div className="calendario-container">
+    <div className="calendario-container text-gray-900">
       <h1 className="titulo-calendario">Gestión de Reservas</h1>
 
       {/* === FILTROS === */}

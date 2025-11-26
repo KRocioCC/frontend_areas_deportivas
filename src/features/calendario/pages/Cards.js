@@ -120,7 +120,7 @@ const ReservaCard = ({ reserva = {} }) => {
   };
 
   return (
-    <div className="reserva-wrapper">
+    <div className="reserva-wrapper text-gray-900">
       <div className="card">
         <header className="card-header row-between">
           <div className="header-left">

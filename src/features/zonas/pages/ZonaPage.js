@@ -120,7 +120,7 @@ async function handleSave(payload) {
 
 
   return (
-    <div className="Zona-page card">
+    <div className="Zona-page card text-gray-900">
       <div className="page-header">
         <h2>Zonas</h2>
 

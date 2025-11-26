@@ -147,7 +147,7 @@ export default function CanchaForm({
   }
 
   return (
-    <div className="p-6 max-h-[80vh] overflow-y-auto">
+    <div className="p-6 max-h-[80vh] overflow-y-auto text-gray-900">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-gray-800">{title}</h2>
         <button onClick={onCancel} className="p-2 rounded-full hover:bg-gray-100 transition-colors">

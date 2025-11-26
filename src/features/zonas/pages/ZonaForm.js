@@ -85,7 +85,7 @@ export default function ZonaForm({ initialData, onSave, onCancel }) {
   }
   
   return (
-    <form className="Zona-form" onSubmit={handleSubmit}>
+    <form className="Zona-form text-gray-900" onSubmit={handleSubmit}>
       <h3>{initialData ? 'Editar Zona' : 'Nueva Zona'}</h3>
 
       <div className="form-row">
