@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import SidebarAdmin from "./SidebarAdmin";
 import NavbarAdmin from "./NavbarAdmin"; // Navbar específico
+import AdminIntroTour from "../ui/AdminIntroTour";
 
 function DashboardLayoutAdmin({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -17,6 +18,8 @@ function DashboardLayoutAdmin({ children }) {
         />
         
         <main className="flex-1 overflow-x-hidden overflow-y-auto p-6">
+          {/* Guided Tour component mounted for admin pages */}
+          <AdminIntroTour />
           {children}
         </main>
       </div>

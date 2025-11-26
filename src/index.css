@@ -99,3 +99,110 @@
 html.dark {
   color-scheme: dark;
 }
+
+/* Estilos personalizados para el tour de Intro.js */
+.customIntroTooltip {
+  max-width: 600px !important;
+  min-width: 450px !important;
+  font-family: var(--font-Balo) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2) !important;
+}
+
+.customIntroTooltip .introjs-tooltip-header {
+  padding: 16px 20px !important;
+  border-bottom: 2px solid var(--color-secondary) !important;
+}
+
+.customIntroTooltip .introjs-tooltip-title {
+  font-family: var(--font-Alumni) !important;
+  font-size: 1.5rem !important;
+  font-weight: 700 !important;
+  color: var(--color-p-10) !important;
+}
+
+.customIntroTooltip .introjs-tooltiptext {
+  padding: 20px !important;
+  font-size: 1rem !important;
+  line-height: 1.6 !important;
+  color: #374151 !important;
+}
+
+.customIntroTooltip .introjs-tooltipbuttons {
+  padding: 12px 20px !important;
+  border-top: 1px solid #e5e7eb !important;
+}
+
+.customIntroTooltip .introjs-button {
+  font-family: var(--font-josefin) !important;
+  font-weight: 600 !important;
+  padding: 10px 20px !important;
+  border-radius: 8px !important;
+  transition: all 0.3s ease !important;
+  text-shadow: none !important;
+  font-size: 0.95rem !important;
+}
+
+.customIntroTooltip .introjs-nextbutton,
+.customIntroTooltip .introjs-donebutton {
+  background: var(--color-secondary) !important;
+  color: white !important;
+  border: none !important;
+}
+
+.customIntroTooltip .introjs-nextbutton:hover,
+.customIntroTooltip .introjs-donebutton:hover {
+  background: var(--color-p-11) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(65, 191, 179, 0.3) !important;
+}
+
+.customIntroTooltip .introjs-prevbutton {
+  background: #6b7280 !important;
+  color: white !important;
+  border: none !important;
+}
+
+.customIntroTooltip .introjs-prevbutton:hover {
+  background: #4b5563 !important;
+  transform: translateY(-2px) !important;
+}
+
+.customIntroTooltip .introjs-skipbutton {
+  color: #9ca3af !important;
+  font-weight: 500 !important;
+}
+
+.customIntroTooltip .introjs-skipbutton:hover {
+  color: #6b7280 !important;
+}
+
+.customIntroHighlight {
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5) !important;
+  border: 3px solid var(--color-secondary) !important;
+  border-radius: 8px !important;
+}
+
+.introjs-helperLayer {
+  border-radius: 8px !important;
+}
+
+/* Progress bar personalizada */
+.introjs-progress {
+  background: var(--color-secondary) !important;
+  height: 4px !important;
+}
+
+.introjs-progressbar {
+  background: var(--color-p-11) !important;
+}
+
+/* Asegurar que el tour siempre quede por delante del sidebar y cualquier overlay */
+.introjs-overlay,
+.introjs-helperLayer,
+.introjs-tooltip,
+.introjs-tooltipReferenceLayer,
+.introjs-showElement,
+.introjsFloatingElement {
+  z-index: 2147483000 !important; /* por encima de cualquier z-index común del layout */
+}

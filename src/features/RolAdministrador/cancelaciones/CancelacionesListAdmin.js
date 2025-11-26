@@ -89,7 +89,6 @@ export default function CancelacionesListAdmin() {
       sortable: true 
     },
     { header: "Cliente", render: (_, row) => `${row.cliente?.nombre} ${row.cliente?.apellidoPaterno}`, sortable: true },
-    { header: "Observaciones", accessor: "observaciones", truncate: 200 },
   ], []);
 
   const actions = useMemo(() => [

@@ -42,10 +42,10 @@ export default function TablaPedidosRecientes({ idAdministrador }) {
   }, [idAdministrador]);
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-4 pb-3 pt-4 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6">
+    <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-4 pb-3 pt-4 sm:px-6">
       <div className="flex flex-col gap-2 mb-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
+          <h3 className="text-lg font-semibold text-gray-800">
             Reservas del Mes
           </h3>
         </div>
@@ -54,41 +54,41 @@ export default function TablaPedidosRecientes({ idAdministrador }) {
 
       <div className="max-w-full overflow-x-auto">
         {loading ? (
-          <p className="text-gray-500 dark:text-gray-400">⏳ Cargando reservas...</p>
+          <p className="text-gray-500">⏳ Cargando reservas...</p>
         ) : reservas.length === 0 ? (
-          <p className="text-gray-500 dark:text-gray-400">📭 No hay reservas este mes.</p>
+          <p className="text-gray-500">📭 No hay reservas este mes.</p>
         ) : (
           <Table>
-            <TableHeader className="border-gray-100 dark:border-gray-800 border-y">
+            <TableHeader className="border-gray-100 border-y">
               <TableRow>
-                <TableCell isHeader className="py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">
+                <TableCell isHeader className="py-3 font-medium text-gray-500 text-start text-theme-xs">
                   Cliente
                 </TableCell>
-                <TableCell isHeader className="py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">
+                <TableCell isHeader className="py-3 font-medium text-gray-500 text-start text-theme-xs">
                   Cancha
                 </TableCell>
-                <TableCell isHeader className="py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">
+                <TableCell isHeader className="py-3 font-medium text-gray-500 text-start text-theme-xs">
                   Fecha
                 </TableCell>
-                <TableCell isHeader className="py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">
+                <TableCell isHeader className="py-3 font-medium text-gray-500 text-start text-theme-xs">
                   Estado
                 </TableCell>
               </TableRow>
             </TableHeader>
 
-            <TableBody className="divide-y divide-gray-100 dark:divide-gray-800">
+            <TableBody className="divide-y divide-gray-100">
               {reservas.map((reserva) => (
                 <TableRow key={reserva.idReserva}>
-                  <TableCell className="py-3 text-gray-800 text-theme-sm dark:text-white/90">
+                  <TableCell className="py-3 text-gray-800 text-theme-sm">
                     {reserva.cliente?.nombre || 'Cliente N/A'}
                   </TableCell>
-                  <TableCell className="py-3 text-gray-500 text-theme-sm dark:text-gray-400">
+                  <TableCell className="py-3 text-gray-500 text-theme-sm">
                     {reserva.cancha?.nombre || 'Cancha N/A'}
                   </TableCell>
-                  <TableCell className="py-3 text-gray-500 text-theme-sm dark:text-gray-400">
+                  <TableCell className="py-3 text-gray-500 text-theme-sm">
                     {reserva.fechaReserva}
                   </TableCell>
-                  <TableCell className="py-3 text-gray-500 text-theme-sm dark:text-gray-400">
+                  <TableCell className="py-3 text-gray-500 text-theme-sm">
                     <Badge
                       size="sm"
                       color={
