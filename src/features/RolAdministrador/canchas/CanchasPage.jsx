@@ -3,12 +3,10 @@ import { getAreadeportivaPorAdminId } from "../../../api/AreadeportivaApi";
 import {
   getCanchasPorArea,
   updateCancha,
-  createCancha,
   deleteCancha,
-  agregarImagenesCancha,
 } from "../../../api/CanchaApi";
 import { useAuth } from "../../../auth/hooks/useAuth";
-import BuscadorCanchas from "./components/components_cancha/BuscadorCanchas";
+// import BuscadorCanchas from "./components/components_cancha/BuscadorCanchas";
 import CanchaCard from "./components/components_cancha/CanchaCard";
 import WizardCrearCancha from "./WizardCrearCancha";
 import ModalEdicionCancha from "./components/components_cancha/ModalEdicionCancha";
@@ -23,6 +21,7 @@ const CanchasPage = () => {
   const [editingId, setEditingId] = useState(null);
   const [editedData, setEditedData] = useState({});
   const [err, setErr] = useState(null);
+  const [sinAreaDeportiva, setSinAreaDeportiva] = useState(false);
 
   // Wizard states
   const [showWizard, setShowWizard] = useState(false);
@@ -33,6 +32,8 @@ const CanchasPage = () => {
         const area = await getAreadeportivaPorAdminId(currentUser.idPersona);
         const id = area?.idAreadeportiva;
         if (!id) {
+          // No tiene área deportiva: mostrar mensaje amigable y evitar error
+          setSinAreaDeportiva(true);
           setLoading(false);
           return;
         }
@@ -43,7 +44,13 @@ const CanchasPage = () => {
         setFilteredCanchas(canchasData);
       } catch (error) {
         console.error("Error al obtener área o canchas:", error);
-        setErr("No se pudo cargar las canchas.");
+        // Si la API devuelve 404 para el área, tratar como sin área deportiva
+        if (error?.response?.status === 404) {
+          setSinAreaDeportiva(true);
+          setErr(null);
+        } else {
+          setErr("No se pudo cargar las canchas.");
+        }
       } finally {
         setLoading(false);
       }
@@ -149,6 +156,48 @@ const CanchasPage = () => {
     );
   }
 
+  // Mensaje amigable cuando no existe área deportiva aún
+  if (sinAreaDeportiva) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-[var(--color-p-4)] via-white to-[var(--color-p-5)]">
+        <div 
+          className="relative bg-cover bg-center bg-no-repeat py-20 px-4 md:px-8 overflow-hidden"
+          style={{
+            backgroundImage: `linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), url('/Fondos/Deporte11.png')`,
+          }}
+        >
+          <div className="absolute inset-0 bg-black bg-opacity-20" />
+          <div className="max-w-5xl mx-auto relative z-10 text-center">
+            <h1 className="text-4xl md:text-6xl font-black tracking-tighter mb-4" style={{fontFamily: "var(--font-Oswald)"}}>
+              Primero crea tu <span className="text-[var(--color-secondary)]">Área Deportiva</span>
+            </h1>
+            <p className="text-lg md:text-xl text-gray-200 max-w-3xl mx-auto" style={{fontFamily: "var(--font-Balo)"}}>
+              Para gestionar las canchas necesitas configurar tu área deportiva. Dirígete a <strong>Mi Área</strong> y completa la información.
+            </p>
+          </div>
+        </div>
+
+        <div className="w-full mx-auto px-4 md:px-12 py-12">
+          <div className="bg-white/85 backdrop-blur-md rounded-3xl shadow-2xl border border-white/30 p-10 text-center">
+            <div className="w-24 h-24 mx-auto mb-6 bg-yellow-100 rounded-full flex items-center justify-center">
+              <span className="text-4xl">🏟️</span>
+            </div>
+            <p className="text-gray-700 mb-6" style={{fontFamily: "var(--font-Balo)"}}>
+              Ve a <strong>Mi Área</strong> para crear tu área deportiva; luego vuelve aquí para añadir tus canchas.
+            </p>
+            <button
+              onClick={() => { window.location.href = '/admin/mi_area'; }}
+              className="px-8 py-4 bg-black text-white rounded-xl hover:bg-gray-800 transition-all duration-300 font-semibold shadow-lg"
+              style={{fontFamily: "var(--font-josefin)"}}
+            >
+              Ir a Mi Área
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (err) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[var(--color-p-4)] to-[var(--color-p-5)]">
@@ -234,6 +283,7 @@ const CanchasPage = () => {
             
             <div className="flex flex-col sm:flex-row gap-4">
               <button
+                id="btn-crear-cancha"
                 onClick={handleClearSearch}
                 className="px-8 py-4 bg-black text-white rounded-xl hover:bg-gray-800 transition-all duration-300 font-semibold text-sm shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center border border-gray-600"
                 style={{fontFamily: "var(--font-josefin)"}}
@@ -242,6 +292,7 @@ const CanchasPage = () => {
               </button>
               
               <button
+                id="btn-abrir-wizard-crear-cancha"
                 onClick={() => setShowWizard(true)}
                 className="px-8 py-4 bg-black text-white rounded-xl hover:bg-gray-800 transition-all duration-300 font-semibold text-sm shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center border border-gray-700"
                 style={{fontFamily: "var(--font-josefin)"}}
@@ -289,6 +340,7 @@ const CanchasPage = () => {
             </p>
             {!searchTerm && (
               <button
+                id="cta-primer-cancha"
                 onClick={() => setShowWizard(true)}
                 className="px-10 py-4 bg-black text-white rounded-xl hover:bg-gray-800 transition-all duration-300 font-semibold text-lg shadow-2xl hover:shadow-3xl transform hover:-translate-y-1"
                 style={{fontFamily: "var(--font-josefin)"}}

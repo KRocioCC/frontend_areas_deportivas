@@ -3,7 +3,7 @@
   padding: 2rem;
   background-color: #f5f6fa; /* Fondo gris muy suave */
   min-height: 100vh;
-  font-family: 'Inter', sans-serif; /* O la fuente que uses */
+  font-family: var(--font-Balo);
 }
 
 .page-header {

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from "framer-motion";
+import { useNavigate } from 'react-router-dom';
 import { 
     getAreadeportivaPorAdminId, 
     updateAreadeportiva,
@@ -12,6 +13,7 @@ import { ChevronLeft, Mail, Phone, MapPin, Clock, Globe, Camera, Trash2, Upload,
 
 export default function MiAreaPage() {
     const { currentUser } = useAuth();
+    const navigate = useNavigate();
     const [areaDeportiva, setAreaDeportiva] = useState(null);
     const [loading, setLoading] = useState(true);
     const [zonas, setZonas] = useState([]);
@@ -38,10 +40,10 @@ export default function MiAreaPage() {
     const primaryColor = '#41bfb2';
     const accentColor = '#f28627';
     const dangerColor = '#d61727';
-    const darkBg = '#0f1213';
-    const lightBg = '#ffffff';
-    const cardDark = '#1a1d1e';
-    const cardLight = '#ffffff';
+    // const darkBg = '#0f1213';
+    // const lightBg = '#ffffff';
+    // const cardDark = '#1a1d1e';
+    // const cardLight = '#ffffff';
 
     // Cargar área deportiva del administrador
     useEffect(() => {
@@ -124,6 +126,24 @@ export default function MiAreaPage() {
             setIsEditing(false);
             setNuevasImagenes([]);
             setImagenesAEliminar([]);
+            
+            // Verificar si está en el flujo del tour
+            const tourStatus = localStorage.getItem('adminTourStatus');
+            if (tourStatus) {
+                const status = JSON.parse(tourStatus);
+                if (status.stage === 'wait-area-creation') {
+                    // Actualizar el estado del tour para que continúe en Canchas
+                    localStorage.setItem('adminTourStatus', JSON.stringify({
+                        ...status,
+                        stage: 'canchas',
+                        ts: Date.now()
+                    }));
+                    // Redirigir a Canchas para que el tour continúe automáticamente
+                    setTimeout(() => {
+                        navigate('/admin/canchas_admin');
+                    }, 500);
+                }
+            }
         } catch (err) {
             alert('Error al actualizar el área deportiva: ' + (err.response?.data?.message || err.message));
         } finally {
@@ -414,6 +434,7 @@ export default function MiAreaPage() {
                         {!isEditing && (
                             <div className="flex justify-end mb-8">
                                 <button
+                                    id="mi-area-edit"
                                     onClick={() => setIsEditing(true)}
                                     className="px-6 py-3 rounded-xl font-medium flex items-center space-x-2 transition-all hover:scale-105"
                                     style={{ 
@@ -427,7 +448,7 @@ export default function MiAreaPage() {
                             </div>
                         )}
 
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div id="mi-area-form" className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                             {/* Información de contacto */}
                             <motion.div 
                                 initial={{ opacity: 0, x: -20 }}

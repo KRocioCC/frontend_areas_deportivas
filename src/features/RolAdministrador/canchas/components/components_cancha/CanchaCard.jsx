@@ -277,8 +277,8 @@ const CanchaCard = ({
                 </button>
 
                 <button
+                  className="w-1/3 py-3 bg-black text-white rounded-xl hover:bg-gray-800 transition-all duration-300 font-semibold text-sm shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 tour-btn-ver-reservas"
                   onClick={() => navigate(`/admin/cancha/ver_reservas/${cancha.idCancha}`)}
-                  className="w-1/3 py-3 bg-black text-white rounded-xl hover:bg-gray-800 transition-all duration-300 font-semibold text-sm shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                   style={{fontFamily: "var(--font-josefin)"}}
                 >
                   Ver Reservas

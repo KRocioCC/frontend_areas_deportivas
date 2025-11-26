@@ -1,36 +1,85 @@
 // src/features/cancelaciones/components/ModalCancelacionList.js
-import React from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { X, Users, Clock, CreditCard, CalendarDays } from "lucide-react";
 import Button from "../../../components/ui/Button";
+import { getCancha } from "../../../api/CanchaApi";
 import "./ModalCancelacionList.css";
 
 export default function ModalCancelacionList({ initialData, onCancel }) {
-  if (!initialData) return null;
+  const [imagenPrincipal, setImagenPrincipal] = useState("");
+  const [cargandoImagen, setCargandoImagen] = useState(true);
 
-  const cancha = initialData.cancha || {};
-  const cliente = initialData.cliente || {};
-  const pago = initialData.pago || {};
+  const cancha = useMemo(() => initialData?.cancha || {}, [initialData]);
+  const cliente = initialData?.cliente || {};
+  const pago = initialData?.pago || {};
 
-  // Función para obtener la primera imagen del vector de imágenes de la cancha
-  const getCanchaImageUrl = () => {
-    if (cancha.imagenes && cancha.imagenes.length > 0) {
-      const primeraImagen = cancha.imagenes[0];
-      if (primeraImagen.urlAcceso.startsWith('http')) {
-        return primeraImagen.urlAcceso;
-      } else {
-        return `http://localhost:8032${primeraImagen.urlAcceso}`;
-      }
-    }
-    return cancha.urlImagen || "https://placehold.co/300x300/2563eb/white?text=Sin+Imagen";
+  const getUrlImagenCompleta = (urlAcceso) => {
+    if (!urlAcceso) return "https://placehold.co/600x400?text=Sin+Imagen";
+    if (urlAcceso.startsWith("http")) return urlAcceso;
+    const baseUrl = "http://localhost:8032";
+    return `${baseUrl}${urlAcceso.startsWith('/') ? urlAcceso : '/' + urlAcceso}`;
   };
 
-  // Función para manejar errores de carga de imagen
+  useEffect(() => {
+    let cancelado = false;
+    async function cargar() {
+      setCargandoImagen(true);
+      try {
+        if (cancha && Array.isArray(cancha.imagenes) && cancha.imagenes.length > 0) {
+          const primera = cancha.imagenes[0];
+          const url = getUrlImagenCompleta(primera?.urlAcceso);
+          if (!cancelado) setImagenPrincipal(url);
+          setCargandoImagen(false);
+          return;
+        }
+        const alternos = [initialData?.imagenes, initialData?.imagenesCancha];
+        for (const arr of alternos) {
+          if (Array.isArray(arr) && arr.length > 0) {
+            const url = getUrlImagenCompleta(arr[0]?.urlAcceso);
+            if (!cancelado) setImagenPrincipal(url);
+            setCargandoImagen(false);
+            return;
+          }
+        }
+        if (cancha?.idCancha) {
+          const canchaFull = await getCancha(cancha.idCancha);
+          const imgs = canchaFull?.imagenes;
+          if (Array.isArray(imgs) && imgs.length > 0) {
+            const url = getUrlImagenCompleta(imgs[0]?.urlAcceso);
+            if (!cancelado) setImagenPrincipal(url);
+            setCargandoImagen(false);
+            return;
+          }
+        }
+        const directa = cancha?.urlImagen || cancha?.imageUrl || initialData?.urlImagen || initialData?.imageUrl;
+        if (directa) {
+          const url = getUrlImagenCompleta(directa);
+          if (!cancelado) setImagenPrincipal(url);
+          setCargandoImagen(false);
+          return;
+        }
+        if (!cancelado) {
+          setImagenPrincipal("https://placehold.co/600x400?text=Sin+Imágenes");
+          setCargandoImagen(false);
+        }
+      } catch (err) {
+        console.error('[ModalCancelacionList] Error cargando imagen:', err);
+        if (!cancelado) {
+          setImagenPrincipal("https://placehold.co/600x400?text=Error");
+          setCargandoImagen(false);
+        }
+      }
+    }
+    if (initialData) cargar(); else setCargandoImagen(false);
+    return () => { cancelado = true; };
+  }, [initialData, cancha]);
+
   const handleImageError = (e) => {
     e.target.onerror = null;
     e.target.src = "https://placehold.co/300x300/2563eb/white?text=Sin+Imagen";
   };
 
-  const imageUrl = getCanchaImageUrl();
+  if (!initialData) return null;
 
   return (
     <div className="modal-cancelacion-overlay">
@@ -49,11 +98,19 @@ export default function ModalCancelacionList({ initialData, onCancel }) {
           {/* Imagen y datos principales */}
           <div className="modal-cancelacion-grid">
             <div className="modal-cancelacion-image">
-              <img 
-                src={imageUrl} 
-                alt={cancha.nombre} 
-                onError={handleImageError}
-              />
+              {cargandoImagen ? (
+                <div className="w-full h-full flex flex-col items-center justify-center bg-gray-200 text-xs text-gray-600">
+                  <span>Cargando imagen...</span>
+                  <span>{cancha?.nombre}</span>
+                </div>
+              ) : (
+                <img 
+                  src={imagenPrincipal} 
+                  alt={cancha?.nombre} 
+                  onError={handleImageError}
+                  className="w-full h-full object-cover"
+                />
+              )}
             </div>
 
             <div className="modal-cancelacion-info">
@@ -89,8 +146,7 @@ export default function ModalCancelacionList({ initialData, onCancel }) {
                 <CreditCard className="icon" />
                 <span>
                   Pago: Bs{" "}
-                  {pago.monto || initialData.totalPagado || 0} (
-                  {pago.metodoPago || "Método no registrado"})
+                  {pago.monto || initialData.totalPagado || 0} 
                 </span>
               </div>
             </div>
@@ -118,12 +174,6 @@ export default function ModalCancelacionList({ initialData, onCancel }) {
                 <div className="label">Teléfono</div>
                 <div className="value">
                   {cliente.telefono || "No disponible"}
-                </div>
-              </div>
-              <div>
-                <div className="label">Observaciones</div>
-                <div className="value">
-                  {initialData.observaciones || "Sin observaciones"}
                 </div>
               </div>
             </div>
