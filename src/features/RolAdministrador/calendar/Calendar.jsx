@@ -52,25 +52,39 @@ const Calendar = () => {
           fin
         );
 
-        const mappedEvents = data.map((reserva) => ({
-          id: reserva.idReserva.toString(),
-          title: `${reserva.cliente?.nombre || "Cliente"} - ${
-            reserva.cancha?.nombre || ""
-          }`,
-          start: `${reserva.fechaReserva}T${reserva.horaInicio}`,
-          end: `${reserva.fechaReserva}T${reserva.horaFin}`,
-          backgroundColor: "#F28627", // color naranja
-            textColor: "#fff",          // 
-          extendedProps: {
-            estado: reserva.estadoReserva,
-            observaciones: reserva.observaciones,
-            cliente: reserva.cliente,
-            cancha: reserva.cancha,
-            disciplina: reserva.disciplina,
-            horaInicio: reserva.horaInicio,  
-            horaFin: reserva.horaFin          
-          },
-        }));
+        const mappedEvents = data.map((reserva) => {
+          // Determinar color según estado
+          let bgColor = "#2596be"; // color por defecto
+          
+          if (reserva.estadoReserva === "CONFIRMADA") {
+            bgColor = "#45bfb5"; // turquesa para confirmadas
+          } else if (reserva.estadoReserva === "PENDIENTE") {
+            bgColor = "#FF9800"; // naranja para pendientes
+          } else if (reserva.estadoReserva === "CANCELADA") {
+            bgColor = "#f44336"; // rojo para canceladas
+          }
+
+          return {
+            id: reserva.idReserva.toString(),
+            title: `${reserva.cliente?.nombre || "Cliente"} - ${
+              reserva.cancha?.nombre || ""
+            }`,
+            start: `${reserva.fechaReserva}T${reserva.horaInicio}`,
+            end: `${reserva.fechaReserva}T${reserva.horaFin}`,
+            backgroundColor: bgColor,
+            textColor: "#000000",
+            borderColor: bgColor,
+            extendedProps: {
+              estado: reserva.estadoReserva,
+              observaciones: reserva.observaciones,
+              cliente: reserva.cliente,
+              cancha: reserva.cancha,
+              disciplina: reserva.disciplina,
+              horaInicio: reserva.horaInicio,  
+              horaFin: reserva.horaFin          
+            },
+          };
+        });
 
         setEvents(mappedEvents);
       } catch (error) {
@@ -151,6 +165,10 @@ const handleEventClick = (clickInfo) => {
             initialView="dayGridMonth"
             locales={[esLocale]}
             locale="es"
+            height="auto"
+            contentHeight="750px"
+            slotMinTime="06:00:00"
+            slotMaxTime="20:00:00"
             headerToolbar={{
                 left: "prev,next",
                 center: "title",

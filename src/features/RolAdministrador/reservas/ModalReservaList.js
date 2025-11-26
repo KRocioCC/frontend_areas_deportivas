@@ -11,7 +11,26 @@ export default function ModalReservaList({ initialData, onCancel }) {
   const cliente = initialData.cliente || {};
   const pago = initialData.pago || {};
 
-  const imageUrl = cancha.urlImagen || "https://placehold.co/300x300/2563eb/white?text=Sin+Imagen";
+  // Función para obtener la primera imagen del vector de imágenes de la cancha
+  const getCanchaImageUrl = () => {
+    if (cancha.imagenes && cancha.imagenes.length > 0) {
+      const primeraImagen = cancha.imagenes[0];
+      if (primeraImagen.urlAcceso.startsWith('http')) {
+        return primeraImagen.urlAcceso;
+      } else {
+        return `http://localhost:8032${primeraImagen.urlAcceso}`;
+      }
+    }
+    return cancha.urlImagen || "https://placehold.co/300x300/2563eb/white?text=Sin+Imagen";
+  };
+
+  // Función para manejar errores de carga de imagen
+  const handleImageError = (e) => {
+    e.target.onerror = null;
+    e.target.src = "https://placehold.co/300x300/2563eb/white?text=Sin+Imagen";
+  };
+
+  const imageUrl = getCanchaImageUrl();
 
   return (
     <div className="modal-reserva-overlay">
@@ -30,7 +49,11 @@ export default function ModalReservaList({ initialData, onCancel }) {
           {/* Imagen y datos principales */}
           <div className="modal-reserva-grid">
             <div className="modal-reserva-image">
-              <img src={imageUrl} alt={cancha.nombre} />
+              <img 
+                src={imageUrl} 
+                alt={cancha.nombre} 
+                onError={handleImageError}
+              />
             </div>
 
             <div className="modal-reserva-info">

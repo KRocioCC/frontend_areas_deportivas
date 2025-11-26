@@ -1,7 +1,7 @@
 import React from 'react';
 import './ReservaCardCalendar.css';
 
-const ReservaCardCalendar = ({ reserva, onClose, onCancelarReserva, onGenerarPDF }) => {
+const ReservaCardCalendar = ({ reserva, onClose }) => {
     
     const formatearFecha = (fechaStr) => {
         if (!fechaStr) return 'Fecha no disponible';
@@ -24,19 +24,6 @@ const ReservaCardCalendar = ({ reserva, onClose, onCancelarReserva, onGenerarPDF
         } catch (err) {
             console.error('Error formateando fecha:', err);
             return fechaStr;
-        }
-    };
-
-    // Verificar si la reserva es pasada
-    const esReservaPasada = (reserva) => {
-        try {
-            const fechaReserva = new Date(reserva.fechaReserva);
-            const hoy = new Date();
-            fechaReserva.setHours(0,0,0,0);
-            hoy.setHours(0,0,0,0);
-            return fechaReserva < hoy;
-        } catch (error) {
-            return false;
         }
     };
 
@@ -152,67 +139,9 @@ const ReservaCardCalendar = ({ reserva, onClose, onCancelarReserva, onGenerarPDF
                             <p className="reserva-no-info">Información del cliente no disponible</p>
                         )}
                     </div>
-
-                    {/* Información de Pago */}
-                    <div className="reserva-info-card">
-                        <h3 className="reserva-info-card-title">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="reserva-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            Detalles de Pago
-                        </h3>
-                        <div className="reserva-info-card-content">
-                            <div className="reserva-info-line">
-                                <span className="reserva-label">Total pagado:</span>
-                                <span className="reserva-value">{reserva.totalPagado || 0} Bs.</span>
-                            </div>
-                            <div className="reserva-info-line">
-                                <span className="reserva-label">Saldo pendiente:</span>
-                                <span className="reserva-value">{reserva.saldoPendiente || 0} Bs.</span>
-                            </div>
-                            <div className="reserva-info-line">
-                                <span className="reserva-label">Completamente pagada:</span>
-                                <span className={`reserva-value ${reserva.pagadaCompleta ? 'reserva-pagada-si' : 'reserva-pagada-no'}`}>
-                                    {reserva.pagadaCompleta ? 'Sí ' : 'No '}
-                                </span>
-                            </div>
-                            {reserva.duracionMinutos && (
-                                <div className="reserva-info-line">
-                                    <span className="reserva-label">Duración:</span>
-                                    <span className="reserva-value">{reserva.duracionMinutos} minutos</span>
-                                </div>
-                            )}
-                        </div>
-                    </div>
                 </div>
 
-                {/* Observaciones */}
-                {reserva.observaciones && (
-                    <div className="reserva-observaciones-section">
-                        <h3 className="reserva-observaciones-title">Observaciones</h3>
-                        <div className="reserva-observaciones-content">
-                            {reserva.observaciones}
-                        </div>
-                    </div>
-                )}
-
-                {/* Botones de Acción */}
-                <div className="reserva-action-buttons">
-                    {/* Botón Cancelar (solo si no es pasada y está confirmada/pendiente) */}
-                    {!esReservaPasada(reserva) && 
-                     reserva.estadoReserva !== 'CANCELADA' && 
-                     !(reserva.eliminado || reserva.activo === false) && (
-                        <button
-                            className="reserva-btn-cancelar"
-                            onClick={() => onCancelarReserva(reserva)}
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="reserva-btn-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                            Cancelar Reserva
-                        </button>
-                    )}
-                </div>
+            
             </div>
         </div>
     );
