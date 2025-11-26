@@ -5,6 +5,9 @@ import { motion } from "framer-motion";
 import {
   getComentariosPorCancha,
   createComentario,
+  getComentariosMasRecientes,
+  getComentariosPorCliente,
+  getComentariosPorCalificacion
 } from "../../../api/ComentarioApi";
 import { useAuth } from "../../../auth/hooks/useAuth";
 import { useTheme } from "../../../context/ThemeContext";
@@ -49,7 +52,7 @@ export default function ComentariosCancha({ canchaId }) {
       setNuevo({ calificacion: 5, contenido: "" });
       cargar();
     } catch {
-      showToast("Error al enviar comentario", "error");
+      showToast("Debes iniciar sesión para dejar un comentario en esta cancha.", "warning");
     }
   }
 
@@ -97,8 +100,97 @@ export default function ComentariosCancha({ canchaId }) {
   const btnBg = isDarkMode ? "bg-[var(--color-p-2)]" : "bg-[var(--color-pb-3)]";
   const btnHover = isDarkMode ? "hover:bg-[#d94a28]" : "hover:bg-[#d9741f]";
 
+  //FILTROS Y ORDENAMIENTOS
+  // FILTROS
+  const [filtro, setFiltro] = useState("todos"); // 'todos', 'recientes', 'usuario', 1-5
+  const [clienteComentarios, setClienteComentarios] = useState([]);
+
+  useEffect(() => {
+    async function cargarFiltro() {
+      try {
+        let data = [];
+        if (filtro === "todos") {
+          data = await getComentariosPorCancha(canchaId);
+        } else if (filtro === "recientes") {
+          data = await getComentariosMasRecientes(canchaId);
+        } else if (filtro === "usuario") {
+          if (!user) {
+            showToast("Debes iniciar sesión para ver tus comentarios", "warning");
+            return;
+          }
+          data = await getComentariosPorCliente(user.id);
+        } else if (typeof filtro === "number") {
+          data = await getComentariosPorCalificacion(filtro);
+        }
+        setComentarios(data);
+      } catch (e) {
+        showToast("Error al cargar comentarios", "error");
+      }
+    }
+
+    cargarFiltro();
+  }, [filtro, canchaId, user]);
+
+
   return (
     <div className="w-full max-w-4xl mx-auto py-8 px-4">
+
+      <div className="flex flex-wrap gap-2 mb-6">
+        <button
+          onClick={() => setFiltro("todos")}
+          className={`px-4 py-2 rounded-full font-medium text-sm transition-all ${
+            filtro === "todos"
+              ? "bg-[var(--color-p-2)] text-white"
+              : isDarkMode
+              ? "bg-[#1c1f20] text-gray-300 hover:bg-[#2a2d2e]"
+              : "bg-[var(--color-pb-4)] text-gray-600 hover:bg-[var(--color-pb-5)]"
+          }`}
+        >
+          Todos
+        </button>
+
+        <button
+          onClick={() => setFiltro("recientes")}
+          className={`px-4 py-2 rounded-full font-medium text-sm transition-all ${
+            filtro === "recientes"
+              ? "bg-[var(--color-p-2)] text-white"
+              : isDarkMode
+              ? "bg-[#1c1f20] text-gray-300 hover:bg-[#2a2d2e]"
+              : "bg-[var(--color-pb-4)] text-gray-600 hover:bg-[var(--color-pb-5)]"
+          }`}
+        >
+          Más recientes
+        </button>
+
+        <button
+          onClick={() => setFiltro("usuario")}
+          className={`px-4 py-2 rounded-full font-medium text-sm transition-all ${
+            filtro === "usuario"
+              ? "bg-[var(--color-p-2)] text-white"
+              : isDarkMode
+              ? "bg-[#1c1f20] text-gray-300 hover:bg-[#2a2d2e]"
+              : "bg-[var(--color-pb-4)] text-gray-600 hover:bg-[var(--color-pb-5)]"
+          }`}
+        >
+          Mis comentarios
+        </button>
+
+        {[5, 4, 3, 2, 1].map((n) => (
+          <button
+            key={n}
+            onClick={() => setFiltro(n)}
+            className={`px-4 py-2 rounded-full font-medium text-sm transition-all flex items-center justify-center gap-1 ${
+              filtro === n
+                ? "bg-[var(--color-p-2)] text-white"
+                : isDarkMode
+                ? "bg-[#1c1f20] text-gray-300 hover:bg-[#2a2d2e]"
+                : "bg-[var(--color-pb-4)] text-gray-600 hover:bg-[var(--color-pb-5)]"
+            }`}
+          >
+            {n} ⭐
+          </button>
+        ))}
+      </div>
       {/* =====================
           HEADER PROMEDIO
       ====================== */}
@@ -236,59 +328,75 @@ export default function ComentariosCancha({ canchaId }) {
       {/* =====================
           FORMULARIO NUEVO
       ====================== */}
-      <div
-        className={`mt-10 p-6 rounded-2xl shadow-[0_4px_14px_#00000015] border ${border} ${bgCard}`}
-      >
-        <h3
-          className={`text-xl mb-4 font-[var(--font-Alumni)] ${textPrimary}`}
-        >
-          Escribe una opinión
+      <div className={`mt-10 p-8 rounded-3xl border ${border} ${bgCard} shadow-lg`}>
+        <h3 className={`text-1xl font-bold mb-6 font-[var(--font-Alumni)] ${textPrimary}`}>
+          ¿Qué te pareció esta cancha?
         </h3>
 
-        {/* SELECCIÓN DE ESTRELLAS */}
-        <div className="flex gap-2 mb-4">
+        {/* ESTRELLAS - Más grandes y con hover bonito */}
+        <div className="flex gap-3 mb-6 justify-center md:justify-start">
           {Array.from({ length: 5 }).map((_, i) => (
-            <Star
+            <motion.div
               key={i}
-              size={26}
-              className={`cursor-pointer transition-all ${
-                i < nuevo.calificacion
-                  ? starFill
-                  : "text-gray-300 dark:text-gray-600"
-              }`}
-              onClick={() => setNuevo({ ...nuevo, calificacion: i + 1 })}
-            />
+              whileHover={{ scale: 1.2 }}
+              whileTap={{ scale: 0.9 }}
+            >
+              <Star
+                size={26}
+                className={`cursor-pointer transition-all duration-200 ${
+                  i < nuevo.calificacion
+                    ? `${starFill} drop-shadow-lg`
+                    : "text-gray-300 dark:text-gray-600 hover:text-gray-400 dark:hover:text-gray-500"
+                }`}
+                onClick={() => setNuevo({ ...nuevo, calificacion: i + 1 })}
+              />
+            </motion.div>
           ))}
         </div>
 
-        {/* TEXTAREA */}
+        {/* TEXTAREA - Diseño más moderno */}
         <textarea
           value={nuevo.contenido}
           onChange={(e) => setNuevo({ ...nuevo, contenido: e.target.value })}
-          placeholder="Comparte tu experiencia..."
+          placeholder="Cuéntanos tu experiencia... ¿La cancha estaba en buen estado? ¿El ambiente? ¿Recomendarías este lugar?"
           className={`
-            w-full p-3 rounded-xl font-[var(--font-Balo)]
+            w-full p-5 rounded-2xl font-[var(--font-Balo)] text-base leading-relaxed
             border ${border}
-            ${isDarkMode ? "bg-[#0b0d0e] text-white" : "bg-white text-black"}
+            ${isDarkMode ? "bg-[#0b0d0e] text-white placeholder-gray-500" : "bg-white text-black placeholder-gray-400"}
+            focus:outline-none focus:ring-4 
+            resize-none transition-all duration-300
           `}
-          rows={3}
+          rows={4}
         />
 
-        {/* BOTÓN ENVIAR */}
-        <motion.button
-          whileTap={{ scale: 0.97 }}
-          whileHover={{ scale: 1.02 }}
-          onClick={enviar}
-          className={`
-            mt-4 px-6 py-3 flex items-center gap-2 
-            rounded-xl shadow-[0_4px_14px_#00000020]
-            font-[var(--font-josefin)] text-white
-            transition-all ${btnBg} ${btnHover}
-          `}
-        >
-          <SendHorizontal size={18} />
-          Enviar opinión
-        </motion.button>
+        {/* Mensaje de privacidad */}
+        <p className={`text-xs mt-3 ${textSecondary} flex items-center gap-1`}>
+          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
+          </svg>
+          Tu opinión será pública y aparecerá con tu nombre
+        </p>
+
+        {/* BOTÓN PUBLICAR - Más grande, llamativo y centrado */}
+        <div className="mt-6 flex justify-end">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={enviar}
+            disabled={!nuevo.contenido.trim() || !user?.id}
+            className={`
+              px-8 py-4 rounded-2xl font-bold text-lg
+              flex items-center gap-3 shadow-xl
+              transition-all duration-300
+              ${btnBg} ${btnHover} text-white
+              disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100
+              hover:shadow-2xl
+            `}
+          >
+            <SendHorizontal size={18} />
+            Publicar opinión
+          </motion.button>
+        </div>
       </div>
     </div>
   );
