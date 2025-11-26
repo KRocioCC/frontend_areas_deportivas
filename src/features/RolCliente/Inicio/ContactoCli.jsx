@@ -52,7 +52,7 @@ export default function ContactosCli() {
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+          <div className="grid grid-cols-1 lg:grid-cols-1 gap-10">
             {/* Formulario */}
             <motion.div
               initial={{ opacity: 0, x: -40 }}

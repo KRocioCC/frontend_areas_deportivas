@@ -2,11 +2,13 @@
 import React, { useEffect, useState } from "react";
 import { Star, Heart, MapPin, Clock, Tag, CheckCircle } from "lucide-react";
 import { getComentariosPorCancha } from "../../../../api/ComentarioApi";
+import { useNavigate } from "react-router-dom";
 
 export default function CanchaCardTodas({ cancha, isDarkMode }) {
   const [promedio, setPromedio] = useState(0);
   const [totalOpiniones, setTotalOpiniones] = useState(0);
-
+  const navigate = useNavigate();
+  
   useEffect(() => {
     async function cargarPromedio() {
       try {
@@ -137,12 +139,21 @@ export default function CanchaCardTodas({ cancha, isDarkMode }) {
 
         {/* Botones: Carta, Patrocinado, etc. */}
         <div className="flex gap-2">
-          <button className="text-xs px-3 py-1 border border-gray-300 rounded-md hover:bg-gray-100">
-            Ver disponibilidad
-          </button>
-          <button className="text-xs px-3 py-1 bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200">
-            Reservar
-          </button>
+          {/* Botones: Carta, Patrocinado, etc. */}
+          <div className="flex gap-2">
+            <button
+              onClick={() => navigate(`/canchacli/detalle/${cancha.idCancha}`)} // ← redirige al detalle
+              className="text-xs px-3 py-1 border border-gray-300 rounded-md hover:bg-gray-100"
+            >
+              Ver disponibilidad
+            </button>
+            <button
+              onClick={() => navigate(`/canchacli/detalle/${cancha.idCancha}`)} // ← redirige al detalle
+              className="text-xs px-3 py-1 bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200"
+            >
+              Reservar
+            </button>
+          </div>
           {/* Si quieres añadir "Patrocinado" como en la imagen */}
           {/* <span className="text-xs px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full font-medium">Patrocinado</span> */}
         </div>

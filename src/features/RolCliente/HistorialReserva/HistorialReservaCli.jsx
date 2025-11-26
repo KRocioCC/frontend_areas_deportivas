@@ -1,4 +1,3 @@
-// HistorialReservaCli.jsx
 import { useEffect, useState } from "react";
 import { format } from "date-fns";
 import {
@@ -20,9 +19,12 @@ import { useAuth } from "../../../auth/hooks/useAuth";
 import { useTheme } from "../../../context/ThemeContext";
 
 import {
-  getReservasPorCliente,
-  getReservasPorRangoFechas,
-  getReservasPorEstado
+  getReservasPorClienteYEstado,
+  getReservasClienteOrdenDesc,
+  getReservasClienteOrdenAsc,
+  getReservasPorClienteYNombreCancha, 
+  getReservasPorClienteEnRango,      
+  getReservasPorCliente
 } from "../../../api/ReservaApi";
 import { useNavigate } from "react-router-dom";
 import QrModal from "../QR/QrModal";
@@ -30,11 +32,9 @@ import QrModal from "../QR/QrModal";
 const ESTADO_TEXTO = {
   PENDIENTE: "Pendiente",
   CONFIRMADA: "Confirmada",
-  EN_CURSO: "En curso",
-  COMPLETADA: "Completada",
   CANCELADA: "Cancelada",
 };
-//aqui es donde me falta filtro de estado por fecha  es que debe ser de un solo clienyte
+
 export default function HistorialReservaCli() {
   const { user } = useAuth();
   const { isDarkMode } = useTheme();
@@ -45,31 +45,20 @@ export default function HistorialReservaCli() {
   const [fechaInicio, setFechaInicio] = useState("");
   const [fechaFin, setFechaFin] = useState("");
   const [loading, setLoading] = useState(true);
-  const [ordenFecha, setOrdenFecha] = useState("desc")
+  const [ordenFecha, setOrdenFecha] = useState("desc");
   const [reservasFiltradas, setReservasFiltradas] = useState([]);
   const navigate = useNavigate();
   const [openQrModal, setOpenQrModal] = useState(false);
   const [selectedReservaId, setSelectedReservaId] = useState(null);
+  const [searchCancha, setSearchCancha] = useState("");
 
   const ESTADO_COLORES = {
-    PENDIENTE: 
-      isDarkMode  
-        ? "border-[#f35734]" 
-        : "border-[#f38321]",
-
-    CONFIRMADA:
-      isDarkMode
-        ? "border-[#2C7366]"
-        : "border-[#46c4b7]",
-
-    CANCELADA:
-      isDarkMode
-        ? "border-[#8a2628]"
-        : "border-[#d40000]",
+    PENDIENTE: isDarkMode ? "border-[#f35734]" : "border-[#f38321]",
+    CONFIRMADA: isDarkMode ? "border-[#2C7366]" : "border-[#46c4b7]",
+    CANCELADA: isDarkMode ? "border-[#8a2628]" : "border-[#d40000]",
   };
 
   const toggleOrdenFecha = () => {
-    //aqui deberia ordenenar por fecha de creacion
     setOrdenFecha(prev => prev === "desc" ? "asc" : "desc");
   };
 
@@ -80,37 +69,122 @@ export default function HistorialReservaCli() {
       setReservas([]);
       setLoading(false);
     }
-  }, [idCliente, filtroEstado, fechaInicio, fechaFin]);
+  }, [idCliente, filtroEstado, fechaInicio, fechaFin, ordenFecha, searchCancha]);
+
+  const cargarReservas = async () => {
+    if (!idCliente) return;
+
+    try {
+      setLoading(true);
+
+      let data = [];
+
+      const nombreCancha = searchCancha.trim();
+      const tieneEstado = filtroEstado !== "TODOS";
+      const tieneFecha = fechaInicio || fechaFin;
+
+      /*
+      1️⃣ FILTRO POR NOMBRE DE CANCHA → prioridad máxima
+      */
+      if (nombreCancha) {
+        data = await getReservasPorClienteYNombreCancha(idCliente, nombreCancha); 
+
+        if (tieneEstado) {
+          data = data.filter((r) => r.estadoReserva === filtroEstado);
+        }
+
+        if (tieneFecha) {
+          const inicio = fechaInicio ? new Date(fechaInicio) : null;
+          const fin = fechaFin ? new Date(fechaFin) : null;
+
+          data = data.filter((r) => {
+            const fr = new Date(r.fechaCreacion);
+            if (inicio && fr < inicio) return false;
+            if (fin && fr > fin) return false;
+            return true;
+          });
+        }
+
+        setReservas(data);
+        return;
+      }
+
+      /*
+      FILTRO POR FECHAS
+      */
+      if (tieneFecha) {
+        data = await getReservasPorClienteEnRango(idCliente, fechaInicio, fechaFin); // 
+
+        if (tieneEstado) {
+          data = data.filter((r) => r.estadoReserva === filtroEstado);
+        }
+
+        setReservas(data);
+        return;
+      }
+
+      /*
+      SOLO ESTADO
+      */
+      if (tieneEstado) {
+        data = await getReservasPorClienteYEstado(idCliente, filtroEstado); // 
+        setReservas(data);
+        return;
+      }
+
+      /*
+      4️⃣ SOLO ORDEN
+      */
+      if (ordenFecha !== null) {
+        if (ordenFecha === "desc") {
+          data = await getReservasClienteOrdenDesc(idCliente);
+        } else {
+          data = await getReservasClienteOrdenAsc(idCliente);
+        }
+
+        setReservas(data);
+        return;
+      }
+
+      /*
+      5️⃣ CASO DEFAULT → TODAS LAS RESERVAS DEL CLIENTE
+      */
+      data = await getReservasPorCliente(idCliente);
+      setReservas(data);
+
+    } catch (error) {
+      console.error("Error cargando reservas:", error);
+      setReservas([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ✅ Solo aplicamos filtros adicionales en frontend si el backend no los soporta
+  // En este caso, como ya aplicamos todos los filtros en backend, no necesitamos reordenar ni filtrar aquí
+  // Pero si quieres ordenar por fecha de creación (por si el backend no lo hace), puedes hacerlo aquí
 
   useEffect(() => {
     let lista = [...reservas];
 
-    // Filtrar por estado si no es TODOS
-    if (filtroEstado !== "TODOS") {
-      lista = lista.filter(r => r.estadoReserva === filtroEstado);
-    }
-
-    // Función segura para parsear fechaReserva en objeto Date
+    // ✅ Solo si necesitas ordenar por fecha de creación (si el backend no lo hace)
     const parseDate = (str) => {
       if (!str) return NaN;
-      // si ya contiene 'T' (fecha ISO completa), usar Date
       if (str.includes('T')) return new Date(str);
-      // si es 'YYYY-MM-DD' -> crear Date en modo local añadiendo T00:00:00
       const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(str);
       if (match) {
         const [_, y, m, d] = match;
         return new Date(Number(y), Number(m) - 1, Number(d));
       }
-      // fallback
       const d = new Date(str);
       return isNaN(d) ? NaN : d;
     };
 
+    // ✅ Ordenar por fecha de creación (solo si no viene ordenado desde backend)
     lista.sort((a, b) => {
-      const fechaA = parseDate(a.fechaReserva);
-      const fechaB = parseDate(b.fechaReserva);
+      const fechaA = parseDate(a.fechaCreacion);
+      const fechaB = parseDate(b.fechaCreacion);
 
-      // fechas inválidas van al final
       const aInvalid = isNaN(fechaA);
       const bInvalid = isNaN(fechaB);
       if (aInvalid && bInvalid) return 0;
@@ -121,35 +195,9 @@ export default function HistorialReservaCli() {
     });
 
     setReservasFiltradas(lista);
-  }, [reservas, filtroEstado, ordenFecha]);
+  }, [reservas, ordenFecha]); 
+ 
 
-  
-
-  const cargarReservas = async () => {
-    try {
-      //console.log(" Cargando reservas...");
-      setLoading(true);
-      let data = [];
-
-      if (filtroEstado === "TODOS" && !fechaInicio && !fechaFin) {
-        data = await getReservasPorCliente(idCliente);
-      } else if (fechaInicio || fechaFin) {
-        data = await getReservasPorRangoFechas(idCliente, fechaInicio, fechaFin);
-      } else {
-        data = await getReservasPorEstado(filtroEstado);
-      }
-     
-      if (filtroEstado !== "TODOS") {
-        data = data.filter(r => r.estadoReserva === filtroEstado);
-      }
-
-      setReservas(data);
-    } catch (error) {
-      setReservas([]);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const getAccionesPorEstado = (estado) => {
     switch (estado) {
@@ -157,9 +205,6 @@ export default function HistorialReservaCli() {
         return ["Ver Pagos", "Detalle", "Reprogramar", "Cancelar"];
       case "CONFIRMADA":
         return ["QR", "Detalle", "Invitados", "Ver Pagos"];
-      case "EN_CURSO":
-      case "COMPLETADA":
-        return ["QR", "Detalle", "Invitados","Ver Pagos"];
       case "CANCELADA":
         return ["Detalle"];
       default:
@@ -234,6 +279,33 @@ export default function HistorialReservaCli() {
           }}
         >
           <div className="flex flex-col lg:flex-row lg:items-end gap-6">
+             {/*buscasor */}
+             {/* Buscador por cancha (opcional) */}
+            <div className="flex-1">
+              <label className="block text-sm font-medium mb-2" style={{ color: isDarkMode ? "#2C7366" : "#46c4b7" }}>
+                Buscar por cancha
+              </label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Nombre de la cancha"
+                  value={searchCancha}
+                  onChange={(e) => setSearchCancha(e.target.value)}
+                  className={`w-full px-4 py-2 rounded-xl text-sm transition-all
+                    ${isDarkMode ? "bg-[#141717] text-gray-200" : "bg-white text-gray-900"}
+                  `}
+                  style={{ border: "1px solid transparent", outline: "none" }}
+                />
+                <button
+                  onClick={() => cargarReservas()}
+                  className="px-4 py-2 rounded-xl font-medium"
+                  style={{ background: isDarkMode ? "#171a1b" : "#f2f2f2", color: isDarkMode ? "#e5e5e5" : "#333" }}
+                >
+                  Buscar
+                </button>
+              </div>
+            </div>
+
 
             {/* Filtro por estado */}
             <div className="flex-1">
