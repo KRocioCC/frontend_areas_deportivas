@@ -143,3 +143,31 @@ export const getReservasPorCancha = async (idCancha) => {
   const res = await api.get(`${URL_BASE}/${idCancha}/reservas`);
   return res.data;
 };
+/**RESERVAS DE UN CLIENTE POR ESTADO */
+export const getReservasPorClienteYEstado = async (idCliente, estado) => {
+  const res = await api.get(`${URL_BASE}/cliente/${idCliente}/estado/${estado}`);
+  return res.data;
+};
+
+export const getReservasClienteOrdenAsc = async (idCliente) => {
+  const res = await api.get(`${URL_BASE}/cliente/${idCliente}/orden/fecha-creacion/asc`);
+  return res.data;
+};
+
+export const getReservasClienteOrdenDesc = async (idCliente) => {
+  const res = await api.get(`${URL_BASE}/cliente/${idCliente}/orden/fecha-creacion/desc`);
+  return res.data;
+};
+
+
+// Buscar por cancha
+export const getReservasPorNombreCancha = async (nombre) => {
+  const res = await api.get(`${URL_BASE}/cancha/${nombre}`);
+  return res.data;
+};
+
+// Listar invitados por reserva
+export const getInvitadosByReserva = async (idReserva) => {
+  const res = await api.get(`${URL_BASE}/${idReserva}/invitados`);
+  return res.data;
+};

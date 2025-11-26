@@ -126,3 +126,84 @@ export const getAllCanchas = async () => {
     return response.data;
 };
 
+//Obtener canchas mejor calificadas
+export async function getCanchasMejorCalificadas() {
+  const res = await api.get(`${API_URL}/mejor-calificadas`);
+  return res.data;
+}
+
+// Obtener canchas más reservadas
+export async function getCanchasMasReservadas() {
+  const res = await api.get(`${API_URL}/mas-reservadas`);
+  return res.data;
+}
+
+// Por disciplina (por ID)
+export async function getCanchasPorDisciplina(idDisciplina) {
+  const res = await api.get(`${API_URL}/por-disciplina/${idDisciplina}`);
+  return res.data;
+}
+
+// Por zona (por ID)
+export async function getCanchasPorZona(idZona) {
+  const res = await api.get(`${API_URL}/por-zona/${idZona}`);
+  return res.data;
+}
+
+// Abiertas ahora
+export async function getCanchasAbiertasAhora() {
+  const res = await api.get(`${API_URL}/abiertas-ahora`);
+  return res.data;
+}
+
+// Disponibles en una fecha y rango horario
+export async function getCanchasDisponibles(fecha, horaInicio, horaFin) {
+  const res = await api.get(`${API_URL}/disponibles`, {
+    params: { fecha, horaInicio, horaFin }
+  });
+  return res.data;
+}
+
+// Reservadas por cliente (por ID de cliente)
+export async function getCanchasReservadasPorCliente(idCliente) {
+  const res = await api.get(`${API_URL}/reservadas-cliente/${idCliente}`);
+  return res.data;
+}
+
+// Buscar por nombre de disciplina (texto)
+export async function buscarCanchasPorNombreDisciplina(nombreDisciplina) {
+  const res = await api.get(`${API_URL}/buscar-por-disciplina`, {
+    params: { nombreDisciplina }
+  });
+  return res.data;
+}
+
+// Por capacidad
+export async function getCanchasPorCapacidad(capacidad) {
+  const res = await api.get(`${API_URL}/por-capacidad/${capacidad}`);
+  return res.data;
+}
+
+// Por tipo de superficie
+export async function getCanchasPorTipoSuperficie(tipoSuperficie) {
+  const res = await api.get(`${API_URL}/por-superficie`, {
+    params: { tipoSuperficie }
+  });
+  return res.data;
+}
+
+// Por iluminación ("si" o "no", por ejemplo)
+export async function getCanchasPorIluminacion(iluminacion) {
+  const res = await api.get(`${API_URL}/por-iluminacion`, {
+    params: { iluminacion }
+  });
+  return res.data;
+}
+
+// Por cubierta ("si" o "no")
+export async function getCanchasPorCubierta(cubierta) {
+  const res = await api.get(`${API_URL}/por-cubierta`, {
+    params: { cubierta }
+  });
+  return res.data;
+}
