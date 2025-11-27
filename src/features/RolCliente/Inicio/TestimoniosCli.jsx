@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useTheme } from "../../../context/ThemeContext";
-import { getComentariosMayorCalificacionRecientes } from "../../../api/ComentarioApi"; // ✅ Endpoint corregido
+import { getComentariosMayorCalificacionRecientes } from "../../../api/ComentarioApi";
 import { Quote, User } from "lucide-react";
 
 export default function TestimoniosCli() {
@@ -14,8 +14,8 @@ export default function TestimoniosCli() {
     async function cargarTestimonios() {
       try {
         const data = await getComentariosMayorCalificacionRecientes();
-        // Tomamos máximo 5 testimonios
-        setTestimonios(data.slice(0, 5));
+        // ✅ Ahora tomamos solo los 4 más recientes
+        setTestimonios(data.slice(0, 4));
       } catch (err) {
         console.error("Error cargando testimonios destacados:", err);
         setTestimonios([]);
@@ -26,14 +26,13 @@ export default function TestimoniosCli() {
     cargarTestimonios();
   }, []);
 
-  // Mapeo seguro: usa contenido, persona.nombre, etc.
   const testimoniosMapeados = testimonios.map(t => ({
     idComentario: t.idComentario,
-    comentario: t.contenido, // ✅ API usa "contenido"
+    comentario: t.contenido,
     fecha: t.fecha,
     calificacion: t.calificacion,
     usuario: {
-      nombre: t.persona?.nombre || "Jugador", // ✅ viene en "persona"
+      nombre: t.persona?.nombre || "Jugador Mario ",
     },
   }));
 
@@ -45,7 +44,6 @@ export default function TestimoniosCli() {
       }`}
     >
       <div className="max-w-7xl mx-auto relative z-10">
-        {/* Título - SIN CAMBIOS */}
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -69,16 +67,15 @@ export default function TestimoniosCli() {
         </motion.div>
 
         {loading ? (
-          // Skeleton - SIN CAMBIOS
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[...Array(5)].map((_, i) => (
+            {[...Array(4)].map((_, i) => (
               <div key={i} className="h-64 bg-gray-200 dark:bg-gray-800 rounded-3xl animate-pulse" />
             ))}
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Columna testimonios - MISMO DISEÑO */}
-            <div className="flex flex-col gap-4">
+            {/* Columna de testimonios: ahora con más ancho */}
+            <div className="flex flex-col gap-1">
               {testimoniosMapeados.map((t, index) => {
                 const isLeft = index % 2 === 0;
                 return (
@@ -91,7 +88,7 @@ export default function TestimoniosCli() {
                     className={`flex ${isLeft ? 'justify-start' : 'justify-end'}`}
                   >
                     <div
-                      className={`max-w-[85%] p-6 rounded-2xl shadow-lg border relative ${
+                      className={`max-w-[95%] p-6 rounded-2xl shadow-lg border relative ${
                         isDarkMode
                           ? 'bg-black/40 border-white/10 text-gray-200'
                           : 'bg-white border-gray-200 text-gray-800'
@@ -131,14 +128,13 @@ export default function TestimoniosCli() {
               })}
             </div>
 
-            {/* Columna imagen - SIN CAMBIOS */}
+            {/* Columna de la imagen: ahora con la imagen real */}
             <div className="flex justify-center items-start">
-              <div
-                className="w-full aspect-square rounded-2xl bg-gray-300 dark:bg-gray-700"
-                style={{ maxWidth: '500px' }}
-              >
-                {/* Imagen placeholder */}
-              </div>
+              <img
+                src="/contenido/Imagenfondo.png"
+                alt="Jugadores felices"
+                className="w-full max-w-[500px] aspect-square object-cover rounded-2xl"
+              />
             </div>
           </div>
         )}

@@ -633,8 +633,8 @@ export default function WizardCrearCancha({ isOpen, onClose, onCanchaCreada }) {
                                                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                                                 style={{ fontFamily: 'var(--font-Balo)' }}
                                             >
-                                                <option value="césped natural">Césped Natural</option>
-                                                <option value="césped sintético">Césped Sintético</option>
+                                                <option value="cesped natural">Césped Natural</option>
+                                                <option value="cesped sintetico">Césped Sintético</option>
                                                 <option value="cemento">Cemento</option>
                                                 <option value="parquet">Parquet</option>
                                                 <option value="arena">Arena</option>
@@ -652,7 +652,7 @@ export default function WizardCrearCancha({ isOpen, onClose, onCanchaCreada }) {
                                                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                                                 style={{ fontFamily: 'var(--font-Balo)' }}
                                             >
-                                                <option value="halógena">Halógena</option>
+                                                <option value="halogena">Halógena</option>
                                                 <option value="led">LED</option>
                                                 <option value="fluorescente">Fluorescente</option>
                                                 <option value="natural">Natural</option>

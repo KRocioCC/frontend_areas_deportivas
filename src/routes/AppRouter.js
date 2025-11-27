@@ -76,7 +76,7 @@ import PreguntasFrecuentes from "../features/RolCliente/Inicio/Ayuda/PreguntasFr
 import SobreNosotros from "../features/RolCliente/Inicio/SobreNosotros/SobreNosotros.jsx";
 import ListadoCanchas from "../features/RolCliente/Canchas/ListadoCanchas.jsx";
 import PerfilCliente from "../features/RolCliente/MiPerfil/PerfilCLiente.jsx";
-
+import FormularioQrPublico from "../features/RolCliente/FormularioQrPublico.jsx";
 function AppRouter() {
 
   const pageVariants = {
@@ -109,6 +109,8 @@ function AppRouter() {
       <BrowserRouter>
         {/* routes */}
         <Routes>
+
+
           
           {/* Redirección por defecto → inicio */}
           <Route path="/" element={<Navigate to="/inicio" replace />} />
@@ -119,6 +121,7 @@ function AppRouter() {
           <Route path="/register" element={<RegisterTypeSelector />} />
           <Route path="/register/cliente" element={<RegisterCliente />} />
           <Route path="/register/administrador" element={<RegisterAdministrador />} />
+          <Route path="/qr-publico/:idReserva/:codigoQr" element={<FormularioQrPublico />} />
 
           {/*paginas publicas */}
 

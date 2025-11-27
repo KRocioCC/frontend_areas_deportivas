@@ -30,7 +30,7 @@ const ReservaCardCalendar = ({ reserva, onClose }) => {
     if (!reserva) return null;
 
     return (
-        <div className="reserva-card-modal-overlay" onClick={onClose}>
+        <div className="reserva-card-modal-overlay text-gray-800" onClick={onClose}>
             <div className="reserva-card-modal-container" onClick={(e) => e.stopPropagation()}>
                 
                 {/* Header del Modal */}

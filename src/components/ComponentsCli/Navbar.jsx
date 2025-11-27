@@ -39,8 +39,7 @@ export default function Navbar() {
       path: "/empresa", 
       children: [
         { name: "¿Quiénes Somos?", path: "/empresa#nosotros" },
-        { name: "Misión y Visión", path: "/empresa#misionvision" },
-        { name: "Equipo", path: "/empresa#equipo" }
+        { name: "Misión y Visión", path: "/empresa#misionvision" }
       ]
     },
   ];

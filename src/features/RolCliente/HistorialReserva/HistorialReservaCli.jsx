@@ -263,9 +263,9 @@ export default function HistorialReservaCli() {
   const getAccionesPorEstado = (estado) => {
     switch (estado) {
       case "PENDIENTE":
-        return ["Ver Pagos", "Detalle", "Reprogramar", "Cancelar"];
+        return ["Ver Pagos", "Detalle", "Cancelar"];
       case "CONFIRMADA":
-        return ["QR", "Detalle", "Invitados", "Ver Pagos"];
+        return ["QR", "Detalle", "Ver Pagos"];
       case "CANCELADA":
         return ["Detalle"];
       default:

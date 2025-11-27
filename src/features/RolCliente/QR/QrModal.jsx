@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { getQrImage, getQrsByPersona } from "../../../api/QrApi";
 import { useAuth } from "../../../auth/hooks/useAuth";
 import { useTheme } from "../../../context/ThemeContext";
+import { useToast } from "../../../context/ToastContext";
 
 export default function QrModal({ open, onClose, idReserva }) {
   const { user } = useAuth();
@@ -15,6 +16,7 @@ export default function QrModal({ open, onClose, idReserva }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [copied, setCopied] = useState(false);
+  const { showToast } = useToast();
 
   /* ============================================================
         1) BUSCAR EL QR (solo cuando se abre el modal)
@@ -43,6 +45,7 @@ export default function QrModal({ open, onClose, idReserva }) {
 
         if (!encontrado) {
           setError("No tienes un QR para esta reserva");
+          showToast("No tienes un QR para esta reserva", "error");
           setQrData(null);
           return;
         }
@@ -50,6 +53,10 @@ export default function QrModal({ open, onClose, idReserva }) {
         setQrData(encontrado);
       } catch {
         setError("Error al cargar el QR");
+        showToast(
+          "Error al cargar información. Intenta recargar la página.",
+          "error"
+        );
       } finally {
         setLoading(false);
       }
@@ -81,8 +88,8 @@ export default function QrModal({ open, onClose, idReserva }) {
   if (!open) return null;
 
   const enlacePublico = qrData
-    ? `https://miapp.com/qr-publico/${qrData.codigoQr.replace(".png", "")}`
-    : "";
+  ? `${window.location.origin}/qr-publico/${qrData.idReserva}/${qrData.codigoQr.replace(".png", "")}`
+  : "";
 
   const copiarEnlace = async () => {
     await navigator.clipboard.writeText(enlacePublico);

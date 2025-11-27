@@ -7,7 +7,9 @@ import {
   buscarCanchasPorNombreDisciplina,
   getCanchas,
   getCanchasActivas,
-  getCanchasDisponibles
+  getCanchasPorTipoSuperficie,
+  getCanchasPorIluminacion,
+  getCanchasPorCubierta,
 } from "../../../../api/CanchaApi";
 
 const FiltrosCanchas = ({ onFilter, onReset }) => {
@@ -33,7 +35,7 @@ const FiltrosCanchas = ({ onFilter, onReset }) => {
 
   const [activas, setActivas] = useState(true);
 
-  const [fecha, setFecha] = useState("");
+  //const [fecha, setFecha] = useState("");
   const [horaInicio, setHoraInicio] = useState("");
   const [horaFin, setHoraFin] = useState("");
 
@@ -48,12 +50,12 @@ const FiltrosCanchas = ({ onFilter, onReset }) => {
       let data = [];
 
       // 1️⃣ DISPONIBILIDAD (prioridad máxima)
-      if (fecha && horaInicio && horaFin) {
+      /*if (fecha && horaInicio && horaFin) {
         data = await getCanchasDisponibles(fecha, horaInicio, horaFin);
         data = filtrarLocales(data);
         onFilter(data);
         return;
-      }
+      }*/
 
       // 2️⃣ POR NOMBRE
       if (debouncedNombre.length >= 2) {
@@ -66,6 +68,30 @@ const FiltrosCanchas = ({ onFilter, onReset }) => {
       // 3️⃣ POR DISCIPLINA
       if (debouncedDisciplina.length >= 2) {
         data = await buscarCanchasPorNombreDisciplina(debouncedDisciplina);
+        data = filtrarLocales(data);
+        onFilter(data);
+        return;
+      }
+
+          // 4️⃣ SUPERFICIE (API — SOLO ACTIVAS)
+      if (superficie) {
+        data = await getCanchasPorTipoSuperficie(superficie);
+        data = filtrarLocales(data);
+        onFilter(data);
+        return;
+      }
+
+      // 5️⃣ ILUMINACIÓN (API — SOLO ACTIVAS)
+      if (iluminacion) {
+        data = await getCanchasPorIluminacion(iluminacion);
+        data = filtrarLocales(data);
+        onFilter(data);
+        return;
+      }
+
+      // 6️⃣ CUBIERTA (API — SOLO ACTIVAS)
+      if (cubierta) {
+        data = await getCanchasPorCubierta(cubierta);
         data = filtrarLocales(data);
         onFilter(data);
         return;
@@ -110,10 +136,9 @@ const FiltrosCanchas = ({ onFilter, onReset }) => {
 
       if (superficie && c.tipoSuperficie !== superficie) return false;
 
-      if (iluminacion && (c.iluminacion ? "si" : "no") !== iluminacion)
-        return false;
+      if (iluminacion && c.iluminacion !== iluminacion)return false;
 
-      if (cubierta && (c.cubierta ? "si" : "no") !== cubierta)
+      if (cubierta && (c.cubierta ? "abierta" : "cubierta") !== cubierta)
         return false;
 
       return true;
@@ -134,7 +159,6 @@ const FiltrosCanchas = ({ onFilter, onReset }) => {
     iluminacion,
     cubierta,
     activas,
-    fecha,
     horaInicio,
     horaFin
   ]);
@@ -153,7 +177,7 @@ const FiltrosCanchas = ({ onFilter, onReset }) => {
     setIluminacion("");
     setCubierta("");
     setActivas(true);
-    setFecha("");
+    //setFecha("");
     setHoraInicio("");
     setHoraFin("");
 
@@ -242,7 +266,8 @@ const FiltrosCanchas = ({ onFilter, onReset }) => {
               setValue={setSuperficie}
               options={[
                 ["", "Cualquiera"],
-                ["cesped", "Césped"],
+                ["cesped natural", "Césped Natural"],
+                ["cesped sintetico", "Césped Sintético"],
                 ["cemento", "Cemento"],
                 ["parquet", "Parquet"],
                 ["arena", "Arena"]
@@ -255,8 +280,10 @@ const FiltrosCanchas = ({ onFilter, onReset }) => {
               setValue={setIluminacion}
               options={[
                 ["", "Cualquiera"],
-                ["si", "Sí"],
-                ["no", "No"]
+                ["halogena", "Halógena"],
+                ["led", "LED"],
+                ["fluorescente", "Fluorescente"],
+                ["natural", "Natural"]
               ]}
               isDarkMode={isDarkMode}
             />
@@ -266,8 +293,8 @@ const FiltrosCanchas = ({ onFilter, onReset }) => {
               setValue={setCubierta}
               options={[
                 ["", "Cualquiera"],
-                ["si", "Sí"],
-                ["no", "No"]
+                ["abierta", "Abierta"],
+                ["cubierta", "Cubierta"]
               ]}
               isDarkMode={isDarkMode}
             />
@@ -275,7 +302,7 @@ const FiltrosCanchas = ({ onFilter, onReset }) => {
 
           {/* Disponibilidad + Checkbox */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-            <InputFiltroFecha
+            {/*<InputFiltroFecha
               label="Fecha"
               value={fecha}
               setValue={setFecha}
@@ -294,8 +321,8 @@ const FiltrosCanchas = ({ onFilter, onReset }) => {
               value={horaFin}
               setValue={setHoraFin}
               isDarkMode={isDarkMode}
-            />
-            <div className="flex items-end">
+            />*/}
+           {/*<div className="flex items-end">
               <label className={`flex items-center gap-2 text-sm ${labelColor} font-['Alumni']`}>
                 <input
                   type="checkbox"
@@ -305,7 +332,7 @@ const FiltrosCanchas = ({ onFilter, onReset }) => {
                 />
                 Solo activas
               </label>
-            </div>
+            </div>*/}
           </div>
 
           {/* Botón de reset */}

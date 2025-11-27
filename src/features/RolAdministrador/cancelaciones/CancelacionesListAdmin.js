@@ -96,7 +96,7 @@ export default function CancelacionesListAdmin() {
   ], [openView]);
 
   return (
-    <div className="CancelacionesListAdmin card">
+    <div className="CancelacionesListAdmin card text-gray-800">
       <div className="page-header">
         <h2>Cancelaciones</h2>
 
