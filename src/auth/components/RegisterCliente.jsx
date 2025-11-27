@@ -13,7 +13,7 @@ const RegisterCliente = () => {
     apellidoMaterno: '',
     telefono: '',
     fechaNacimiento: '',
-    urlImagen: '',
+    urlImagen: 'https://cdn-icons-png.flaticon.com/512/4814/4814852.png',
     categoria: 'NUEVO'
   });
 
@@ -366,7 +366,7 @@ const RegisterCliente = () => {
                     className={getInputClassName('password').replace('py-2', 'py-2')}
                   />
                 </div>
-
+                {/*
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-300 mb-1">
                     URL de Imagen (Opcional)
@@ -380,6 +380,7 @@ const RegisterCliente = () => {
                     placeholder="https://ejemplo.com/imagen.jpg"
                   />
                 </div>
+                */}
               </div>
 
               <input type="hidden" name="categoria" value="NUEVO" />

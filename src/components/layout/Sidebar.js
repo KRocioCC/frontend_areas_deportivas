@@ -65,8 +65,8 @@ function Sidebar({ open }) {
       },
       { label: "Áreas Deportivas", icon: <TfiLocationPin />, path: "/areadeportiva" },
       { label: "Canchas", icon: <TfiBasketball />, path: "/canchas" },
-      { label: "Equipamientos", icon: <TfiLayersAlt />, path: "/equipamientos" },
-      { label: "Calendario", icon: <TfiCalendar />, path: "/reservas/calendario" }
+      //{ label: "Equipamientos", icon: <TfiLayersAlt />, path: "/equipamientos" },
+      //{ label: "Calendario", icon: <TfiCalendar />, path: "/reservas/calendario" }
     );
   }
 
