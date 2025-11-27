@@ -11,7 +11,7 @@ export default function CalendarSelector({ fecha, onChange }) {
 
   return (
     <div
-      className="bg-p-5 p-4 rounded-2xl shadow-lg border border-p-6"
+      className="bg-p-5 p-4 rounded-2xl shadow-lg border border-p-6 text-gray-500"
       style={{
         fontFamily: "var(--font-Balo)",
         maxWidth: "560px", 

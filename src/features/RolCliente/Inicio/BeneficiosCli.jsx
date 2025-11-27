@@ -9,7 +9,7 @@ const beneficios = [
   { title: "Acceso directo con QR", subtitle: "Sin filas ni esperas", icon: QrCode, delay: 0.2 },
   { title: "Invita a tus amigos", subtitle: "Comparte el acceso QR con tu equipo", icon: Users, delay: 0.3 },
   { title: "Pago 100% seguro", subtitle: "QR · Tarjeta · Transferencia", icon: Shield, delay: 0.4 },
-  { title: "Cancelación flexible", subtitle: "Hasta 2 horas antes", icon: CalendarCheck, delay: 0.5 },
+  { title: "Cancelación flexible", subtitle: "Hasta 12 horas antes", icon: CalendarCheck, delay: 0.5 },
   { title: "Promociones exclusivas", subtitle: "Cumpleaños, torneos y más", icon: Gift, delay: 0.6 },
 ];
 

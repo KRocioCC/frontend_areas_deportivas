@@ -270,7 +270,7 @@ export default function MiAreaPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 py-8 w-full">
+        <div className="min-h-screen bg-gradient-to-br text-gray-500 from-gray-50 to-blue-50 py-8 w-full">
             <div className="max-w-8xl mx-auto px-6">
                 {/* Header con estilo inspirado */}
                 <motion.div

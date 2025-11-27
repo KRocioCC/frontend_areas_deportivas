@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "../../../auth/hooks/useAuth";
 import { useTheme } from "../../../context/ThemeContext";
-
+import { useToast } from "../../../context/ToastContext";
 import {
   getReservasPorClienteYEstado,
   getReservasClienteOrdenDesc,
@@ -29,6 +29,7 @@ import {
 } from "../../../api/ReservaApi";
 import { useNavigate } from "react-router-dom";
 import QrModal from "../QR/QrModal";
+import DetalleReservaModal from "./DetalleReservaModal";
 
 const ESTADO_TEXTO = {
   PENDIENTE: "Pendiente",
@@ -52,12 +53,15 @@ export default function HistorialReservaCli() {
   const [openQrModal, setOpenQrModal] = useState(false);
   const [selectedReservaId, setSelectedReservaId] = useState(null);
   const [searchCancha, setSearchCancha] = useState("");
+  //detalles
+  const [openDetalleModal, setOpenDetalleModal] = useState(false);
+  const [reservaSeleccionada, setReservaSeleccionada] = useState(null);
 
   //para cancelar reserva
   const [openCancelModal, setOpenCancelModal] = useState(false);
   const [motivoCancelacion, setMotivoCancelacion] = useState("");
   const [reservaACancelar, setReservaACancelar] = useState(null);
-
+  const { showToast } = useToast();
   const ESTADO_COLORES = {
     PENDIENTE: isDarkMode ? "border-[#f35734]" : "border-[#f38321]",
     CONFIRMADA: isDarkMode ? "border-[#2C7366]" : "border-[#46c4b7]",
@@ -200,7 +204,8 @@ export default function HistorialReservaCli() {
   };
   const confirmarCancelacion = async () => {
     if (!motivoCancelacion.trim()) {
-      alert("Debes ingresar un motivo para cancelar.");
+      showToast("Debes ingresar un motivo para cancelar.", "warning");
+      //alert("Debes ingresar un motivo para cancelar.");
       return;
     }
 
@@ -249,6 +254,10 @@ export default function HistorialReservaCli() {
     setReservasFiltradas(lista);
   }, [reservas, ordenFecha]); 
  
+  const abrirDetalle = (reserva) => {
+    setReservaSeleccionada(reserva);
+    setOpenDetalleModal(true);
+  };
 
 
   const getAccionesPorEstado = (estado) => {
@@ -547,7 +556,7 @@ export default function HistorialReservaCli() {
 
                   <p className="flex items-center gap-2">
                     <Calendar className="w-4 h-4" style={{ color: isDarkMode ? "#2C7366" : "#46c4b7" }} />
-                    {format(new Date(r.fechaReserva), "dd 'de' MMMM, yyyy")}
+                    {format(new Date(r.fechaReserva + "T12:00:00" ), "dd 'de' MMMM, yyyy")}
                   </p>
 
                   <p className="flex items-center gap-2">
@@ -575,9 +584,9 @@ export default function HistorialReservaCli() {
                           setSelectedReservaId(r.idReserva);
                           setOpenQrModal(true);
                         }
-                        /*if (accion === "Detalle") {
-                          navigate(`/reserva/${r.idReserva}`);
-                        }*/
+                        if (accion === "Detalle") {
+                          abrirDetalle(r);
+                        }
                         if (accion === "Cancelar") {
                           abrirCancelacion(r.idReserva);
                         }
@@ -625,6 +634,8 @@ export default function HistorialReservaCli() {
         idReserva={selectedReservaId}
       />
 
+      
+
       {openCancelModal && (
       <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50">
         <div className={`p-6 rounded-xl shadow-lg w-full max-w-md
@@ -666,6 +677,15 @@ export default function HistorialReservaCli() {
         </div>
       </div>
     )}
+
+  <DetalleReservaModal
+    open={openDetalleModal}
+    onClose={() => setOpenDetalleModal(false)}
+    reserva={reservaSeleccionada}
+    isDarkMode={isDarkMode}
+  />
+
+
 
     </div>
   );

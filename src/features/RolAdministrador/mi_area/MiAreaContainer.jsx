@@ -140,7 +140,7 @@ export default function MiAreaContainer() {
     // Fallback por seguridad
     console.log("❓ [MiAreaContainer] Mostrando FALLBACK");
     return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="min-h-screen text-gray-900 bg-gray-50 flex items-center justify-center">
             <div className="text-center">
                 <div className="text-6xl mb-4">🏟️</div>
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">

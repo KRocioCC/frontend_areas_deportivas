@@ -31,7 +31,7 @@ const AreaCard = memo(({ area, index, currentIndex, onClick }) => {
   };
 
   let estaAbierta = false;
-  if (area?.horaInicioArea && area?.areaDeportiva?.horaFinArea) {
+  if (area?.horaInicioArea && area?.horaFinArea) {
     const ahora = new Date();
     const horaActual = ahora.getHours();
     const minutoActual = ahora.getMinutes();
@@ -110,7 +110,7 @@ const AreaCard = memo(({ area, index, currentIndex, onClick }) => {
             </div>
           )}
 
-          {/* Zona */}
+          {/* Zona 
           {area.zona && (
             <div className="flex items-center gap-2 text-white text-sm">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -122,7 +122,7 @@ const AreaCard = memo(({ area, index, currentIndex, onClick }) => {
                 <span className="text-xs opacity-90">({area.zona.macrodistrito.nombre})</span>
               )}
             </div>
-          )}
+          )}*/}
 
           {/* Estado */}
           <div className="flex justify-between items-center mt-2">
@@ -131,8 +131,8 @@ const AreaCard = memo(({ area, index, currentIndex, onClick }) => {
                 className="px-3 py-1.5 rounded-lg text-sm font-medium"
                 style={{
                   backgroundColor: estaAbierta
-                    ? (isDarkMode ? '#30786bf2' : '#41bfb2d3')   // Verde suave
-                    : (isDarkMode ? '#8a2628e3' : '#d6172720'), 
+                    ? (isDarkMode ? '#30786bf2' : '#46c4b7')   // Verde suave
+                    : (isDarkMode ? '#8a2628e3' : '#d40000'), 
                   color: estaAbierta ? '#d4e3e1ff' : '#c4dcddff'
                 }}
               >
