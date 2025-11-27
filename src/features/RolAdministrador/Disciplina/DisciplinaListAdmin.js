@@ -1,19 +1,23 @@
 import React, { useEffect, useState, useMemo, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import DisciplinaForm from "./DisciplinaForm"; 
 import * as disciplinaService from "../../../api/AreadeportivaApi"; 
 import "./DisciplinaListAdmin.css";
 import Button from "../../../components/ui/Button";
 import SearchBar from "../../../components/ui/SearchInput";
-import { Plus, Eye, Edit3, Trash2 } from "lucide-react";
+import { Plus, Eye, Edit3, Trash2, CheckCircle } from "lucide-react";
 import CRUDTable from "../../../components/ui/CRUDTable";
 
 export default function DisciplinaListAdmin() {
+  const navigate = useNavigate();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState(null);
   const [search, setSearch] = useState("");
+  const [showFirstDisciplinaModal, setShowFirstDisciplinaModal] = useState(false);
 
   // ⚠️ Obtener adminId desde el objeto guardado al loguearse
   const storedUser = JSON.parse(localStorage.getItem("user")); 
@@ -96,12 +100,17 @@ export default function DisciplinaListAdmin() {
           )
         );
       } else {
+        const isFirst = items.length === 0; // detectar si es la primera disciplina
         const created = await disciplinaService.createDisciplinaPorAdmin(
           adminId,
           payload,
           [] // idsCanchas opcional
         );
         setItems((prev) => [created, ...prev]);
+        if (isFirst) {
+          // mostrar modal informativo especial
+          setShowFirstDisciplinaModal(true);
+        }
       }
 
       setShowForm(false);
@@ -206,6 +215,54 @@ export default function DisciplinaListAdmin() {
           </div>
         </div>
       )}
+
+      {/* Modal informativo para la primera disciplina creada - diseño consistente con canchas */}
+      <AnimatePresence>
+        {showFirstDisciplinaModal && (
+          <div className="fixed inset-0 flex items-center justify-center p-4" style={{ zIndex: 60 }}>
+            <div className="absolute inset-0 bg-black/60" onClick={() => setShowFirstDisciplinaModal(false)} />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="relative bg-white rounded-3xl shadow-2xl max-w-3xl md:max-w-4xl w-full p-8 md:p-10 border border-gray-100"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-start space-x-4">
+                <div className="flex-shrink-0">
+                  <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-green-100 flex items-center justify-center">
+                    <CheckCircle className="w-8 h-8 md:w-10 md:h-10 text-green-600" />
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-2xl md:text-3xl font-extrabold text-gray-900 mb-3 leading-tight" style={{ fontFamily: 'var(--font-Oswald)' }}>
+                    ¡Primera disciplina creada!
+                  </h3>
+                  <p className="text-lg md:text-xl text-gray-800 leading-relaxed font-semibold" style={{ fontFamily: 'var(--font-Balo)' }}>
+                    Ahora puedes regresar al módulo de Canchas y asígnarla. Este paso es importante: cada cancha debe tener al menos una disciplina asignada para que los clientes sepan qué deportes se pueden practicar en ella al momento de reservar.
+                  </p>
+                </div>
+              </div>
+              <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-end">
+                <button
+                  onClick={() => setShowFirstDisciplinaModal(false)}
+                  className="px-6 md:px-7 py-3 md:py-3.5 rounded-xl font-semibold text-base md:text-lg border border-gray-300 text-gray-800 hover:bg-gray-100 transition"
+                  style={{ fontFamily: 'var(--font-josefin)' }}
+                >
+                  Quedarme en Disciplinas
+                </button>
+                <button
+                  onClick={() => { setShowFirstDisciplinaModal(false); navigate('/admin/canchas_admin'); }}
+                  className="px-6 md:px-7 py-3 md:py-3.5 rounded-xl text-white font-semibold text-base md:text-lg shadow-md hover:shadow-lg transition"
+                  style={{ backgroundColor: 'var(--color-accent)', fontFamily: 'var(--font-josefin)' }}
+                >
+                  Ir a Canchas
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

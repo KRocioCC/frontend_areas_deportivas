@@ -12,6 +12,26 @@ export default function CardCancha({ cancha }) {
   const abierto = cancha.estado === true; // asumiendo que 'estado: true' = activo/abierto
   const promedioPuntuacion = cancha.promedioPuntuacion; // debe venir del endpoint
 
+  // Función para obtener URL completa de la imagen
+  const getUrlImagenCompleta = (urlAcceso) => {
+    if (!urlAcceso) return null;
+    if (urlAcceso.startsWith('http')) return urlAcceso;
+    const baseUrl = 'http://localhost:8032';
+    return `${baseUrl}${urlAcceso.startsWith('/') ? urlAcceso : `/${urlAcceso}`}`;
+  };
+
+  // Obtener la primera imagen del vector de imágenes
+  const getImagenCancha = () => {
+    if (cancha.imagenes && cancha.imagenes.length > 0) {
+      const primeraImagen = cancha.imagenes[0];
+      return getUrlImagenCompleta(primeraImagen.urlAcceso);
+    }
+    // Fallback a imagen simple si existe
+    return cancha.imagen || null;
+  };
+
+  const imagenUrl = getImagenCancha();
+
   // Estilos según modo
   const bg = isDarkMode ? "bg-[#141717]" : "bg-white";
   const borderColor = isDarkMode ? "border-[#2a2e2f]" : "border-gray-200";
@@ -35,11 +55,18 @@ export default function CardCancha({ cancha }) {
     >
       {/* Imagen */}
       <div className="relative w-full h-40 overflow-hidden rounded-xl mb-4">
-        {cancha.imagen ? (
+        {imagenUrl ? (
           <img
-            src={cancha.imagen}
+            src={imagenUrl}
             alt={nombre}
             className="w-full h-full object-cover"
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.style.display = 'none';
+              e.target.parentElement.innerHTML = `<div class="w-full h-full flex items-center justify-center ${
+                isDarkMode ? "bg-[#0f1213]" : "bg-gray-100"
+              }"><span class="text-sm font-['Alumni'] ${textSecondary}">Error al cargar imagen</span></div>`;
+            }}
           />
         ) : (
           <div

@@ -210,13 +210,22 @@ export default function CreateMiAreaPage({ onAreaCreada }) {
     };
 
     const handleCreateArea = async () => {
+        // Verificar campos obligatorios vacíos antes de validar
+        const camposObligatorios = ['nombreArea', 'emailArea', 'telefonoArea', 'idZona', 'descripcionArea', 'latitud', 'longitud'];
+        const camposVacios = camposObligatorios.filter(campo => !formData[campo] || formData[campo].toString().trim() === '');
+        
+        if (camposVacios.length > 0) {
+            showToast('Debes llenar todos los campos', 'warning');
+            return;
+        }
+
         if (!validateForm()) {
             showToast('Por favor corrige los errores en el formulario', 'warning');
             return;
         }
 
         if (!formData.id) {
-            showToast('Error: No se pudo identificar al administrador');
+            showToast('Error: No se pudo identificar al administrador', 'error');
             return;
         }
 
@@ -577,7 +586,7 @@ export default function CreateMiAreaPage({ onAreaCreada }) {
                                                     name="telefonoArea"
                                                     value={formData.telefonoArea}
                                                     onChange={handleChange}
-                                                    placeholder="12345678 (8 dígitos)"
+                                                    placeholder="67545678 (8 dígitos)"
                                                     className={`w-full bg-transparent border-none focus:outline-none focus:ring-0 ${
                                                         errors.telefonoArea ? 'text-red-500' : ''
                                                     }`}
@@ -626,55 +635,72 @@ export default function CreateMiAreaPage({ onAreaCreada }) {
                                         </div>
 
                                         {/* Coordenadas */}
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-xl">
-                                                <Globe className="w-5 h-5" style={{ color: 'var(--color-secondary)' }} />
-                                                <div className="flex-1">
-                                                    <label className="block text-sm text-gray-500 mb-1" style={{ fontFamily: 'var(--font-Balo)' }}>Latitud</label>
-                                                    <input
-                                                        name="latitud"
-                                                        type="number"
-                                                        step="any"
-                                                        value={formData.latitud}
-                                                        onChange={handleChange}
-                                                        placeholder="-12.0464"
-                                                        className={`w-full bg-transparent border-none focus:outline-none focus:ring-0 ${
-                                                            errors.latitud ? 'text-red-500' : ''
-                                                        }`}
-                                                        style={{ fontFamily: 'var(--font-Balo)' }}
-                                                    />
-                                                    {errors.latitud && (
-                                                        <p className="text-red-500 text-sm mt-1" style={{ fontFamily: 'var(--font-Balo)' }}>
-                                                            {errors.latitud}
-                                                        </p>
-                                                    )}
-                                                </div>
-                                            </div>
+<div className="space-y-4 p-4 bg-white rounded-xl border border-blue-400">                                            <p className="text-sm text-gray-600" style={{ fontFamily: 'var(--font-Balo)' }}>
+                                                BUSCA LAS COORDENADAS DE TU DIRECCIÓN EN 
+                                                <a 
+                                                    href="https://www.google.com/maps" 
+                                                    target="_blank" 
+                                                    rel="noopener noreferrer" 
+                                                    className="text-blue-500 underline ml-1"
+                                                >
+                                                    GOOGLE MAPS
+                                                </a>. 
+                                                ESTO SIRVE PARA MOSTRAR LA DIRECCIÓN DEL ÁREA DEPORTIVA A LOS CLIENTES.
+                                                <br />
+                                                <span className="text-gray-500">(Ejemplo: -16.542, -68.172)</span>
+                                            </p>
 
-                                            <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-xl">
-                                                <Globe className="w-5 h-5" style={{ color: 'var(--color-secondary)' }} />
-                                                <div className="flex-1">
-                                                    <label className="block text-sm text-gray-500 mb-1" style={{ fontFamily: 'var(--font-Balo)' }}>Longitud</label>
-                                                    <input
-                                                        name="longitud"
-                                                        type="number"
-                                                        step="any"
-                                                        value={formData.longitud}
-                                                        onChange={handleChange}
-                                                        placeholder="-77.0428"
-                                                        className={`w-full bg-transparent border-none focus:outline-none focus:ring-0 ${
-                                                            errors.longitud ? 'text-red-500' : ''
-                                                        }`}
-                                                        style={{ fontFamily: 'var(--font-Balo)' }}
-                                                    />
-                                                    {errors.longitud && (
-                                                        <p className="text-red-500 text-sm mt-1" style={{ fontFamily: 'var(--font-Balo)' }}>
-                                                            {errors.longitud}
-                                                        </p>
-                                                    )}
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-xl">
+                                                    <Globe className="w-5 h-5" style={{ color: 'var(--color-secondary)' }} />
+                                                    <div className="flex-1">
+                                                        <label className="block text-sm text-gray-500 mb-1" style={{ fontFamily: 'var(--font-Balo)' }}>Latitud</label>
+                                                        <input
+                                                            name="latitud"
+                                                            type="number"
+                                                            step="any"
+                                                            value={formData.latitud}
+                                                            onChange={handleChange}
+                                                            placeholder="-16.542"
+                                                            className={`w-full bg-transparent border-none focus:outline-none focus:ring-0 ${
+                                                                errors.latitud ? 'text-red-500' : ''
+                                                            }`}
+                                                            style={{ fontFamily: 'var(--font-Balo)' }}
+                                                        />
+                                                        {errors.latitud && (
+                                                            <p className="text-red-500 text-sm mt-1" style={{ fontFamily: 'var(--font-Balo)' }}>
+                                                                {errors.latitud}
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-xl">
+                                                    <Globe className="w-5 h-5" style={{ color: 'var(--color-secondary)' }} />
+                                                    <div className="flex-1">
+                                                        <label className="block text-sm text-gray-500 mb-1" style={{ fontFamily: 'var(--font-Balo)' }}>Longitud</label>
+                                                        <input
+                                                            name="longitud"
+                                                            type="number"
+                                                            step="any"
+                                                            value={formData.longitud}
+                                                            onChange={handleChange}
+                                                            placeholder="-68.172"
+                                                            className={`w-full bg-transparent border-none focus:outline-none focus:ring-0 ${
+                                                                errors.longitud ? 'text-red-500' : ''
+                                                            }`}
+                                                            style={{ fontFamily: 'var(--font-Balo)' }}
+                                                        />
+                                                        {errors.longitud && (
+                                                            <p className="text-red-500 text-sm mt-1" style={{ fontFamily: 'var(--font-Balo)' }}>
+                                                                {errors.longitud}
+                                                            </p>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
+
                                     </div>
                                 </div>
 

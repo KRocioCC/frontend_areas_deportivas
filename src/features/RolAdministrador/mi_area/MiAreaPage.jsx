@@ -383,10 +383,16 @@ export default function MiAreaPage() {
                                 </div>
                             </>
                         ) : (
-                            <div className="w-full h-full flex items-center justify-center text-white">
-                                <div className="text-center">
-                                    <Camera className="w-16 h-16 mx-auto mb-4 opacity-60" />
-                                    <p className="text-xl font-semibold" style={{ fontFamily: 'var(--font-Alumni)' }}>Sin imágenes</p>
+                            <div className="w-full h-full flex items-center justify-center text-white bg-gradient-to-br from-gray-700 to-gray-900">
+                                <div className="text-center max-w-md px-6">
+                                    <Camera className="w-20 h-20 mx-auto mb-6 opacity-70" />
+                                    <p className="text-2xl font-bold mb-3" style={{ fontFamily: 'var(--font-Oswald)' }}>
+                                        Aún no subiste imágenes para tu área deportiva
+                                    </p>
+                                    <p className="text-lg opacity-90 mb-4" style={{ fontFamily: 'var(--font-Alumni)' }}>
+                                        presiona en Editar Area, desliza hacia abajo para subirlas y presiona en guardar cambios
+                                    </p>
+                                    
                                 </div>
                             </div>
                         )}

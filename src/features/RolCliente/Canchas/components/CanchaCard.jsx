@@ -1,10 +1,9 @@
 // src/features/RolCliente/Cancha/components/CanchaCard.jsx
 import React from "react";
 import { Users, CalendarCheck } from "lucide-react";
-import { useState, useCallback } from "react";
-import { FaUsers } from "react-icons/fa";
+import { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { useTheme } from "../../../../context/ThemeContext";
 
@@ -13,22 +12,41 @@ const CanchaCard = ({ cancha }) => {
   const { isDarkMode } = useTheme();
   const navigate = useNavigate();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [cargandoImagen, setCargandoImagen] = useState(true);
 
   const totalImages = cancha?.imagenes?.length || 0;
   const hasMultipleImages = totalImages > 1;
 
   // Obtener URL de la imagen actual
-  const getCurrentImageUrl = () => {
-    if (cancha.imagenes && cancha.imagenes.length > 0) {
-      const imagenActual = cancha.imagenes[currentImageIndex];
-      if (!imagenActual) return "/defaults/cancha-default.jpg";
-      const raw = imagenActual.urlAcceso || imagenActual.url || "";
-      if (raw.startsWith("http")) return raw;
-      if (raw) return `http://localhost:8032${raw}`;
-      return "/defaults/cancha-default.jpg";
-    }
-    return cancha.urlImagen || "/defaults/cancha-default.jpg";
+  const getUrlImagenCompleta = (raw) => {
+    if (!raw) return "/defaults/cancha-default.jpg";
+    if (raw.startsWith("http")) return raw;
+    return `http://localhost:8032${raw.startsWith('/') ? raw : '/' + raw}`;
   };
+
+  const getCurrentImageUrl = () => {
+    if (cancha?.imagenes && cancha.imagenes.length > 0) {
+      const imagenActual = cancha.imagenes[currentImageIndex];
+      const raw = imagenActual?.urlAcceso || imagenActual?.url || "";
+      return getUrlImagenCompleta(raw);
+    }
+    const rawSimple = cancha?.urlImagen || "";
+    return getUrlImagenCompleta(rawSimple);
+  };
+
+  useEffect(() => {
+    if (cancha?.imagenes && cancha.imagenes.length > 0) {
+      const primera = cancha.imagenes[0];
+      const raw = primera?.urlAcceso || primera?.url || "";
+      const url = getUrlImagenCompleta(raw);
+      const img = new Image();
+      img.onload = () => setCargandoImagen(false);
+      img.onerror = () => setCargandoImagen(false);
+      img.src = url;
+    } else {
+      setCargandoImagen(false);
+    }
+  }, [cancha]);
 
   // Manejar error de carga de imagen
   const handleImageError = (e) => {
@@ -83,19 +101,52 @@ const CanchaCard = ({ cancha }) => {
       whileHover={{ y: -6, boxShadow: isDarkMode ? '0 10px 24px rgba(0,0,0,0.4)' : '0 10px 24px rgba(0,0,0,0.12)' }}
       whileTap={{ scale: 0.99 }}
     >
-      {/* Imagen */}
+      {/* Imagen con carrusel (vector imagenes) */}
       <div className="relative w-full h-40 overflow-hidden">
-        <img
-          src={cancha?.urlImagen || "/defaults/cancha-default.jpg"}
-          alt={cancha.nombre || "Cancha deportiva"}
-          className="w-full h-full object-cover transition-transform duration-300"
-          loading="lazy"
-          onError={(e) => {
-            e.target.onerror = null;
-            e.target.src = "/defaults/cancha-default.jpg";
-          }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
+        {cargandoImagen ? (
+          <div className="w-full h-full flex items-center justify-center bg-gray-800">
+            <span className="text-white text-xs" style={{fontFamily:'var(--font-josefin)'}}>Cargando...</span>
+          </div>
+        ) : (
+          <>
+            <img
+              src={getCurrentImageUrl()}
+              alt={cancha.nombre || "Cancha deportiva"}
+              className="w-full h-full object-cover transition-transform duration-300"
+              loading="lazy"
+              onError={handleImageError}
+            />
+            {hasMultipleImages && (
+              <>
+                <button
+                  onClick={(e)=>{e.stopPropagation();prevImage(e);}}
+                  className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/80 text-white w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg hover:scale-110 z-20"
+                >
+                  <ChevronLeftIcon className="w-3 h-3" />
+                </button>
+                <button
+                  onClick={(e)=>{e.stopPropagation();nextImage(e);}}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/80 text-white w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg hover:scale-110 z-20"
+                >
+                  <ChevronRightIcon className="w-3 h-3" />
+                </button>
+                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex space-x-1 z-20">
+                  {cancha.imagenes.map((_, idx) => (
+                    <button
+                      key={idx}
+                      onClick={(e)=>goToImage(e, idx)}
+                      className={`w-1.5 h-1.5 rounded-full transition-all duration-200 ${idx===currentImageIndex? 'bg-white shadow scale-125':'bg-white/50 hover:bg-white/70'}`}
+                    />
+                  ))}
+                </div>
+                <div className="absolute top-2 left-2 bg-black/70 text-white px-2 py-1 rounded-full text-xs font-medium z-20">
+                  {currentImageIndex+1}/{totalImages}
+                </div>
+              </>
+            )}
+          </>
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
       </div>
 
       {/* Contenido */}

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from "framer-motion";
-import { createCancha, agregarImagenesCancha } from '../../../api/CanchaApi';
+import { createCancha, agregarImagenesCancha, getCanchasPorArea } from '../../../api/CanchaApi';
 import { getAreadeportivaPorAdminId } from '../../../api/AreadeportivaApi';
 import { useAuth } from '../../../auth/hooks/useAuth';
 import { 
@@ -48,6 +49,7 @@ const Toast = ({ message, type, onClose }) => {
 };
 
 export default function WizardCrearCancha({ isOpen, onClose, onCanchaCreada }) {
+    const navigate = useNavigate();
     const { currentUser } = useAuth();
     const [step, setStep] = useState(1);
     const [canchaId, setCanchaId] = useState(null);
@@ -56,6 +58,8 @@ export default function WizardCrearCancha({ isOpen, onClose, onCanchaCreada }) {
     const [areaCargando, setAreaCargando] = useState(true);
     const [toast, setToast] = useState(null);
     const [errors, setErrors] = useState({});
+    const [canchasIniciales, setCanchasIniciales] = useState(null); // cantidad de canchas antes de crear
+    const [showFirstCanchaModal, setShowFirstCanchaModal] = useState(false); // modal informativo para la primera cancha
     
     const [formData, setFormData] = useState({
         nombre: '',
@@ -65,7 +69,7 @@ export default function WizardCrearCancha({ isOpen, onClose, onCanchaCreada }) {
         horaFin: '',
         tipoSuperficie: 'césped natural',
         tamano: '',
-        iluminacion: 'halógena',
+        iluminacion: 'Natural',
         cubierta: 'abierta',
         mantenimiento: 'mensual',
         estado: true
@@ -106,6 +110,23 @@ export default function WizardCrearCancha({ isOpen, onClose, onCanchaCreada }) {
             cargarAreaDeportiva();
         }
     }, [currentUser, isOpen]);
+
+    // Cargar cuántas canchas existen actualmente en el área (antes de crear una nueva)
+    useEffect(() => {
+        const cargarCanchasIniciales = async () => {
+            try {
+                if (isOpen && idAreaDeportiva) {
+                    const lista = await getCanchasPorArea(idAreaDeportiva);
+                    setCanchasIniciales(Array.isArray(lista) ? lista.length : 0);
+                }
+            } catch (error) {
+                console.error('Error al obtener canchas por área:', error);
+                setCanchasIniciales(0);
+            }
+        };
+
+        cargarCanchasIniciales();
+    }, [isOpen, idAreaDeportiva]);
 
     // Validaciones según tu DTO
     const validateField = (name, value) => {
@@ -255,7 +276,12 @@ export default function WizardCrearCancha({ isOpen, onClose, onCanchaCreada }) {
             await agregarImagenesCancha(canchaId, imagenes);
             showToast('Cancha creada exitosamente', 'success');
             onCanchaCreada?.();
-            handleClose();
+            // Si es la primera cancha creada para el área, mostramos el mensaje especial
+            if (canchasIniciales === 0) {
+                setShowFirstCanchaModal(true);
+            } else {
+                handleClose();
+            }
         } catch (err) {
             showToast('Error al subir imágenes: ' + (err.response?.data?.message || err.message));
         } finally {
@@ -341,8 +367,45 @@ export default function WizardCrearCancha({ isOpen, onClose, onCanchaCreada }) {
         <AnimatePresence>
             {isOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                    {/* Modal informativo para la primera cancha creada */}
+                    {showFirstCanchaModal && (
+                        <div className="fixed inset-0 flex items-center justify-center p-4" style={{ zIndex: 60 }}>
+                            <div className="absolute inset-0 bg-black/60" />
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.95 }}
+                                className="relative bg-white rounded-3xl shadow-2xl max-w-3xl md:max-w-4xl w-full p-8 md:p-10 border border-gray-100"
+                            >
+                                <div className="flex items-start space-x-4">
+                                    <div className="flex-shrink-0">
+                                        <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-green-100 flex items-center justify-center">
+                                            <CheckCircle className="w-8 h-8 md:w-10 md:h-10 text-green-600" />
+                                        </div>
+                                    </div>
+                                    <div className="flex-1">
+                                        <h3 className="text-2xl md:text-3xl font-extrabold text-gray-900 mb-3 leading-tight" style={{ fontFamily: 'var(--font-Oswald)' }}>
+                                            ¡Cancha creada exitosamente!
+                                        </h3>
+                                        <p className="text-lg md:text-xl text-gray-800 leading-relaxed font-semibold" style={{ fontFamily: 'var(--font-Balo)' }}>
+                                            Ahora debes ingresar al módulo de Disciplinas, crear una disciplina y asignarla a tus canchas. Este paso es obligatorio para indicar qué deportes se pueden practicar en cada cancha y garantizar que los clientes reciban la información correcta al momento de reservar.
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="mt-8 flex justify-end">
+                                    <button
+                                        onClick={() => { setShowFirstCanchaModal(false); handleClose(); navigate('/admin/disciplinas'); }}
+                                        className="px-6 md:px-8 py-3 md:py-3.5 rounded-xl text-white font-semibold text-base md:text-lg shadow-md hover:shadow-lg transition"
+                                        style={{ backgroundColor: 'var(--color-accent)', fontFamily: 'var(--font-josefin)' }}
+                                    >
+                                        Ir a Disciplinas
+                                    </button>
+                                </div>
+                            </motion.div>
+                        </div>
+                    )}
                     {/* Toast Container */}
-                    {toast && (
+                    {toast && !showFirstCanchaModal && (
                         <Toast 
                             message={toast.message} 
                             type={toast.type} 
@@ -350,7 +413,8 @@ export default function WizardCrearCancha({ isOpen, onClose, onCanchaCreada }) {
                         />
                     )}
                     
-                    {/* CONTENEDOR OPTIMIZADO */}
+                    {/* CONTENEDOR OPTIMIZADO (se oculta cuando aparece el modal final) */}
+                    {!showFirstCanchaModal && (
                     <motion.div
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
@@ -822,6 +886,7 @@ export default function WizardCrearCancha({ isOpen, onClose, onCanchaCreada }) {
                             </div>
                         </div>
                     </motion.div>
+                    )}
                 </div>
             )}
         </AnimatePresence>
