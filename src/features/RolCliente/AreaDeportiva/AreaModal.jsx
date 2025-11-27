@@ -166,6 +166,7 @@ export default function AreaModal({ area, onClose }) {
         
         // Asegurarnos de que tenemos un array de canchas
         const canchaArray = Array.isArray(data) ? data : data?.canchas || [];
+        const canchasActivas = canchaArray.filter(c => c.estado === true);
         console.log("📸 Canchas con imágenes:", canchaArray.map(c => ({
           nombre: c.nombre,
           tieneImagenes: c.imagenes && c.imagenes.length > 0,
@@ -179,7 +180,7 @@ export default function AreaModal({ area, onClose }) {
         });
         setCargandoCanchas(estadosCarga);
         
-        setCanchas(canchaArray.slice(0, 3));
+        setCanchas(canchasActivas.slice(0, 3));
       } catch (error) {
         showToast("Error al cargar canchas. Intenta recargar la página.", "error");
         console.error("❌ Error al obtener canchas:", error);

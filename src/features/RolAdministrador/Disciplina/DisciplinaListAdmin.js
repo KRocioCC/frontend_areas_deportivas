@@ -156,7 +156,7 @@ export default function DisciplinaListAdmin() {
   );
 
   return (
-    <div className="disciplina-page card">
+    <div className="disciplina-page card text-gray-500">
       <div className="page-header">
         <h2 className="h-heading text-2xl mb-2">Disciplinas</h2>
 

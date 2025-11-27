@@ -75,6 +75,7 @@ import ComoUsarQr from "../features/RolCliente/Inicio/ComoFunciona/ComoUsarQr.js
 import PreguntasFrecuentes from "../features/RolCliente/Inicio/Ayuda/PreguntasFrecuentes.jsx";
 import SobreNosotros from "../features/RolCliente/Inicio/SobreNosotros/SobreNosotros.jsx";
 import ListadoCanchas from "../features/RolCliente/Canchas/ListadoCanchas.jsx";
+import PerfilCliente from "../features/RolCliente/MiPerfil/PerfilCLiente.jsx";
 
 function AppRouter() {
 
@@ -212,6 +213,18 @@ function AppRouter() {
             }
           />
           {/* CLIENTE - Reservas protegidas */}
+
+          <Route
+            path="/miperfil"
+            element={
+              <ProtectedRoute requireCliente>
+                <LayoutCliente>
+                  <PerfilCliente />
+                </LayoutCliente>
+              </ProtectedRoute>
+            }
+          />
+
           <Route
             path="/reservascli"
             element={

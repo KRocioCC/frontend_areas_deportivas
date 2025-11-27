@@ -45,7 +45,7 @@ export default function CanchaViewModal({ initialData, onCancel }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 text-gray-900">
       {/* Aqui ta el efecto desenfoque */}
       <div className="absolute inset-0 backdrop-blur-sm"></div>
       

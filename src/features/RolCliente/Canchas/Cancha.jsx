@@ -1,7 +1,7 @@
 // src/features/RolCliente/Cancha/Cancha.jsx
 import { useEffect, useState, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { getCanchasPorArea } from "../../../api/CanchaApi.js";
+import { getCanchasActivasPorArea } from "../../../api/CanchaApi.js";
 import { getAreadeportivaById } from "../../../api/AreadeportivaApi";
 import CanchaCard from "./components/CanchaCard.jsx";
 import { useTheme } from "../../../context/ThemeContext";
@@ -79,7 +79,7 @@ export default function Cancha() {
       try {
         const [areaData, canchasData] = await Promise.allSettled([
           getAreadeportivaById(areaId),
-          getCanchasPorArea(areaId)
+          getCanchasActivasPorArea(areaId)
         ]);
 
         if (!isMounted) return;

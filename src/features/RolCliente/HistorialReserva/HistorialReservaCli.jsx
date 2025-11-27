@@ -17,17 +17,19 @@ import {
 } from "lucide-react";
 import { useAuth } from "../../../auth/hooks/useAuth";
 import { useTheme } from "../../../context/ThemeContext";
-
+import { useToast } from "../../../context/ToastContext";
 import {
   getReservasPorClienteYEstado,
   getReservasClienteOrdenDesc,
   getReservasClienteOrdenAsc,
   getReservasPorClienteYNombreCancha, 
   getReservasPorClienteEnRango,      
-  getReservasPorCliente
+  getReservasPorCliente,
+  cancelarReserva 
 } from "../../../api/ReservaApi";
 import { useNavigate } from "react-router-dom";
 import QrModal from "../QR/QrModal";
+import DetalleReservaModal from "./DetalleReservaModal";
 
 const ESTADO_TEXTO = {
   PENDIENTE: "Pendiente",
@@ -51,7 +53,15 @@ export default function HistorialReservaCli() {
   const [openQrModal, setOpenQrModal] = useState(false);
   const [selectedReservaId, setSelectedReservaId] = useState(null);
   const [searchCancha, setSearchCancha] = useState("");
+  //detalles
+  const [openDetalleModal, setOpenDetalleModal] = useState(false);
+  const [reservaSeleccionada, setReservaSeleccionada] = useState(null);
 
+  //para cancelar reserva
+  const [openCancelModal, setOpenCancelModal] = useState(false);
+  const [motivoCancelacion, setMotivoCancelacion] = useState("");
+  const [reservaACancelar, setReservaACancelar] = useState(null);
+  const { showToast } = useToast();
   const ESTADO_COLORES = {
     PENDIENTE: isDarkMode ? "border-[#f35734]" : "border-[#f38321]",
     CONFIRMADA: isDarkMode ? "border-[#2C7366]" : "border-[#46c4b7]",
@@ -71,6 +81,31 @@ export default function HistorialReservaCli() {
     }
   }, [idCliente, filtroEstado, fechaInicio, fechaFin, ordenFecha, searchCancha]);
 
+  // Dentro de tu componente HistorialReservaCli
+
+  const ajustarEstadoReservas = (reservasOriginales) => {
+    const ahora = new Date();
+    return reservasOriginales.map((r) => {
+      // Si la cancha está deshabilitada (estado === false)
+      const canchaDeshabilitada = r.cancha?.estado === false;
+
+      // ¿La reserva es futura? (comparar con fechaReserva + horaInicio)
+      const fechaReservaCompleta = new Date(`${r.fechaReserva}T${r.horaInicio}`);
+      const esFutura = fechaReservaCompleta > ahora;
+
+      // Si la cancha está deshabilitada Y la reserva es futura → marcar como cancelada (solo visualmente)
+      if (canchaDeshabilitada && esFutura) {
+        return {
+          ...r,
+          estadoReservaVisual: "CANCELADA_POR_CANCHA", // estado ficticio solo para UI
+          _esCanceladaPorCancha: true,
+        };
+      }
+
+      // Si ya pasó, mantener estado original
+      return r;
+    });
+  };
   const cargarReservas = async () => {
     if (!idCliente) return;
 
@@ -150,7 +185,8 @@ export default function HistorialReservaCli() {
       5️⃣ CASO DEFAULT → TODAS LAS RESERVAS DEL CLIENTE
       */
       data = await getReservasPorCliente(idCliente);
-      setReservas(data);
+      const dataAjustada = ajustarEstadoReservas(data);
+      setReservas(dataAjustada);
 
     } catch (error) {
       console.error("Error cargando reservas:", error);
@@ -160,10 +196,31 @@ export default function HistorialReservaCli() {
     }
   };
 
-  // ✅ Solo aplicamos filtros adicionales en frontend si el backend no los soporta
-  // En este caso, como ya aplicamos todos los filtros en backend, no necesitamos reordenar ni filtrar aquí
-  // Pero si quieres ordenar por fecha de creación (por si el backend no lo hace), puedes hacerlo aquí
+  
 
+  const abrirCancelacion = (idReserva) => {
+    setReservaACancelar(idReserva);
+    setOpenCancelModal(true);
+  };
+  const confirmarCancelacion = async () => {
+    if (!motivoCancelacion.trim()) {
+      showToast("Debes ingresar un motivo para cancelar.", "warning");
+      //alert("Debes ingresar un motivo para cancelar.");
+      return;
+    }
+
+    try {
+      await cancelarReserva(reservaACancelar, motivoCancelacion);
+      setOpenCancelModal(false);
+      setMotivoCancelacion("");
+      setReservaACancelar(null);
+
+      await cargarReservas(); // 🔄 Recargar lista
+    } catch (error) {
+      console.error("Error al cancelar reserva:", error);
+      alert("Hubo un error al cancelar la reserva.");
+    }
+  };
   useEffect(() => {
     let lista = [...reservas];
 
@@ -197,6 +254,10 @@ export default function HistorialReservaCli() {
     setReservasFiltradas(lista);
   }, [reservas, ordenFecha]); 
  
+  const abrirDetalle = (reserva) => {
+    setReservaSeleccionada(reserva);
+    setOpenDetalleModal(true);
+  };
 
 
   const getAccionesPorEstado = (estado) => {
@@ -495,7 +556,7 @@ export default function HistorialReservaCli() {
 
                   <p className="flex items-center gap-2">
                     <Calendar className="w-4 h-4" style={{ color: isDarkMode ? "#2C7366" : "#46c4b7" }} />
-                    {format(new Date(r.fechaReserva), "dd 'de' MMMM, yyyy")}
+                    {format(new Date(r.fechaReserva + "T12:00:00" ), "dd 'de' MMMM, yyyy")}
                   </p>
 
                   <p className="flex items-center gap-2">
@@ -522,10 +583,13 @@ export default function HistorialReservaCli() {
                           console.log("ABRIENDO QR PARA:", r.idReserva);
                           setSelectedReservaId(r.idReserva);
                           setOpenQrModal(true);
-                        }/*
+                        }
                         if (accion === "Detalle") {
-                          navigate(`/reserva/${r.idReserva}`);
-                        }*/
+                          abrirDetalle(r);
+                        }
+                        if (accion === "Cancelar") {
+                          abrirCancelacion(r.idReserva);
+                        }
                         // Puedes agregar más acciones aquí
                       }}
                       className="flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all"
@@ -569,6 +633,60 @@ export default function HistorialReservaCli() {
         onClose={() => setOpenQrModal(false)}
         idReserva={selectedReservaId}
       />
+
+      
+
+      {openCancelModal && (
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50">
+        <div className={`p-6 rounded-xl shadow-lg w-full max-w-md
+          ${isDarkMode ? "bg-[#111315] text-white" : "bg-white text-gray-900"}`}>
+          
+          <h2 className="text-xl font-bold mb-4">Cancelar Reserva</h2>
+
+          <label className="block text-sm font-medium mb-2">
+            Motivo de cancelación
+          </label>
+
+          <textarea
+            value={motivoCancelacion}
+            onChange={(e) => setMotivoCancelacion(e.target.value)}
+            rows="3"
+            className={`w-full p-3 rounded-lg border mb-4 resize-none outline-none
+              ${isDarkMode 
+                ? "bg-[#0f1213] border-gray-700 text-gray-200" 
+                : "bg-gray-100 border-gray-300 text-gray-800"}`}
+            placeholder="Escribe el motivo..."
+          />
+
+          <div className="flex justify-end gap-3 mt-4">
+            <button
+              onClick={() => setOpenCancelModal(false)}
+              className={`px-4 py-2 rounded-lg font-semibold
+                ${isDarkMode ? "bg-gray-700 text-white" : "bg-gray-300 text-gray-900"}`}
+            >
+              Cerrar
+            </button>
+
+            <button
+              onClick={confirmarCancelacion}
+              className="px-4 py-2 rounded-lg bg-red-600 text-white font-semibold"
+            >
+              Confirmar
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+
+  <DetalleReservaModal
+    open={openDetalleModal}
+    onClose={() => setOpenDetalleModal(false)}
+    reserva={reservaSeleccionada}
+    isDarkMode={isDarkMode}
+  />
+
+
+
     </div>
   );
 }

@@ -112,7 +112,7 @@ export default function ModalReservaList({ initialData, onCancel }) {
   }
 
   return (
-    <div className="modal-reserva-overlay">
+    <div className="modal-reserva-overlay text-gray-500">
       <div className="modal-reserva-blur"></div>
 
       <div className="modal-reserva-container">

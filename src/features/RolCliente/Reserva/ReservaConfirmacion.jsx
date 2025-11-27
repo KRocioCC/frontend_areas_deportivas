@@ -117,9 +117,9 @@ export default function ReservaConfirmacion() {
 
       // Toast de éxito y navegación
       showToast("¡Reserva confirmada con éxito!", "success");
-      navigate("/");
+      navigate("/reservas/mihistorial");
     } catch (err) {
-      console.error("Error al confirmar reserva:", err);
+      //console.error("Error al confirmar reserva:", err);
       showToast("Error al procesar la reserva. Intenta más tarde.", "error");
       navigate("/");
     } finally {
@@ -135,7 +135,8 @@ export default function ReservaConfirmacion() {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35 }}
-          className={isDarkMode ? "text-gray-200" : "text-gray-700"}
+          className={isDarkMode ? "text-gray-200" : "text-gray-700 "}
+          style={{ fontSize: "36px" }}
         >
           Cargando detalles...
         </motion.div>

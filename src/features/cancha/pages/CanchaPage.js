@@ -160,7 +160,7 @@ async function handleSave(payload) {
 
 
   return (
-    <div className="Cancha-page card">
+    <div className="Cancha-page card text-gray-900">
       <div className="page-header">
         <h2>Canchas</h2>
 

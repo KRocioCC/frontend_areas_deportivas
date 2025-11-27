@@ -141,7 +141,7 @@ export default function MacrodistritoPage() {
   ], [openView, openEdit, handleDelete]);
 
   return (
-    <div className="macrodistrito-page card">
+    <div className="macrodistrito-page card text-gray-900">
       <div className="page-header">
         <h2 className="h-heading text-2xl mb-2" >Macrodistritos</h2>
 

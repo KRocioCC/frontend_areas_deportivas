@@ -194,7 +194,7 @@ export default function AreadeportivaPage() {
   ], [openView, openEdit, handleDelete]);
 
   return (
-    <div className="Areadeportiva-page card">
+    <div className="Areadeportiva-page card text-gray-900">
       <div className="page-header">
         <h2 className="h-heading text-2xl mb-2">Áreas Deportivas</h2>
         <div className="search-actions-container">

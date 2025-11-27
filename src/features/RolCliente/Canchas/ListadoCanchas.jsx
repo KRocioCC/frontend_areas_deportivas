@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getAllCanchas } from "../../../api/CanchaApi";
+import { getCanchasActivas } from "../../../api/CanchaApi";
 import CanchaCardTodas from "./components/CanchaCardTodas";
 import { useTheme } from "../../../context/ThemeContext";
 import FiltrosCanchas from "./components/FiltroCanchas";
@@ -19,7 +19,7 @@ export default function ListadoCanchas() {
   const handleReset = async () => {
     setLoading(true);
     try {
-      const data = await getAllCanchas();
+      const data = await getCanchasActivas();
       setCanchas(data);
     } finally {
       setLoading(false);

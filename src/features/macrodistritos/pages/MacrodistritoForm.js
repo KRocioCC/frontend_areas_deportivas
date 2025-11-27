@@ -72,7 +72,7 @@ export default function MacrodistritoForm({
       : "Nuevo Macrodistrito";
 
   return (
-    <form className="macrodistrito-form" onSubmit={handleSubmit}>
+    <form className="macrodistrito-form text-gray-900" onSubmit={handleSubmit}>
       <h3>{title}</h3>
 
       <div className="form-row">

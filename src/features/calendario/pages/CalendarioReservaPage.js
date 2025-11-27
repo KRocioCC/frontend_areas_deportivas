@@ -56,7 +56,7 @@ const CalendarioReservasPage = () => {
   }, [fecha]);
 
   return (
-    <div className="reservas-page">
+    <div className="reservas-page text-gray-900">
       {/* Encabezado */}
       <header className="reservas-header">
         <div className="header-left">

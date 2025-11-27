@@ -229,7 +229,7 @@ export default function InvitadoPage() {
     if (!invitado) return null;
 
     return (
-      <div className="modal">
+      <div className="modal text-gray-900">
         <div className="modal-content detail-modal">
           <div className="detail-content">
             <div className="detail-header">

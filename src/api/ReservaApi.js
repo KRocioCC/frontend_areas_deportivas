@@ -168,10 +168,12 @@ export const getReservasClienteOrdenDesc = async (idCliente) => {
 // Por nombre de cancha (solo del cliente)
 export const getReservasPorClienteYNombreCancha = async (idCliente, nombre) => {
   const res = await api.get(
-    `${URL_BASE}/cliente/${idCliente}/cancha/${encodeURIComponent(nombre)}`
+    `${URL_BASE}/cliente/${idCliente}/cancha`,
+    { params: { nombre } }
   );
   return res.data;
 };
+
 
 // Por rango de fechas (solo del cliente)
 export const getReservasPorClienteEnRango = async (idCliente, inicio, fin) => {
@@ -181,6 +183,7 @@ export const getReservasPorClienteEnRango = async (idCliente, inicio, fin) => {
   );
   return res.data;
 };
+
 
 // Listar invitados por reserva
 export const getInvitadosByReserva = async (idReserva) => {

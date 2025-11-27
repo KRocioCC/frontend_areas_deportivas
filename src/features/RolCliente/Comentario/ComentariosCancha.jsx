@@ -36,6 +36,12 @@ export default function ComentariosCancha({ canchaId }) {
   // ENVIAR COMENTARIO
   // ======================
   async function enviar() {
+    // ⚡ Validar usuario primero
+    if (!user?.id) {
+      showToast("Debes iniciar sesión para dejar un comentario en esta cancha.", "warning");
+      return;
+    }
+
     if (!nuevo.contenido.trim()) {
       showToast("Escribe un comentario antes de enviar", "warning");
       return;
@@ -51,10 +57,12 @@ export default function ComentariosCancha({ canchaId }) {
       showToast("Comentario enviado", "success");
       setNuevo({ calificacion: 5, contenido: "" });
       cargar();
-    } catch {
-      showToast("Debes iniciar sesión para dejar un comentario en esta cancha.", "warning");
+    } catch (e) {
+      showToast("Escribe un comentarios de almenos 5 caracteres", "warning");
     }
   }
+
+
 
   // ======================
   // FORMATEAR FECHA
@@ -383,7 +391,7 @@ export default function ComentariosCancha({ canchaId }) {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={enviar}
-            disabled={!nuevo.contenido.trim() || !user?.id}
+            disabled={!nuevo.contenido.trim()} 
             className={`
               px-8 py-4 rounded-2xl font-bold text-lg
               flex items-center gap-3 shadow-xl

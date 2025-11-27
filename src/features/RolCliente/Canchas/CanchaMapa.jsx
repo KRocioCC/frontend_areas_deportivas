@@ -20,13 +20,14 @@ export default function CanchaMapa({ cancha }) {
   // Link directo a Google Maps
   const googleMapsLink = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
 
+  
   return (
-    <div className="bg-[var(--color-p-6)] rounded-lg p-4 z-1 shadow-sm">
+    <div className="bg-[var(--color-p-6)] rounded-lg p-4 shadow-sm">
       <h3 className="font-[var(--font-Oswald)] text-lg text-[var(--primary)] mb-3 flex items-center gap-2">
         <MapPin size={20} /> Nos encontramos en : 
       </h3>
 
-      <div className="map-wrapper" style={{ height: "250px", width: "100%", borderRadius: "12px", overflow: "hidden" }}>
+      <div className="map-wrapper z-0" style={{ height: "250px", width: "100%", borderRadius: "12px", overflow: "hidden" }}>
         <MapContainer center={[lat, lng]} zoom={15} style={{ height: "100%", width: "100%" }}>
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

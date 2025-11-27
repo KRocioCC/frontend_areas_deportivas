@@ -306,7 +306,7 @@ export default function UsuarioControlPage() {
   }
 
   return (
-    <div className="cliente-page">
+    <div className="cliente-page text-gray-900">
       <div className="page-header">
         <h2>Gestión de Usuarios de Control</h2>
         

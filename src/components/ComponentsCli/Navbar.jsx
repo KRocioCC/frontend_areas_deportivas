@@ -21,12 +21,11 @@ export default function Navbar() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
+  // { name: "Reservar", path: "/reservas" },
   // 🔹 Items base (sin cambios)
   const baseItems = [
     { name: "Inicio", path: "/inicio"},
     { name: "Canchas", path: "/cancha/listado" },
-    { name: "Reservar", path: "/reservas" },
     { name: "¿Cómo Funciona?", path: "/como-funciona/reservar",
       children: [
         { name: "Cómo reservar paso a paso", path: "/como-funciona/reservar" },
@@ -209,7 +208,7 @@ export default function Navbar() {
                 {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
               </motion.button>
               {/*agregue un boton notificaiones */}
-              <motion.button
+              {/*<motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.98 }}
                 className={`p-2 rounded-md transition-colors ${
@@ -223,7 +222,7 @@ export default function Navbar() {
                     3
                   </span>
                 </div>
-              </motion.button>
+              </motion.button>*/}
 
               {currentUser ? (
                 <div className="relative group">
@@ -251,7 +250,7 @@ export default function Navbar() {
                   >
                     <div className="flex flex-col">
                       <button
-                        onClick={() => handleNavigate('/perfil')}
+                        onClick={() => handleNavigate('/miperfil')}
                         className="
                           text-[0.85rem] text-[var(--color-p-4)] text-left 
                           px-4 py-2 rounded-md transition-all duration-150 
@@ -287,6 +286,7 @@ export default function Navbar() {
                 </motion.button>
               )}
             </div>
+
           </div>
 
 
@@ -418,8 +418,9 @@ export default function Navbar() {
                   {isDarkMode ? "Modo Claro" : "Modo Oscuro"}
                 </span>
               </button>
+
               {/*notificaiones */}
-              <div className="mb-6">
+              {/*<div className="mb-6">
                 <div className="flex items-center gap-3 p-3 rounded-lg bg-[rgba(255,255,255,0.03)] hover:bg-[rgba(255,255,255,0.05)] transition">
                   <div className="relative">
                     <Bell className="w-5 h-5 text-[var(--color-p-5)]" />
@@ -460,7 +461,7 @@ export default function Navbar() {
                     <div className="grid grid-cols-2 gap-2">
                       <motion.button
                         whileTap={{ scale: 0.95 }}
-                        onClick={() => handleNavigate("/perfil")}
+                        onClick={() => handleNavigate("/miperfil")}
                         className="py-2 px-3 rounded-lg bg-[var(--color-p-5)] text-white dark:text-gray-200 text-sm font-[var(--font-Balo)] hover:bg-[var(--color-p-5)]/90 transition"
                       >
                         Perfil

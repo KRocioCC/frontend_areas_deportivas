@@ -118,11 +118,11 @@ export default function ReservaListAdmin() {
   );
 
   return (
-    <div className="ReservaListAdmin card">
+    <div className="ReservaListAdmin card text-gray-500">
       <div className="page-header">
         <h2>Reservas</h2>
 
-        <div className="filters-container">
+        <div className="filters-container ">
           {/* Selector de rango de fechas */}
           <div className="date-range">
             <label>

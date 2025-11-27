@@ -180,12 +180,6 @@ export default function CanchaCardTodas({ cancha, isDarkMode }) {
           <div className="flex gap-2">
             <button
               onClick={() => navigate(`/canchacli/detalle/${cancha.idCancha}`)} // ← redirige al detalle
-              className="text-xs px-3 py-1 border border-gray-300 rounded-md hover:bg-gray-100"
-            >
-              Ver disponibilidad
-            </button>
-            <button
-              onClick={() => navigate(`/canchacli/detalle/${cancha.idCancha}`)} // ← redirige al detalle
               className="text-xs px-3 py-1 bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200"
             >
               Reservar
