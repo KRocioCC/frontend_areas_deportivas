@@ -5,7 +5,7 @@ import { getCancha } from "../../../api/CanchaApi";
 import DisciplinaCli from "../Disciplina/DisciplinaCli";
 import CanchaDetallesExtras from "./CanchaDetallesExtras";
 import CanchaMapa from "./CanchaMapa";
-import { ChevronLeft, Phone, Mail } from "lucide-react";
+import { ChevronLeft, Phone, Mail, ChevronRight } from "lucide-react";
 import { useAuth } from "../../../auth/hooks/useAuth";
 import { useTheme } from "../../../context/ThemeContext";
 import { useToast } from "../../../context/ToastContext"; 
@@ -23,13 +23,46 @@ export default function CanchaDetalle() {
   const [disciplina, setDisciplina] = useState(null);
   const [activeTab, setActiveTab] = useState("descripcion");
   const [isEquipamientoOpen, setIsEquipamientoOpen] = useState(false);
-    const { showToast } = useToast();
+  const { showToast } = useToast();
+
+  // Estados para el carrusel de imágenes
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [cargandoImagen, setCargandoImagen] = useState(true);
+  const [showGallery, setShowGallery] = useState(false);
+
+  const getUrlImagenCompleta = (urlAcceso) => {
+    if (!urlAcceso) return "https://placehold.co/600x400?text=Sin+Imagen";
+    
+    if (urlAcceso.startsWith('http')) {
+      return urlAcceso;
+    }
+    
+    const baseUrl = 'http://localhost:8032';
+    return `${baseUrl}${urlAcceso.startsWith('/') ? urlAcceso : `/${urlAcceso}`}`;
+  };
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const data = await getCancha(id);
         setCancha(data);
+        
+        if (data.imagenes && data.imagenes.length > 0) {
+          const primeraImagen = data.imagenes[0];
+          const urlImagen = getUrlImagenCompleta(primeraImagen.urlAcceso);
+          
+          const img = new Image();
+          img.onload = () => {
+            setCargandoImagen(false);
+          };
+          img.onerror = () => {
+            setCargandoImagen(false);
+          };
+          img.src = urlImagen;
+        } else {
+          console.log("⚠️ No hay imágenes disponibles para esta cancha");
+          setCargandoImagen(false);
+        }
       } catch (e) {
         console.error("Error al cargar cancha", e);
       } finally {
@@ -39,10 +72,42 @@ export default function CanchaDetalle() {
     fetchData();
   }, [id]);
 
+  const nextImage = () => {
+    if (cancha.imagenes && cancha.imagenes.length > 0) {
+      setCurrentImageIndex((prev) => 
+        prev === cancha.imagenes.length - 1 ? 0 : prev + 1
+      );
+    }
+  };
+
+  const prevImage = () => {
+    if (cancha.imagenes && cancha.imagenes.length > 0) {
+      setCurrentImageIndex((prev) => 
+        prev === 0 ? cancha.imagenes.length - 1 : prev - 1
+      );
+    }
+  };
+
+  const goToImage = (index) => {
+    setCurrentImageIndex(index);
+  };
+
+  const getCurrentImageUrl = () => {
+    if (cancha.imagenes && cancha.imagenes.length > 0) {
+      const imagenActual = cancha.imagenes[currentImageIndex];
+      return getUrlImagenCompleta(imagenActual.urlAcceso);
+    }
+    return "https://placehold.co/600x400?text=Sin+Imagen";
+  };
+
+  const handleImageError = (e) => {
+    e.target.onerror = null;
+    e.target.src = "https://placehold.co/600x400?text=Error+Cargando";
+  };
+
   const handleReservar = () => {
     if (!disciplina) {
-      //setError("Por favor, selecciona una disciplina antes de reservar.");
-      showToast(" Por favor, selecciona una disciplina antes de reservar.", "warning");
+      showToast("Por favor, selecciona una disciplina antes de reservar.", "warning");
       return;
     }
     setError("");
@@ -54,7 +119,6 @@ export default function CanchaDetalle() {
     }
   };
 
-  // ====== COLORES DINÁMICOS ======
   const pageBg = isDarkMode ? 'bg-[#0f1213]' : 'bg-[#ffffff]';
   const cardBg = isDarkMode ? 'bg-[#1a1d1e]' : 'bg-white';
   const borderColor = isDarkMode ? 'border-[#2d3748]' : 'border-gray-200';
@@ -64,7 +128,6 @@ export default function CanchaDetalle() {
   const warningColor = isDarkMode ? '#f35734' : '#f28627';
   const errorColor = isDarkMode ? '#8a2628' : '#d61727';
   const spinnerColor = isDarkMode ? '#f35734' : '#f28627';
-
 
   if (loading) {
     return (
@@ -112,12 +175,15 @@ export default function CanchaDetalle() {
 
     estaAbierta = tiempoActual >= inicioMin && tiempoActual <= finMin;
   }
+
   const scrollToSection = (id) => {
     const section = document.getElementById(id);
     if (section) {
       section.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   };
+
+  const hasMultipleImages = cancha.imagenes && cancha.imagenes.length > 1;
 
   return (
     <div className={`pt-10 w-full transition-colors duration-300 ${pageBg}`}>
@@ -136,23 +202,59 @@ export default function CanchaDetalle() {
         </button>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {/* Imagen principal */}
+          {/* Imagen principal con carrusel */}
           <div className="md:col-span-3 rounded-xl overflow-hidden shadow-lg h-80 md:h-96 relative">
-            <img
-              src={
-                cancha.imagenes && cancha.imagenes.length > 0
-                  ? cancha.imagenes[0].urlAcceso?.startsWith('http')
-                    ? cancha.imagenes[0].urlAcceso
-                    : `http://localhost:8032${cancha.imagenes[0].urlAcceso}`
-                  : cancha.urlImagen || "/images/default-cancha.jpg"
-              }
-              alt={cancha.nombre}
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.src = "/defaults/cancha-default.jpg";
-              }}
-            />
+            {cargandoImagen ? (
+              <div className="w-full h-full flex items-center justify-center bg-gray-800">
+                <div className="text-white" style={{fontFamily: "var(--font-Balo)"}}>Cargando imagen...</div>
+              </div>
+            ) : (
+              <>
+                <img
+                  src={getCurrentImageUrl()}
+                  alt={cancha.nombre}
+                  className="w-full h-full object-cover"
+                  onError={handleImageError}
+                />
+                
+                {hasMultipleImages && (
+                  <>
+                    <button
+                      onClick={prevImage}
+                      className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/60 hover:bg-black/80 text-white w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg hover:scale-110 z-20"
+                    >
+                      <ChevronLeft className="w-5 h-5" />
+                    </button>
+
+                    <button
+                      onClick={nextImage}
+                      className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/60 hover:bg-black/80 text-white w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg hover:scale-110 z-20"
+                    >
+                      <ChevronRight className="w-5 h-5" />
+                    </button>
+
+                    <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-3 z-20">
+                      {cancha.imagenes.map((_, index) => (
+                        <button
+                          key={index}
+                          onClick={() => goToImage(index)}
+                          className={`w-3 h-3 rounded-full transition-all duration-200 ${
+                            index === currentImageIndex 
+                              ? 'bg-white shadow-lg scale-125' 
+                              : 'bg-white/50 hover:bg-white/70'
+                          }`}
+                        />
+                      ))}
+                    </div>
+
+                    <div className="absolute top-4 left-4 bg-black/70 text-white px-3 py-2 rounded-full text-sm font-medium z-20">
+                      {currentImageIndex + 1} / {cancha.imagenes.length}
+                    </div>
+                  </>
+                )}
+              </>
+            )}
+            
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
             <div className="absolute bottom-4 left-4 text-white">
               <h1
@@ -162,50 +264,44 @@ export default function CanchaDetalle() {
                 {cancha.nombre}
               </h1>
             </div>
-
-            {/* Botón Ver galería completa 
-            {cancha.imagenes && cancha.imagenes.length > 1 && (
-              <button
-                onClick={() => " "}
-                className="absolute bottom-4 right-4 bg-black/60 hover:bg-black/80 text-white px-4 py-2 rounded-lg text-sm shadow-lg backdrop-blur-md transition"
-              >
-                Ver galería completa ({cancha.imagenes.length} fotos)
-              </button>
-            )}*/}
           </div>
 
           {/* Mini galería */}
           <div className="md:col-span-1 space-y-4">
-            {cancha.imagenes && cancha.imagenes.length > 1 ? (
-              cancha.imagenes.slice(1, 4).map((imagen, i) => (
-                <div key={i} className="rounded-xl overflow-hidden shadow-md">
-                  <img
-                    src={
-                      imagen.urlAcceso?.startsWith('http')
-                        ? imagen.urlAcceso
-                        : `http://localhost:8032${imagen.urlAcceso}`
-                    }
-                    alt={`${cancha.nombre} imagen ${i + 2}`}
-                    className="w-full h-[7rem] object-cover"
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = "/defaults/cancha-default.jpg";
+            {cancha.imagenes && cancha.imagenes.length > 0 ? (
+              cancha.imagenes.slice(0, 3).map((imagen, i) => {
+                const urlImagen = getUrlImagenCompleta(imagen.urlAcceso);
+                return (
+                  <button
+                    key={i}
+                    onClick={() => goToImage(i)}
+                    className={`w-full rounded-xl overflow-hidden shadow-md transition-all duration-200 hover:scale-105 ${
+                      currentImageIndex === i ? 'ring-4 ring-offset-2' : ''
+                    }`}
+                    style={{
+                      ringColor: currentImageIndex === i ? accentColor : 'transparent',
                     }}
-                  />
-                </div>
-              ))
+                  >
+                    <img
+                      src={urlImagen}
+                      alt={`${cancha.nombre} imagen ${i + 1}`}
+                      className="w-full h-[7rem] object-cover"
+                      onError={(e) => {
+                        console.error(`❌ Error cargando mini galería imagen ${i + 1}`);
+                        e.target.onerror = null;
+                        e.target.src = "https://placehold.co/600x400?text=Error+Cargando";
+                      }}
+                    />
+                  </button>
+                );
+              })
             ) : (
-              // Si no hay suficientes imágenes, mostrar la primera o default
               [1, 2, 3].map((i) => (
                 <div key={i} className="rounded-xl overflow-hidden shadow-md">
                   <img
-                    src={cancha.urlImagen || "/defaults/cancha-default.jpg"}
+                    src="https://placehold.co/600x400?text=Sin+Imagen"
                     alt={`${cancha.nombre} placeholder`}
                     className="w-full h-[7rem] object-cover"
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = "/defaults/cancha-default.jpg";
-                    }}
                   />
                 </div>
               ))
@@ -214,12 +310,10 @@ export default function CanchaDetalle() {
         </div>
       </div>
 
-      {/* TABS — funcionales, animados y respetando tu sistema visual */}
+      {/* Resto del código permanece igual */}
       <div className={`w-full mt-8 transition-colors duration-300 `}>
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex gap-6 text-sm md:text-base overflow-x-auto pb-2">
-
-            {/* DESCRIPCIÓN */}
             <button
               onClick={() => {
                 scrollToSection("descripcion-section");
@@ -240,7 +334,6 @@ export default function CanchaDetalle() {
               Descripción General
             </button>
 
-            {/* DISCIPLINA */}
             <button
               onClick={() => {
                 scrollToSection("disciplina-section");
@@ -261,7 +354,6 @@ export default function CanchaDetalle() {
               Disciplina
             </button>
 
-            {/* EQUIPAMIENTO — abrir modal */}
             <button
               onClick={() => {
                 setIsEquipamientoOpen(true);
@@ -282,7 +374,6 @@ export default function CanchaDetalle() {
               Equipamiento
             </button>
 
-            {/* OPINIONES */}
             <button
               onClick={() => {
                 scrollToSection("opiniones-section");
@@ -302,15 +393,11 @@ export default function CanchaDetalle() {
             >
               Opiniones
             </button>
-
           </div>
         </div>
       </div>
 
-
-      {/* CONTENIDO PRINCIPAL */}
       <div id="descripcion-section" className="max-w-6xl mx-auto mt-8 px-4 grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* IZQUIERDA */}
         <div className="lg:col-span-2 space-y-8">
           <div className={`p-6 rounded-xl`}>
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -324,7 +411,7 @@ export default function CanchaDetalle() {
                 className="px-3 py-1.5 rounded-lg text-sm font-medium"
                 style={{
                   backgroundColor: estaAbierta
-                    ? (isDarkMode ? '#2C736640' : '#41bfb220')   // Verde suave
+                    ? (isDarkMode ? '#2C736640' : '#41bfb220')
                     : (isDarkMode ? '#8a262840' : '#d6172720'), 
                   color: estaAbierta ? accentColor : errorColor
                 }}
@@ -387,7 +474,6 @@ export default function CanchaDetalle() {
           </div>
         </div>
 
-        {/* DERECHA: MAPA */}
         <div className={`p-6 rounded-xl ${cardBg} ${borderColor} border shadow-sm`}>
           <h3
             className="text-xl font-semibold mb-4"
@@ -399,9 +485,8 @@ export default function CanchaDetalle() {
         </div>
       </div>
 
-      {/* SELECCIÓN DE DISCIPLINA + BOTÓN RESERVAR */}
       <div id="disciplina-section" className={`mt-12 py-10 px-4 transition-colors duration-300 `} style={{ 
-        backgroundColor: isDarkMode ? '#0b0d0e' : '#e5ededff' // ✅ Fondo diferenciado, pero coherente
+        backgroundColor: isDarkMode ? '#0b0d0e' : '#e5ededff'
       }}>
         <div className="max-w-4xl mx-auto">
           <h3
@@ -431,23 +516,20 @@ export default function CanchaDetalle() {
             >
               Reservar Ya
             </button>
-
           </div>
         </div>
       </div>
-      {/*secion de comentarios */}
+
       <div id="opiniones-section" className="mt-16">
         <ComentariosCancha canchaId={cancha.idCancha} />
       </div>
 
-      {/* MODAL EQUIPAMIENTO */}
       {isEquipamientoOpen && (
         <EquipamientoCliModal 
           canchaId={cancha.idCancha} 
           onClose={() => setIsEquipamientoOpen(false)} 
         />
       )}
-
     </div>
   );
 }

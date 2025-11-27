@@ -14,7 +14,7 @@ export default function ModalDisciplinas({ canchaId, adminId, onClose }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [effectiveAdminId, setEffectiveAdminId] = useState(adminId);
-  const [nivelDificultad, setNivelDificultad] = useState("MEDIO"); 
+  const [nivelDificultad] = useState("MEDIO"); 
   const [toast, setToast] = useState({ show: false, message: "", type: "" });
 
   // Variables de estilo inspiradas en el código de pagos:
@@ -164,7 +164,7 @@ export default function ModalDisciplinas({ canchaId, adminId, onClose }) {
   };
 
   // Nivel de dificultad para el select
-  const nivelesDificultad = ["BAJO", "MEDIO", "ALTO", "PROFESIONAL"];
+  // const nivelesDificultad = ["BAJO", "MEDIO", "ALTO", "PROFESIONAL"]; // actualmente no usado
 
   // Componente de botón mejorado para coincidir con la inspiración
   const ActionButton = ({ onClick, children, isAssigned, isDisabled = false }) => {
@@ -174,7 +174,7 @@ export default function ModalDisciplinas({ canchaId, adminId, onClose }) {
       return (
         <Button
           variant="danger" 
-          onClick={onClick}
+          onClick={(e) => { e.stopPropagation(); onClick && onClick(e); }}
           className={`${baseClasses} bg-red-600 hover:bg-red-700 hover:shadow-xl transform hover:-translate-y-0.5`}
           style={{ fontFamily: "var(--font-josefin)" }}
           disabled={isDisabled}
@@ -186,9 +186,9 @@ export default function ModalDisciplinas({ canchaId, adminId, onClose }) {
       return (
         <Button
           variant="success" 
-          onClick={onClick}
-          className={`${baseClasses} bg-[${primaryColor}] hover:bg-[#3ba196] hover:shadow-xl transform hover:-translate-y-0.5`}
-          style={{ fontFamily: "var(--font-josefin)" }}
+          onClick={(e) => { e.stopPropagation(); onClick && onClick(e); }}
+          className={`${baseClasses} hover:bg-[#3ba196] hover:shadow-xl transform hover:-translate-y-0.5`}
+          style={{ fontFamily: "var(--font-josefin)", backgroundColor: primaryColor }}
           disabled={isDisabled}
         >
           {children}
@@ -209,7 +209,7 @@ export default function ModalDisciplinas({ canchaId, adminId, onClose }) {
         }`}>
           <div className="flex items-center gap-3">
             {toast.type === "success" ? (
-              <CheckCircle className={`w-6 h-6 text-[${primaryColor}]`} />
+              <CheckCircle className="w-6 h-6" style={{ color: primaryColor }} />
             ) : (
               <XCircle className="w-6 h-6 text-[#d40000]" />
             )}
@@ -302,7 +302,7 @@ export default function ModalDisciplinas({ canchaId, adminId, onClose }) {
         <div className="flex-1 overflow-y-auto bg-white">
           {loading ? (
             <div className="flex flex-col items-center justify-center py-20">
-              <div className="w-12 h-12 border-4 border-gray-300 border-t-[${primaryColor}] rounded-full animate-spin mb-4"></div>
+              <div className="w-12 h-12 border-4 border-gray-300 rounded-full animate-spin mb-4" style={{ borderTopColor: primaryColor }}></div>
               <p className="text-gray-600 text-lg" style={{fontFamily: "var(--font-Balo)"}}>
                 Cargando disciplinas...
               </p>
@@ -317,8 +317,8 @@ export default function ModalDisciplinas({ canchaId, adminId, onClose }) {
                 variant="primary" 
                 size="sm" 
                 onClick={loadDisciplinas}
-                className={`bg-[${primaryColor}] hover:bg-[#3ba196] text-white px-6 py-2.5 rounded-xl shadow-md transition-all duration-300`}
-                style={{fontFamily: "var(--font-josefin)"}}
+                className={`text-white px-6 py-2.5 rounded-xl shadow-md transition-all duration-300 hover:bg-[#3ba196]`}
+                style={{fontFamily: "var(--font-josefin)", backgroundColor: primaryColor}}
               >
                 Reintentar
               </Button>
@@ -367,11 +367,25 @@ export default function ModalDisciplinas({ canchaId, adminId, onClose }) {
                         return (
                           <div 
                             key={disciplina.idDisciplina} 
-                            className={`p-6 rounded-2xl border-2 transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5 flex flex-col ${
+                            className={`p-6 rounded-2xl border-2 transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5 flex flex-col cursor-pointer ${
                               asignada 
-                                ? `bg-white border-[${primaryColor}] shadow-lg` 
+                                ? `bg-white shadow-lg` 
                                 : "bg-white border-gray-200 hover:border-gray-300"
                             }`}
+                            style={asignada ? { borderColor: primaryColor, borderWidth: 2 } : undefined}
+                            onClick={() => {
+                              if (asignada) {
+                                // desasignar en cualquier lugar del card
+                                handleDesasignar(disciplina);
+                              } else {
+                                // asignar si está activa; si no, mostrar aviso
+                                if (disciplina.estado) {
+                                  handleAsignar(disciplina);
+                                } else {
+                                  showToast("Disciplina inactiva, no se puede asignar.", "error");
+                                }
+                              }
+                            }}
                           >
                             <div className="flex items-start justify-end mb-4">
                                 {/* Se ha eliminado la sección del icono de disciplina */}

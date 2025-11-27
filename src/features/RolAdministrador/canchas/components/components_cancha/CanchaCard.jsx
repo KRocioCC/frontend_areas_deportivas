@@ -270,14 +270,14 @@ const CanchaCard = ({
               <>
                 <button
                   onClick={handleVerDisciplinas} // Cambiado para abrir el modal
-                  className="w-1/3 py-3 bg-[#45bfb5] text-white rounded-xl hover:bg-[#3aa89f] transition-all duration-300 font-semibold text-sm shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                  className="w-1/3 py-3 bg-black text-white rounded-xl hover:bg-[#828585] transition-all duration-300 font-semibold text-sm shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                   style={{fontFamily: "var(--font-josefin)"}}
                 >
-                  Ver Disciplinas
+                  Asignar Disciplinas
                 </button>
 
                 <button
-                  className="w-1/3 py-3 bg-black text-white rounded-xl hover:bg-gray-800 transition-all duration-300 font-semibold text-sm shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 tour-btn-ver-reservas"
+                  className="w-1/3 py-3 bg-[#45bfb5] text-white rounded-xl hover:bg-green-800 transition-all duration-300 font-semibold text-sm shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 tour-btn-ver-reservas"
                   onClick={() => navigate(`/admin/cancha/ver_reservas/${cancha.idCancha}`)}
                   style={{fontFamily: "var(--font-josefin)"}}
                 >

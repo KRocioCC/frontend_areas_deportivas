@@ -113,12 +113,12 @@ export default function AdminIntroTour() {
             // No tiene área: iniciar tour
             startSingleTour({
               steps: [
-                { element: '#tour-menu-mi-area', intro: ' <strong> 1RO: Empieza en Mi Área: PRIMERO debes crear tu área deportiva para continuar.</strong>' },
-                { element: '#tour-menu-canchas', intro: '<strong>2DO: PRESIONA AQUI para crear y ver tus Canchas</strong>.' },
-                { element: '#tour-menu-disciplinas', intro: '<strong>3RO: En Disciplinas puedes crear las disciplinas que se parctican en tu area deportiva, luego podras asignarlas a canchas.</strong>' },
-                { element: '#tour-menu-reservas', intro: '<strong>4TO: En Reservas gestionas podras visualizar Reservas y Cancelaciones</strong>.' },
-                { element: '#tour-menu-transacciones', intro: '<strong>5TO: En Transacciones podras ver los pagos y de las reservas</strong> ' },
-                { element: '#tour-menu-calendario', intro: '<strong>6TO: El Calendario te da una vista por fecha de las reservas.</strong> ' }
+                { element: '#tour-menu-mi-area', intro: ' <strong> PRIMERO debes crear tu área deportiva para continuar.</strong>' },
+                { element: '#tour-menu-canchas', intro: '<strong> En Canchas esta toda la gestion, crea, edita, asigna, ve reservas por cancha y desactiva</strong>.' },
+                { element: '#tour-menu-disciplinas', intro: '<strong>En Disciplinas puedes crear las disciplinas que se practican en tu area deportiva, luego podras asignarlas a canchas.</strong>' },
+                { element: '#tour-menu-reservas', intro: '<strong> En Reservas podras visualizar informacion de Reservas  y Cancelaciones</strong>.' },
+                { element: '#tour-menu-transacciones', intro: '<strong>En Transacciones podras ver los pagos de las reservas</strong> ' },
+                { element: '#tour-menu-calendario', intro: '<strong>6TO: El Calendario te da una vista por fecha de las reservas programadas por clientes.</strong> ' }
               ],
               doneLabel: 'Ir a Mi Área',
               navigateTo: '/admin/mi_area',
@@ -128,12 +128,12 @@ export default function AdminIntroTour() {
             // En caso de error al consultar área, igual iniciar tour para ayudar al usuario
             startSingleTour({
               steps: [
-                { element: '#tour-menu-mi-area', intro: 'Primero, ve a <strong>Mi Área</strong> para crear tu área deportiva.' },
-                { element: '#tour-menu-canchas', intro: 'Después podrás crear las <strong>Canchas</strong> de tu área.' },
-                { element: '#tour-menu-disciplinas', intro: 'En <strong>Disciplinas</strong> defines actividades que luego asignarás a las canchas.' },
-                { element: '#tour-menu-reservas', intro: 'En <strong>Reservas</strong> verás: pendientes, confirmadas y <strong>Cancelaciones</strong>.' },
-                { element: '#tour-menu-transacciones', intro: 'En <strong>Pagos</strong> controlarás las transacciones y cobros.' },
-                { element: '#tour-menu-calendario', intro: 'En <strong>Calendario</strong> tendrás una vista visual de las reservas por fecha.' }
+                { element: '#tour-menu-mi-area', intro: ' <strong> PRIMERO debes crear tu área deportiva para continuar.</strong>' },
+                { element: '#tour-menu-canchas', intro: '<strong> En Canchas esta toda la gestion, crea, edita, asigna, ve reservas por cancha y desactiva</strong>.' },
+                { element: '#tour-menu-disciplinas', intro: '<strong>En Disciplinas puedes crear las disciplinas que se practican en tu area deportiva, luego podras asignarlas a canchas.</strong>' },
+                { element: '#tour-menu-reservas', intro: '<strong> En Reservas podras visualizar informacion de Reservas  y Cancelaciones</strong>.' },
+                { element: '#tour-menu-transacciones', intro: '<strong>En Transacciones podras ver los pagos de las reservas</strong> ' },
+                { element: '#tour-menu-calendario', intro: '<strong>6TO: El Calendario te da una vista por fecha de las reservas programadas por clientes.</strong> ' }
               ],
               doneLabel: 'Ir a Mi Área',
               navigateTo: '/admin/mi_area',
