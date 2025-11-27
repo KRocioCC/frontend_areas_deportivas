@@ -249,7 +249,7 @@ const CanchasPage = () => {
             className="text-xl md:text-2xl opacity-90 text-gray-200 max-w-4xl mx-auto"
             style={{fontFamily: "var(--font-Alumni)"}}
           >
-            Administra y organiza todas las canchas de tu área deportiva con herramientas profesionales
+            Administra las canchas de tu área deportiva
           </p>
         </div>
       </div>

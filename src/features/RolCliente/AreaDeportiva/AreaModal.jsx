@@ -19,45 +19,118 @@ export default function AreaModal({ area, onClose }) {
   const { isDarkMode } = useTheme();
   const [canchas, setCanchas] = useState([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [cargandoArea, setCargandoArea] = useState(true);
+  const [cargandoCanchas, setCargandoCanchas] = useState({});
   const navigate = useNavigate();
   const { showToast } = useToast();
 
-  // Función para obtener la URL de la imagen actual del área
+  const getUrlImagenCompleta = (urlAcceso) => {
+    if (!urlAcceso) return "https://placehold.co/600x400?text=Sin+Imagen";
+    
+    // Si la URL ya es completa, usarla directamente
+    if (urlAcceso.startsWith('http')) {
+      return urlAcceso;
+    }
+    
+    // Si es una ruta relativa, construir la URL completa
+    const baseUrl = 'http://localhost:8032';
+    return `${baseUrl}${urlAcceso.startsWith('/') ? urlAcceso : `/${urlAcceso}`}`;
+  };
+
+  // Función para obtener la URL de la imagen actual del área - CON LA NUEVA LÓGICA
   const getCurrentImageUrl = () => {
     if (area.imagenes && area.imagenes.length > 0) {
       const imagenActual = area.imagenes[currentImageIndex];
-      if (imagenActual.urlAcceso.startsWith('http')) {
-        return imagenActual.urlAcceso;
-      } else {
-        return `http://localhost:8032${imagenActual.urlAcceso}`;
-      }
+      return getUrlImagenCompleta(imagenActual.urlAcceso);
     }
-    return area.urlImagen || "/defaults/area-default.jpg";
+    return "https://placehold.co/600x400?text=Sin+Imagen";
   };
 
-  // Función para obtener la primera imagen de una cancha
+  // Función para obtener la primera imagen de una cancha - CON LA NUEVA LÓGICA
   const getCanchaImageUrl = (cancha) => {
     if (cancha.imagenes && cancha.imagenes.length > 0) {
       const primeraImagen = cancha.imagenes[0];
-      if (primeraImagen.urlAcceso.startsWith('http')) {
-        return primeraImagen.urlAcceso;
-      } else {
-        return `http://localhost:8032${primeraImagen.urlAcceso}`;
-      }
+      return getUrlImagenCompleta(primeraImagen.urlAcceso);
     }
-    return cancha.urlImagen || "/defaults/cancha-default.jpg";
+    return "https://placehold.co/600x400?text=Sin+Imagen";
   };
 
-  // Función para manejar errores de carga de imagen
+  // Procesar imágenes del área cuando cambia
+  useEffect(() => {
+    const procesarImagenArea = () => {
+      if (!area) {
+        setCargandoArea(false);
+        return;
+      }
+
+      console.log(" Imágenes del área:", area.imagenes);
+      console.log("Área recibida:", area.nombreArea, "ID:", area.idAreadeportiva);
+
+      // Verificar si hay imágenes en la respuesta del área
+      if (area.imagenes && area.imagenes.length > 0) {
+        const primeraImagen = area.imagenes[0];
+        
+        // Pre-cargar la imagen para verificar que funciona
+        const urlImagen = getUrlImagenCompleta(primeraImagen.urlAcceso);
+        
+        const img = new Image();
+        img.onload = () => {
+          setCargandoArea(false);
+        };
+        img.onerror = () => {
+          setCargandoArea(false);
+        };
+        img.src = urlImagen;
+      } else {
+        setCargandoArea(false);
+      }
+    };
+
+    procesarImagenArea();
+  }, [area]);
+
+  // Procesar imágenes de canchas cuando cambian
+  useEffect(() => {
+    const procesarImagenesCanchas = () => {
+      if (canchas.length === 0) return;
+
+      canchas.forEach((cancha) => {
+        if (cancha.imagenes && cancha.imagenes.length > 0) {
+          const primeraImagen = cancha.imagenes[0];
+          const urlImagen = getUrlImagenCompleta(primeraImagen.urlAcceso);
+          
+          const img = new Image();
+          img.onload = () => {
+            console.log(` Imagen de cancha ${cancha.nombre} cargada correctamente`);
+            setCargandoCanchas(prev => ({ ...prev, [cancha.idCancha]: false }));
+          };
+          img.onerror = () => {
+            console.error(` Error al cargar imagen de cancha ${cancha.nombre}`);
+            setCargandoCanchas(prev => ({ ...prev, [cancha.idCancha]: false }));
+          };
+          img.src = urlImagen;
+        } else {
+          setCargandoCanchas(prev => ({ ...prev, [cancha.idCancha]: false }));
+        }
+      });
+    };
+
+    procesarImagenesCanchas();
+  }, [canchas]);
+
+  // Función para manejar errores de carga de imagen del área
   const handleImageError = (e) => {
+    console.error(" Error en la etiqueta img del área");
     e.target.onerror = null;
-    e.target.src = "/defaults/area-default.jpg";
+    e.target.src = "https://placehold.co/600x400?text=Error+Cargando";
   };
 
   // Función para manejar errores de carga de imagen de cancha
-  const handleCanchaImageError = (e) => {
+  const handleCanchaImageError = (e, canchaId) => {
+    console.error(` Error en la etiqueta img de cancha ${canchaId}`);
     e.target.onerror = null;
-    e.target.src = "/defaults/cancha-default.jpg";
+    e.target.src = "https://placehold.co/600x400?text=Error+Cargando";
+    setCargandoCanchas(prev => ({ ...prev, [canchaId]: false }));
   };
 
   // Navegar a la siguiente imagen del área
@@ -90,7 +163,6 @@ export default function AreaModal({ area, onClose }) {
       if (!area?.idAreadeportiva) return;
       try {
         const data = await getCanchasPorArea(area.idAreadeportiva);
-        //console.log("✅ Canchas recibidas:", data);
         
         // Asegurarnos de que tenemos un array de canchas
         const canchaArray = Array.isArray(data) ? data : data?.canchas || [];
@@ -99,6 +171,13 @@ export default function AreaModal({ area, onClose }) {
           tieneImagenes: c.imagenes && c.imagenes.length > 0,
           cantidadImagenes: c.imagenes ? c.imagenes.length : 0
         })));
+        
+        // Inicializar estados de carga para cada cancha
+        const estadosCarga = {};
+        canchaArray.forEach(cancha => {
+          estadosCarga[cancha.idCancha] = true;
+        });
+        setCargandoCanchas(estadosCarga);
         
         setCanchas(canchaArray.slice(0, 3));
       } catch (error) {
@@ -139,18 +218,36 @@ export default function AreaModal({ area, onClose }) {
         >
           {/* Fondo de imagen con carrusel */}
           <div className="absolute inset-0">
-            <img
-              src={getCurrentImageUrl()}
-              alt={area.nombreArea || "Área deportiva"}
-              loading="eager"
-              fetchPriority="high"
-              onError={handleImageError}
-              className="w-full h-full object-cover transition-opacity duration-500"
-            />
+            {cargandoArea ? (
+              <div className="w-full h-full flex flex-col items-center justify-center bg-gray-800">
+                <div className="text-white mb-2" style={{fontFamily: "var(--font-Balo)"}}>Cargando imagen del área...</div>
+              </div>
+            ) : (
+              <>
+                <img
+                  src={getCurrentImageUrl()}
+                  alt={area.nombreArea || "Área deportiva"}
+                  loading="eager"
+                  fetchPriority="high"
+                  onError={handleImageError}
+                  className="w-full h-full object-cover transition-opacity duration-500"
+                />
+                
+                {/* Indicador de múltiples imágenes */}
+                {hasMultipleImages && (
+                  <div className="absolute top-4 left-4">
+                    <span className="px-2 py-1 bg-black/70 text-white text-xs rounded-full backdrop-blur-sm" style={{fontFamily: "var(--font-Balo)"}}>
+                      {area.imagenes.length} imágenes
+                    </span>
+                  </div>
+                )}
+              </>
+            )}
+            
             <div className="absolute inset-0 bg-black/70"></div>
 
             {/* Flecha izquierda */}
-            {hasMultipleImages && (
+            {hasMultipleImages && !cargandoArea && (
               <button
                 onClick={prevImage}
                 className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/60 hover:bg-black/80 text-white w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg hover:scale-110 z-20"
@@ -161,7 +258,7 @@ export default function AreaModal({ area, onClose }) {
             )}
 
             {/* Flecha derecha */}
-            {hasMultipleImages && (
+            {hasMultipleImages && !cargandoArea && (
               <button
                 onClick={nextImage}
                 className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/60 hover:bg-black/80 text-white w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg hover:scale-110 z-20"
@@ -172,7 +269,7 @@ export default function AreaModal({ area, onClose }) {
             )}
 
             {/* Indicadores de posición (puntos) */}
-            {hasMultipleImages && (
+            {hasMultipleImages && !cargandoArea && (
               <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-3 z-20">
                 {area.imagenes.map((_, index) => (
                   <button
@@ -190,7 +287,7 @@ export default function AreaModal({ area, onClose }) {
             )}
 
             {/* Contador de imágenes */}
-            {hasMultipleImages && (
+            {hasMultipleImages && !cargandoArea && (
               <div className="absolute top-4 left-4 bg-black/70 text-white px-3 py-2 rounded-full text-sm font-medium z-20">
                 {currentImageIndex + 1} / {area.imagenes.length}
               </div>
@@ -299,11 +396,18 @@ export default function AreaModal({ area, onClose }) {
                         className="relative rounded-lg overflow-hidden group cursor-pointer"
                         onClick={() => navigate(`/canchacli/detalle/${cancha.idCancha}`)}
                       >
-                        <img
-                          src={cancha.urlImagen || "/defaults/cancha-default.jpg"}
-                          alt={cancha.nombre}
-                          className="w-full h-20 sm:h-24 object-cover transform group-hover:scale-105 transition duration-300"
-                        />
+                        {cargandoCanchas[cancha.idCancha] ? (
+                          <div className="w-full h-20 sm:h-24 bg-gray-700 flex items-center justify-center">
+                            <div className="text-white text-xs">Cargando...</div>
+                          </div>
+                        ) : (
+                          <img
+                            src={getCanchaImageUrl(cancha)}
+                            alt={cancha.nombre}
+                            className="w-full h-20 sm:h-24 object-cover transform group-hover:scale-105 transition duration-300"
+                            onError={(e) => handleCanchaImageError(e, cancha.idCancha)}
+                          />
+                        )}
                         <div className="absolute inset-0 bg-black/40 group-hover:bg-black/60 transition"></div>
                         <div className="absolute bottom-2 left-2 text-white text-[11px] sm:text-xs">
                           <p className="font-bold truncate max-w-[120px]">
