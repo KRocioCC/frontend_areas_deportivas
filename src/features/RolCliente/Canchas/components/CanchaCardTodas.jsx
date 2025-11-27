@@ -1,6 +1,6 @@
 // CanchaCardTodas.js
 import React, { useEffect, useState } from "react";
-import { Star, Heart, MapPin, Clock, Tag, CheckCircle } from "lucide-react";
+import { Star, Heart, MapPin, Clock, CheckCircle } from "lucide-react";
 import { getComentariosPorCancha } from "../../../../api/ComentarioApi";
 import { useNavigate } from "react-router-dom";
 
@@ -70,18 +70,55 @@ export default function CanchaCardTodas({ cancha, isDarkMode }) {
   const estadoCancha = "Abierto ahora"; // Puedes hacer lógica real con la hora actual
   // Ejemplo: const now = new Date(); const isOpen = ... 
 
+  // Obtener URL completa para imágenes (misma lógica usada en otros componentes)
+  const getUrlImagenCompleta = (raw) => {
+    if (!raw) return null;
+    if (raw.startsWith('http')) return raw;
+    return `http://localhost:8032${raw.startsWith('/') ? raw : '/' + raw}`;
+  };
+
+  // Primer imagen del vector de imágenes de la cancha, con fallback
+  const getImagenCancha = () => {
+    if (cancha?.imagenes && cancha.imagenes.length > 0) {
+      const primera = cancha.imagenes[0];
+      const raw = primera?.urlAcceso || primera?.url || '';
+      return getUrlImagenCompleta(raw);
+    }
+    // Fallback a propiedad simple si existe
+    return getUrlImagenCompleta(cancha?.urlImagen || '') || null;
+  };
+
+  const imagenUrl = getImagenCancha();
+
   return (
     <div
       className={`flex flex-col md:flex-row gap-4 p-4 rounded-xl border transition-all hover:shadow-lg cursor-pointer
       ${isDarkMode ? "bg-[#131617] border-[#1f2426]" : "bg-white border-gray-200"}`}
     >
-      {/* Imagen a la izquierda */}
+      {/* Imagen a la izquierda (primera del vector imagenes) */}
       <div className="md:w-1/3 w-full h-48 md:h-auto overflow-hidden rounded-lg">
-        <img
-          src={cancha.urlImagen}
-          alt={cancha.nombre}
-          className="w-full h-full object-cover"
-        />
+        {imagenUrl ? (
+          <img
+            src={imagenUrl}
+            alt={cancha.nombre}
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.style.display = 'none';
+              const fallback = document.createElement('div');
+              fallback.className = `w-full h-full flex items-center justify-center ${isDarkMode ? 'bg-[#0f1213]' : 'bg-gray-100'}`;
+              const span = document.createElement('span');
+              span.className = `text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`;
+              span.textContent = 'Error al cargar imagen';
+              fallback.appendChild(span);
+              e.target.parentElement.appendChild(fallback);
+            }}
+          />
+        ) : (
+          <div className={`w-full h-full flex items-center justify-center ${isDarkMode ? 'bg-[#0f1213]' : 'bg-gray-100'}`}>
+            <span className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>Sin imagen</span>
+          </div>
+        )}
       </div>
 
       {/* Contenido a la derecha */}
