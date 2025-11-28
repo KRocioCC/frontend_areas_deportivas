@@ -354,7 +354,7 @@ export default function CanchaDetalle() {
               Disciplina
             </button>
 
-            <button
+            {/*<button
               onClick={() => {
                 setIsEquipamientoOpen(true);
                 setActiveTab("equipamiento");
@@ -372,7 +372,7 @@ export default function CanchaDetalle() {
               }}
             >
               Equipamiento
-            </button>
+            </button>*/}
 
             <button
               onClick={() => {
@@ -485,40 +485,83 @@ export default function CanchaDetalle() {
         </div>
       </div>
 
-      <div id="disciplina-section" className={`mt-12 py-10 px-4 transition-colors duration-300 `} style={{ 
-        backgroundColor: isDarkMode ? '#0b0d0e' : '#e5ededff'
-      }}>
+      <div
+        id="disciplina-section"
+        className="mt-12 py-10 px-4 transition-colors duration-300"
+        style={{
+          backgroundColor: isDarkMode ? '#0b0d0e' : '#e5ededff'
+        }}
+      >
         <div className="max-w-4xl mx-auto">
+
+          {/* Título mejorado */}
           <h3
-            className="text-xl font-semibold mb-6"
-            style={{ fontFamily: 'var(--font-Oswald)', color: textColor }}
+            className="text-2xl font-semibold mb-4 tracking-wide"
+            style={{
+              fontFamily: 'var(--font-Oswald)',
+              color: textColor,
+            }}
           >
-            Escoge tu Disciplina Favorita
+            Selecciona la disciplina que deseas practicar
           </h3>
+
+          {/* Texto guía */}
+          <p
+            className="text-sm mb-6 opacity-80"
+            style={{
+              fontFamily: 'var(--font-Balo)',
+              color: isDarkMode ? '#a0aec0' : '#4b5563'
+            }}
+          >
+            Para completar tu reserva debes elegir una disciplina disponible para esta cancha.
+          </p>
+
+          {/* Componente */}
           <DisciplinaCli canchaId={cancha.idCancha} onSelectDisciplina={setDisciplina} />
+
+          {/* Cuando selecciona disciplina */}
           {disciplina && (
-            <p className="mt-3 text-green-500 font-medium text-sm" style={{ color: accentColor }}>
-              ✓ {disciplina.nombre}
+            <p
+              className="mt-4 text-sm font-medium"
+              style={{
+                color: accentColor,
+                fontFamily: 'var(--font-Balo)'
+              }}
+            >
+              ✓ Has seleccionado: <strong>{disciplina.nombre}</strong>
             </p>
           )}
-          {error && <p className="text-sm mt-2" style={{ color: errorColor }}>{error}</p>}
 
-          <div className="mt-8 flex justify-center">
+          {/* Error */}
+          {error && (
+            <p
+              className="text-sm mt-3"
+              style={{ color: errorColor }}
+            >
+              {error}
+            </p>
+          )}
+
+          {/* Botón */}
+          <div className="mt-10 flex justify-center">
             <button
               onClick={handleReservar}
-              className={`px-8 py-3 rounded-lg font-semibold text-white shadow-md flex items-center justify-center gap-2 transition-all`}
+              className="px-8 py-3 rounded-lg font-semibold text-white shadow-md flex items-center justify-center gap-2 transition-all"
               style={{
                 fontFamily: 'var(--font-josefin)',
                 backgroundColor: disciplina ? errorColor : warningColor,
                 boxShadow: '0 4px 14px rgba(0,0,0,0.18)',
-                minWidth: '180px'
+                minWidth: '180px',
+                opacity: disciplina ? 1 : 0.8
               }}
             >
-              Reservar Ya
+              Reservar ahora
             </button>
           </div>
+
         </div>
       </div>
+
 
       <div id="opiniones-section" className="mt-16">
         <ComentariosCancha canchaId={cancha.idCancha} />
