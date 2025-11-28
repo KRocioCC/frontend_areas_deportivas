@@ -83,3 +83,34 @@ export async function obtenerComentarioConBloqueo(id) {
   const res = await api.get(`${API_URL}/${id}/lock`);
   return res.data;
 }
+
+export async function getComentariosPorClienteCancha(clienteId, canchaId) {
+  const res = await api.get(`${API_URL}/cliente/${clienteId}/cancha`, {
+    params: { canchaId }
+  });
+  return res.data;
+}
+export async function getComentariosMasRecientesCancha(canchaId, limite = 10) {
+  const res = await api.get(`${API_URL}/recientes/cancha`, {
+    params: { canchaId, limite }
+  });
+  return res.data;
+}
+export async function getComentariosMayorCalificacionCancha(canchaId, limite = 10) {
+  const res = await api.get(`${API_URL}/mayor-calificacion/cancha`, {
+    params: { canchaId, limite }
+  });
+  return res.data;
+}
+export async function getComentariosMayorCalificacionRecientesCancha(canchaId, limite = 10) {
+  const res = await api.get(`${API_URL}/mayor-calificacion-recientes/cancha`, {
+    params: { canchaId, limite }
+  });
+  return res.data;
+}
+export async function getComentariosPorCalificacionCancha(canchaId, calificacion) {
+  const res = await api.get(`${API_URL}/calificacion/${calificacion}/cancha`, {
+    params: { canchaId }
+  });
+  return res.data;
+}

@@ -5,9 +5,9 @@ import { motion } from "framer-motion";
 import {
   getComentariosPorCancha,
   createComentario,
-  getComentariosMasRecientes,
-  getComentariosPorCliente,
-  getComentariosPorCalificacion
+  getComentariosMasRecientesCancha,
+  getComentariosPorClienteCancha,
+  getComentariosPorCalificacionCancha
 } from "../../../api/ComentarioApi";
 import { useAuth } from "../../../auth/hooks/useAuth";
 import { useTheme } from "../../../context/ThemeContext";
@@ -120,15 +120,15 @@ export default function ComentariosCancha({ canchaId }) {
         if (filtro === "todos") {
           data = await getComentariosPorCancha(canchaId);
         } else if (filtro === "recientes") {
-          data = await getComentariosMasRecientes(canchaId);
+          data = await getComentariosMasRecientesCancha(canchaId, 10);
         } else if (filtro === "usuario") {
           if (!user) {
             showToast("Debes iniciar sesión para ver tus comentarios", "warning");
             return;
           }
-          data = await getComentariosPorCliente(user.id);
+          data = await getComentariosPorClienteCancha(user.id, canchaId);
         } else if (typeof filtro === "number") {
-          data = await getComentariosPorCalificacion(filtro);
+          data = await getComentariosPorCalificacionCancha(canchaId, filtro);
         }
         setComentarios(data);
       } catch (e) {
