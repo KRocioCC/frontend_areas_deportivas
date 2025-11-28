@@ -263,9 +263,9 @@ export default function HistorialReservaCli() {
   const getAccionesPorEstado = (estado) => {
     switch (estado) {
       case "PENDIENTE":
-        return ["Ver Pagos", "Detalle", "Cancelar"];
+        return ["Ver Pagos","Reprogramar","Detalle", "Cancelar"];
       case "CONFIRMADA":
-        return ["QR", "Detalle", "Ver Pagos"];
+        return ["QR","Invitados", "Detalle", "Ver Pagos"];
       case "CANCELADA":
         return ["Detalle"];
       default:
@@ -439,9 +439,6 @@ export default function HistorialReservaCli() {
           </div>
         </div>
 
-
-
-
         {/* Loading */}
         {loading && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
@@ -476,8 +473,6 @@ export default function HistorialReservaCli() {
           ))}
         </div>
       )}
-
-
         {/* No hay reservas */}
         {!loading && reservas.length === 0 && (
           <div className="text-center py-16">
@@ -589,6 +584,9 @@ export default function HistorialReservaCli() {
                         }
                         if (accion === "Cancelar") {
                           abrirCancelacion(r.idReserva);
+                        }
+                        if (accion === "Invitados") {
+                          navigate(`/reservas/${r.idReserva}/invitados/listar`);
                         }
                         // Puedes agregar más acciones aquí
                       }}

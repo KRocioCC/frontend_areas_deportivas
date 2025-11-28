@@ -18,17 +18,9 @@ export default function ReservaCliente() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
-
-
   const [loading, setLoading] = useState(true);
   const reserva = location.state?.reserva;
   const [clienteCompleto, setClienteCompleto] = useState(null);
-
-
-
-
-
-
 
   useEffect(() => {
     if (!currentUser?.idPersona) return;
@@ -64,21 +56,9 @@ export default function ReservaCliente() {
     navigate("/reservas/confirmacion", {
       state: { reserva: payload, cliente: clienteCompleto },
     });
-
-
-
-
-
   };
 
   if (loading) {
-
-
-
-
-
-
-
     return (
       <div className={`flex justify-center items-center min-h-screen ${isDarkMode ? 'bg-[#0f1213]' : 'bg-[#f2efeb]'}`}>
         <div className="text-center">
@@ -124,89 +104,50 @@ export default function ReservaCliente() {
           >
             Verifica tus datos
           </h2>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
           <div className={`rounded-2xl p-7 ${cardBg} ${borderColor} border shadow-sm`}>
-            {/* Foto de perfil */}
-            <div className="flex justify-center mb-6">
-              <div className="relative">
+            <div className="flex flex-col lg:flex-row items-center lg:items-start gap-6">
+              
+              {/* Datos del cliente */}
+              <div className="flex-1 space-y-3 order-2 lg:order-1">
+                <p>
+                  <span className="font-medium" style={{ color: textColor }}>Nombre:</span>{' '}
+                  <span style={{ color: secondaryText }}>
+                    {`${clienteCompleto.nombre} ${clienteCompleto.apellidoPaterno} ${clienteCompleto.apellidoMaterno}`}
+                  </span>
+                </p>
+                <p>
+                  <span className="font-medium" style={{ color: textColor }}>Correo:</span>{' '}
+                  <span style={{ color: secondaryText }}>{clienteCompleto.email}</span>
+                </p>
+                <p>
+                  <span className="font-medium" style={{ color: textColor }}>Fecha de nacimiento:</span>{' '}
+                  <span style={{ color: secondaryText }}>{clienteCompleto.fechaNacimiento || "No registrada"}</span>
+                </p>
+                <p>
+                  <span className="font-medium" style={{ color: textColor }}>Teléfono:</span>{' '}
+                  <span style={{ color: secondaryText }}>{clienteCompleto.telefono || "No registrado"}</span>
+                </p>
+              </div>
+
+              {/* Foto de perfil */}
+              <div className="relative order-1 lg:order-2 flex-shrink-0">
                 <img
                   src={clienteCompleto.urlImagen || "/defaults/user-default.jpg"}
                   alt="Foto del cliente"
-                  className="w-28 h-28 md:w-32 md:h-32 rounded-full object-cover"
-                  style={{ border: `4px solid ${accentColor}` }}
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = "/defaults/user-default.jpg";
-
-
-
-
-
-
-
-
-
-
-
-
-                  }}
+                  className="w-40 h-40 md:w-48 md:h-48 rounded-full object-cover border-4"
+                  style={{ borderColor: accentColor }}
+                  onError={(e) => { e.target.onerror = null; e.target.src = "/defaults/user-default.jpg"; }}
                 />
-
-
-
-
-
-
                 <button
-                  className="absolute bottom-1 right-1 bg-[#4b5563] dark:bg-[#2d3748] text-white p-1.5 rounded-full shadow-sm hover:scale-110 transition-transform"
+                  className="absolute bottom-2 right-2 bg-[#4b5563] dark:bg-[#2d3748] text-white p-2 rounded-full shadow-md hover:scale-110 transition-transform"
                   aria-label="Actualizar foto"
-
                 >
-                  <Camera size={14} />
+                  <Camera size={16} />
                 </button>
               </div>
-            </div>
 
-            {/* Datos del cliente */}
-            <div className="space-y-3">
-              <p>
-                <span className="font-medium" style={{ color: textColor }}>Nombre:</span>{' '}
-                <span style={{ color: secondaryText }}>
-                  {`${clienteCompleto.nombre} ${clienteCompleto.apellidoPaterno} ${clienteCompleto.apellidoMaterno}`}
-                </span>
-              </p>
-              <p>
-                <span className="font-medium" style={{ color: textColor }}>Correo:</span>{' '}
-                <span style={{ color: secondaryText }}>{clienteCompleto.email}</span>
-              </p>
-              <p>
-                <span className="font-medium" style={{ color: textColor }}>Fecha de nacimiento:</span>{' '}
-                <span style={{ color: secondaryText }}>{clienteCompleto.fechaNacimiento || "No registrada"}</span>
-              </p>
-              <p>
-                <span className="font-medium" style={{ color: textColor }}>Teléfono:</span>{' '}
-                <span style={{ color: secondaryText }}>{clienteCompleto.telefono || "No registrado"}</span>
-              </p>
             </div>
           </div>
-
 
           {/* Botones */}
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-10 pt-6 border-t" style={{ borderColor: isDarkMode ? '#2d3748' : '#e5e7eb' }}>
@@ -222,7 +163,6 @@ export default function ReservaCliente() {
             >
               <ChevronLeft size={16} /> Atrás
             </button>
-
             <div className="flex gap-3">
               <button
                 onClick={() => navigate("/login")}
@@ -234,7 +174,6 @@ export default function ReservaCliente() {
               >
                 <X size={16} /> Salir
               </button>
-
               <button
                 onClick={handleSiguiente}
                 className="flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-white transition-all duration-200"
@@ -248,12 +187,6 @@ export default function ReservaCliente() {
             </div>
           </div>
         </div>
-
-
-
-
-
-
       </div>
     </AnimacionTransicion>
   );

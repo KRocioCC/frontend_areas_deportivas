@@ -232,7 +232,7 @@ export default function ReservaConfirmacion() {
                   <div><strong>Nombre:</strong> {cancha.nombre}</div>
                   <div><strong>Área:</strong> {cancha.areaDeportiva?.nombreArea || "—"}</div>
                   <div><strong>Ubicación:</strong> {cancha.areaDeportiva?.latitud ?? "—"}, {cancha.areaDeportiva?.longitud ?? "—"}</div>
-                  <div><strong>Equipamiento:</strong> {cancha.equipamientos?.map(e => e.nombre).join(", ") || "Ninguno"}</div>
+                  {/*<div><strong>Equipamiento:</strong> {cancha.equipamientos?.map(e => e.nombre).join(", ") || "Ninguno"}</div>*/}
                 </div>
               </section>
 
@@ -244,7 +244,7 @@ export default function ReservaConfirmacion() {
                   Disciplina
                 </h4>
                 <div className="text-sm" style={{ color: isDarkMode ? "rgba(255,255,255,0.9)" : "#111827" }}>
-                  <div><strong>Nombre:</strong> {disciplina.nombre}</div>
+                  <div> {disciplina.nombre}</div>
                   {disciplina.descripcion && <div className="mt-1 text-xs text-gray-500">{disciplina.descripcion}</div>}
                 </div>
               </section>
@@ -323,9 +323,9 @@ export default function ReservaConfirmacion() {
               {/* Totales destacados */}
               <div className="mt-6 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
                 <div className="flex-1">
-                  <div className="text-xs" style={{ color: isDarkMode ? "rgba(255,255,255,0.7)" : "#6b7280" }}>
+                  {/*<div className="text-xs" style={{ color: isDarkMode ? "rgba(255,255,255,0.7)" : "#6b7280" }}>
                     Método de pago: En sitio / Transferencia
-                  </div>
+                  </div>*/}
                   <div className="text-xs mt-2" style={{ color: isDarkMode ? "rgba(255,255,255,0.6)" : "#6b7280" }}>
                     Al confirmar, se creará la reserva y se asociará automáticamente.
                   </div>

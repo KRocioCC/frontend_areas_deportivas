@@ -120,30 +120,6 @@ export default function DetalleReservaModal({ open, onClose, reserva, isDarkMode
                 </p>
               </div>
             </div>
-
-            {/* Pago */}
-            {pago && (
-              <div>
-                <h3 className="text-base font-semibold mb-2 flex items-center gap-1.5" style={{ fontFamily: "var(--font-Alumni)" }}>
-                  <CreditCard
-                    className={isDarkMode ? "text-[var(--color-p-2)]" : "text-[var(--color-pb-3)]"}
-                    size={16}
-                  />
-                  Pago
-                </h3>
-                <div
-                  className={`p-3 rounded-xl text-sm space-y-1.5 ${
-                    isDarkMode ? "bg-[#141717]" : "bg-[var(--color-pb-4)]"
-                  }`}
-                  style={{ fontFamily: "var(--font-Balo)" }}
-                >
-                  <p><b>Monto:</b> Bs {pago.monto || "—"}</p>
-                  <p><b>Método:</b> {pago.metodoPago || "—"}</p>
-                  <p><b>Estado:</b> {pago.estado || "—"}</p>
-                  <p><b>Transacción:</b> {pago.codigoTransaccion || "—"}</p>
-                </div>
-              </div>
-            )}
           </div>
         </div>
 

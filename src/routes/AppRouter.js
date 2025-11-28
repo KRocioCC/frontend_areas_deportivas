@@ -77,6 +77,7 @@ import SobreNosotros from "../features/RolCliente/Inicio/SobreNosotros/SobreNoso
 import ListadoCanchas from "../features/RolCliente/Canchas/ListadoCanchas.jsx";
 import PerfilCliente from "../features/RolCliente/MiPerfil/PerfilCLiente.jsx";
 import FormularioQrPublico from "../features/RolCliente/FormularioQrPublico.jsx";
+import ReservaInvitados from "../features/RolCliente/HistorialReserva/ReservaInvitados.jsx";
 function AppRouter() {
 
   const pageVariants = {
@@ -270,6 +271,18 @@ function AppRouter() {
                 </ProtectedRoute>
               }
             />
+
+            <Route
+              path="/reservas/:idReserva/invitados/listar"
+               element={
+                <ProtectedRoute requireCliente>
+                  <LayoutCliente>
+                    <ReservaInvitados />
+                  </LayoutCliente>
+                </ProtectedRoute>
+              }
+            />
+
 
             <Route
               path="/reservas/pagos/:idReserva/listar"

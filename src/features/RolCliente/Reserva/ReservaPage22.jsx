@@ -92,16 +92,29 @@ export default function ReservaPage() {
                   reserva.setFecha(d);
                 }}
               />
+              {!reserva.fecha && (
+                <div className="flex items-center justify-center text-center p-6 opacity-70">
+                  <p
+                    className="text-lg font-semibold"
+                    style={{ fontFamily: 'var(--font-Balo)', color: textColor }}
+                  >
+                    Selecciona una fecha para ver los horarios disponibles
+                  </p>
+                </div>
+              )}
+
               {reserva.fecha && (
                 <HorariosDisponibles
                   canchaId={canchaId}
                   fecha={reserva.fecha.toISOString().split("T")[0]}
                   onSelectRango={(seleccionados) => {
-                    console.log("Horarios seleccionados fin:", seleccionados);
+                    //console.log("Horarios seleccionados fin:", seleccionados);
                     setHorarios(seleccionados);
                   }}
                 />
               )}
+
+              
             </div>
 
             <div
