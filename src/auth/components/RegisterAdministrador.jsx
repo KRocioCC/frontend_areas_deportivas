@@ -8,13 +8,13 @@ const RegisterAdministrador = () => {
     username: '',
     password: '',
     email: '',
-    adminPassword: 'passwordadmin', // ← Añadir este campo con la contraseña ya validada
+    adminPassword: 'passwordadmin',
     nombre: '',
     apellidoPaterno: '',
     apellidoMaterno: '',
     telefono: '',
     fechaNacimiento: '',
-    urlImagen: '',
+    urlImagen: 'https://cdn-icons-png.flaticon.com/512/2942/2942813.png',
     direccion: '',
     cargo: 'Administrador general'
   });
@@ -164,10 +164,9 @@ const RegisterAdministrador = () => {
     setIsLoading(true);
 
     try {
-      // Asegurarnos de que adminPassword esté incluido en los datos enviados
       const datosEnvio = {
         ...formData,
-        adminPassword: 'passwordadmin' // ← Enviar la contraseña validada
+        adminPassword: 'passwordadmin'
       };
 
       console.log('Enviando datos:', datosEnvio);
@@ -214,7 +213,6 @@ const RegisterAdministrador = () => {
       <div className="container mx-auto px-4">
         <div className="max-w-2xl mx-auto">
           
-          {/* Header compacto */}
           <div className="text-center mb-6">
             <div className="mb-4">
               <img 
@@ -406,7 +404,7 @@ const RegisterAdministrador = () => {
                     className={getInputClassName('password').replace('py-2', 'py-2')}
                   />
                 </div>
-
+                {/*
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-300 mb-1">
                     URL de Imagen (Opcional)
@@ -420,6 +418,7 @@ const RegisterAdministrador = () => {
                     placeholder="https://ejemplo.com/imagen.jpg"
                   />
                 </div>
+                */}
               </div>
 
               {/* Campo oculto para adminPassword */}
