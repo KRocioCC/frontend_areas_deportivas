@@ -82,3 +82,14 @@ export async function crearUsuarioControlDesdeAdministrador(idAdmin, payload) {
   const res = await api.post(`${API_URL}/${idAdmin}/usuarios-control`, payload);
   return res.data;
 }
+
+
+export const crearUsuarioControlRegistro = async (userData) => {
+  try {
+    const response = await api.post('/auth/registro/usuario-control', userData);
+    return response.data;
+  } catch (error) {
+    console.error('Error al registrar usuario de control:', error);
+    throw error;
+  }
+};
