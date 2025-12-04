@@ -83,7 +83,81 @@ export async function crearUsuarioControlDesdeAdministrador(idAdmin, payload) {
   return res.data;
 }
 
+// Asignar usuario de control existente a un administrador
+export async function asignarUsuarioControlAAdministrador(adminId, usuarioControlId) {
+  const res = await api.post(`${API_URL}/${adminId}/usuarios-control/asignar/${usuarioControlId}`);
+  return res.data;
+}
 
+// NUEVO: Crear usuario y asignarlo automáticamente con una cancha
+export async function crearYAsignarUsuarioControlAAdministrador(adminId, userData) {
+  console.log(`🚀 INICIANDO PROCESO COMPLETO para admin ${adminId}`);
+  
+  try {
+    // PASO 1: Crear el usuario de control en el sistema
+    console.log("📤 Paso 1: Creando usuario en auth...");
+    const registroResponse = await api.post('/auth/registro/usuario-control', userData);
+    console.log("✅ Usuario creado en auth:", registroResponse.data);
+    
+    // Esperar un momento para que el backend procese
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // PASO 2: Buscar el usuario recién creado por email
+    console.log("🔍 Paso 2: Buscando usuario creado...");
+    const usuariosResponse = await api.get('/usuario_control');
+    const usuarios = usuariosResponse.data;
+    
+    const usuarioCreado = usuarios.find(u => u.email === userData.email);
+    
+    if (!usuarioCreado) {
+      throw new Error("No se encontró el usuario recién creado");
+    }
+    
+    console.log(`✅ Usuario encontrado: ID ${usuarioCreado.id}, Nombre: ${usuarioCreado.nombre}`);
+    
+    // PASO 3: Activar el usuario si está inactivo
+    if (usuarioCreado.estado === false) {
+      console.log("🔄 Activando usuario...");
+      await api.patch(`/api/usuario_control/${usuarioCreado.id}/estado?estado=true`);
+    }
+    
+    // PASO 4: Asignar el usuario al administrador (con cancha automática)
+    console.log(`🔗 Paso 3: Asignando usuario ${usuarioCreado.id} al admin ${adminId}...`);
+    const asignacionResponse = await api.post(`${API_URL}/${adminId}/usuarios-control/asignar/${usuarioCreado.id}`);
+    
+    console.log("✅ PROCESO COMPLETADO:", asignacionResponse.data);
+    
+    // Retornar toda la información
+    return {
+      ...asignacionResponse.data,
+      usuario: usuarioCreado,
+      authData: registroResponse.data,
+      username: userData.username,
+      password: userData.password,
+      idUsuario: usuarioCreado.id
+    };
+    
+  } catch (error) {
+    console.error("❌ Error en proceso completo:", error);
+    
+    // Si falla el proceso completo, al menos crear el usuario
+    if (error.response?.status === 404 || error.message.includes("No se encontró")) {
+      console.log("⚠️ Falló asignación automática, pero el usuario fue creado");
+      // Retornar al menos el éxito del registro
+      const registroResponse = await api.post('/auth/registro/usuario-control', userData);
+      return {
+        message: "Usuario creado. Asignación manual requerida.",
+        username: userData.username,
+        password: userData.password,
+        authData: registroResponse.data
+      };
+    }
+    
+    throw error;
+  }
+}
+
+// Función original de registro
 export const crearUsuarioControlRegistro = async (userData) => {
   try {
     const response = await api.post('/auth/registro/usuario-control', userData);
