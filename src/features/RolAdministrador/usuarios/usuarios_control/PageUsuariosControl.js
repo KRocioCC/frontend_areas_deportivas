@@ -231,46 +231,45 @@ export default function PageUsuariosControl() {
               </thead>
               <tbody>
                 {usuariosPaginados.length === 0 ? (
-                  <tr>
-                    <td colSpan="7" style={{ textAlign: "center" }}>
-                      Sin datos
-                    </td>
-                  </tr>
+                  <>
+                    <tr>
+                      <td colSpan="9" style={{ textAlign: "center" }}>
+                        Sin datos
+                      </td>
+                    </tr>
+                  </>
                 ) : (
                   usuariosPaginados.map((usuario, index) => (
                     <tr
                       key={usuario.id}
                       className={!usuario.estado ? "row-inactive" : ""}
                     >
-                      <td>{indiceInicio + index + 1}</td> {/* número de lista */}
+                      <td>{indiceInicio + index + 1}</td>
                       <td>{usuario.nombre}</td>
                       <td>{usuario.apaterno || "—"}</td>
                       <td>{usuario.amaterno || "—"}</td>
                       <td>{usuario.email}</td>
                       <td>{usuario.telefono}</td>
                       <td>{usuario.estado ? "Activo" : "Inactivo"}</td>
-                      <td>
-                        {usuario.canchas?.map(c => c.nombre).join(", ") || "—"}
-                      </td>
+                      <td>{usuario.canchas?.map(c => c.nombre).join(", ") || "—"}</td>
                       <td>
                         <button className="btn btn-sm" onClick={() => {
-                          console.log("✏️ Editar usuario:", usuario.id);
                           setSelectedUsuario(usuario);
                           setShowForm(true);
                         }}>
                           Editar
                         </button>
+
                         <button className="btn btn-sm" onClick={() => {
-                          console.log("🏟 Abrir canchas para:", usuario.id);
                           setSelectedUsuario(usuario);
                           setShowCanchasModal(true);
                         }}>
                           Canchas
                         </button>
+
                         <button
                           className="btn btn-sm btn-danger"
                           onClick={() => {
-                            console.log("🚫 Solicitar confirmación para desactivar:", usuario.id);
                             setUsuarioAEliminar(usuario);
                             setShowConfirm(true);
                           }}
@@ -283,6 +282,7 @@ export default function PageUsuariosControl() {
                   ))
                 )}
               </tbody>
+
             </table>
           </div>
 
